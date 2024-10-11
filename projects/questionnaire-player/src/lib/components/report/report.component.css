@@ -1,0 +1,151 @@
+/* General Layout */
+.header {
+    background-color: #f8f8f8;
+    padding: 10px;
+  }
+  
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .back-button {
+    background-color: #832215;
+    color: white;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+  }
+  
+  .report-container {
+    padding: 15px;
+  }
+  
+  .header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .filter-button {
+    background-color: #832215;
+    color: white;
+    padding: 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .questions-list {
+    margin-top: 15px;
+  }
+  
+  .question-card {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    padding: 15px;
+  }
+
+
+.question-card:hover {
+  border-left: solid 0.625rem #832215;
+}
+  
+  .question-header {
+    background-color: #f1f1f1;
+    padding: 10px;
+    border-radius: 3px;
+  }
+  
+  .evidence-section {
+    margin-top: 15px;
+  }
+  
+  .evidence-icons {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .iconList {
+    cursor: pointer;
+    font-size: 24px;
+  }
+  
+  .chip {
+    background-color: #007bff;
+    color: white;
+    padding: 5px;
+    border-radius: 3px;
+    margin-right: 5px;
+  }
+  
+  /* Modal Styles */
+  .modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  
+  .modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+  }
+  
+  .modal-content header {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .modal-content button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+  }
+  
+  .modal-content img,
+  .modal-content video,
+  .modal-content iframe {
+    width: 100%;
+    max-height: 500px;
+  }
+  
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  /* I have added from below */
+
+  .hrTag{
+    margin: 10px 0;
+    background-color: #832215;
+    height: 1px;
+  }
+
+  .heading{
+    font-size: large;
+  }
+
+  .questionTitle{
+    font-size: 1rem;
+  }
+  

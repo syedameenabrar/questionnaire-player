@@ -1,4 +1,5 @@
 import {
+  CUSTOM_ELEMENTS_SCHEMA,
   LOCALE_ID,
   NgModule,
 } from '@angular/core';
@@ -48,6 +49,7 @@ import { ApiInterceptor } from './services/api.interceptor';
 import { PrivacyPopupComponent } from './components/privacy-popup/privacy-popup.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import { ReportComponent } from './components/report/report.component';
 
 const MAT_CUSTOM_DATE_FORMATS = {
   parse: {
@@ -63,6 +65,7 @@ const MAT_CUSTOM_DATE_FORMATS = {
 };
 @NgModule({
   declarations: [
+    ReportComponent,
     MainWrapperComponent,
     MainComponent,
     TextInputComponent,
