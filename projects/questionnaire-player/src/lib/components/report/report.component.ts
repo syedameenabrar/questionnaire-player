@@ -7,6 +7,20 @@ import { MatDialog } from '@angular/material/dialog';
 import { ToastService } from '../../services/toast.service';
 import { catchError } from 'rxjs';
 import { ApiConfiguration } from '../../interfaces/questionnaire.type';
+import {
+  Chart,
+  PieController,
+  BarController,
+  ArcElement,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend
+} from 'chart.js';
+
+// Register Chart.js components
+Chart.register(PieController, BarController, ArcElement, BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 @Component({
   selector: 'lib-report',
@@ -79,6 +93,7 @@ export class ReportComponent implements OnInit {
     this.apiService.token = this.apiConfig.userAuthToken;
     this.apiService.solutionType = this.apiConfig.solutionType;
   }
+  
 
   loadSurveyReport(submissionId: string) {
     console.log("loadSurveyReport", submissionId);
@@ -107,56 +122,81 @@ export class ReportComponent implements OnInit {
             this.observationId = res?.result?.observationId;
             this.allQuestions = res?.result?.reportSections;
             this.reportDetails = this.processSurveyData(res?.result?.reportSections);
+            this.renderCharts(this.reportDetails); // Call the method to render charts
         });
 }
 
 processSurveyData(data: any[]): any[] {
-  const mapAnswersToLabels = (answers: any[], options: any[]) => {
-      return answers.map((answer: any) => {
-          // Check if the answer is a string before calling trim
-          if (typeof answer === 'string') {
-              const trimmedAnswer = answer.trim();
-              if (trimmedAnswer === '') {
-                  return 'No response is available';
-              }
+    const mapAnswersToLabels = (answers: any[], options: any[]) => {
+        return answers.map((answer: any) => {
+            if (typeof answer === 'string') {
+                const trimmedAnswer = answer.trim();
+                if (trimmedAnswer === '') {
+                    return 'No response is available';
+                }
 
-              const option = options?.find((opt: { value: any }) => opt.value === trimmedAnswer);
-              return option ? option.label : trimmedAnswer;
-          } 
-          // If the answer is not a string, return it as is
-          return answer;
-      });
-  };
+                const option = options?.find((opt: { value: any }) => opt.value === trimmedAnswer);
+                return option ? option.label : trimmedAnswer;
+            } 
+            return answer;
+        });
+    };
 
-  const processInstanceQuestions = (instance: any) => {
-      const processedInstance = { ...instance };
-      for (const key in processedInstance) {
-          if (key !== 'instanceIdentifier') {
-              processedInstance[key].answers = mapAnswersToLabels(
-                  processedInstance[key].answers,
-                  processedInstance[key].options
-              );
-              delete processedInstance[key].options;
-          }
-      }
-      return processedInstance;
-  };
+    const processInstanceQuestions = (instance: any) => {
+        const processedInstance = { ...instance };
+        for (const key in processedInstance) {
+            if (key !== 'instanceIdentifier') {
+                processedInstance[key].answers = mapAnswersToLabels(
+                    processedInstance[key].answers,
+                    processedInstance[key].options
+                );
+                delete processedInstance[key].options;
+            }
+        }
+        return processedInstance;
+    };
 
-  return data.map((question) => {
-      if (question.responseType === 'matrix' && question.instanceQuestions) {
-          const processedInstanceQuestions = question.instanceQuestions.map(processInstanceQuestions);
-          return { ...question, instanceQuestions: processedInstanceQuestions };
-      } else {
-          const processedQuestion = { ...question };
-          processedQuestion.answers = mapAnswersToLabels(question.answers, question.options);
-          delete processedQuestion.options;
-          return processedQuestion;
-      }
-  });
+    return data.map((question) => {
+        if (question.responseType === 'matrix' && question.instanceQuestions) {
+            const processedInstanceQuestions = question.instanceQuestions.map(processInstanceQuestions);
+            return { ...question, instanceQuestions: processedInstanceQuestions };
+        } else {
+            const processedQuestion = { ...question };
+            processedQuestion.answers = mapAnswersToLabels(question.answers, question.options);
+            delete processedQuestion.options;
+            return processedQuestion;
+        }
+    });
 }
 
+// Method to render charts using Chart.js
+renderCharts(reportDetails: any[]) {
+    reportDetails.forEach((question, index) => {
+        if (question.chart) {
+            const canvasId = `chart-${index}`;
+            let canvas = document.getElementById(canvasId) as HTMLCanvasElement;
+            if (!canvas) {
+                canvas = document.createElement('canvas');
+                canvas.id = canvasId;
+                document.body.appendChild(canvas);
+            }
 
+            // Set up chart options based on the chart type
+            const chartType = question.chart.type === 'horizontalBar' ? 'bar' : question.chart.type;
+            const chartOptions = question.chart.options || {};
+            if (chartType === 'bar' && question.chart.type === 'horizontalBar') {
+                chartOptions.indexAxis = 'y'; // Make the bar chart horizontal
+            }
 
+            // Initialize Chart.js
+            new Chart(canvas, {
+                type: chartType,
+                data: question.chart.data,
+                options: chartOptions
+            });
+        }
+    });
+}
   openDialog(url: string, type: string) {
     this.objectURL = url;
     this.objectType = type;

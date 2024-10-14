@@ -18,6 +18,11 @@
         <div class="question-header">
           <p class="questionTitle">{{qi + 1}}. {{ question.question }}</p>
         </div>
+        <canvas id="chart-{{qi}}"></canvas>
+        <!-- <canvas *ngIf="question.chart" id="chart-{{qi}}"></canvas> -->
+
+
+        <canvas *ngIf="question.chart" id="chart-{{qi}}"></canvas>
 
         <div class="question-content">
           <ng-container [ngSwitch]="question.responseType">
@@ -39,6 +44,7 @@
             <div *ngSwitchCase="'number'">
               <label>{{ question.answers[0] }}</label>
             </div>
+
             <div *ngSwitchCase="'matrix'">
               <ng-container *ngFor="let key of objectKeys(question.instanceQuestions[0]); let k = index">
                 <div class="matrix-item" *ngIf="key !== 'instanceIdentifier'">
@@ -51,6 +57,7 @@
 
                       <div *ngFor="let answer of instance[key].answers">
                         <span class="answer">{{ checkAnswerValue(answer) }}</span>
+
                       </div>
                     </div>
                   </div>
@@ -74,6 +81,7 @@
             </div>
           </div>
         </div>
+
       </div>
     </div>
 
