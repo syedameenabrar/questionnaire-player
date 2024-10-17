@@ -171,31 +171,29 @@ processSurveyData(data: any[]): any[] {
 
 // Method to render charts using Chart.js
 renderCharts(reportDetails: any[]) {
-    reportDetails.forEach((question, index) => {
-        if (question.chart) {
-            const canvasId = `chart-${index}`;
-            let canvas = document.getElementById(canvasId) as HTMLCanvasElement;
-            if (!canvas) {
-                canvas = document.createElement('canvas');
-                canvas.id = canvasId;
-                document.body.appendChild(canvas);
-            }
-
-            // Set up chart options based on the chart type
-            const chartType = question.chart.type === 'horizontalBar' ? 'bar' : question.chart.type;
-            const chartOptions = question.chart.options || {};
-            if (chartType === 'bar' && question.chart.type === 'horizontalBar') {
-                chartOptions.indexAxis = 'y'; // Make the bar chart horizontal
-            }
-
-            // Initialize Chart.js
-            new Chart(canvas, {
-                type: chartType,
-                data: question.chart.data,
-                options: chartOptions
-            });
+  console.log("Rendering charts for report details:", reportDetails); // Log report details to confirm data presence
+  reportDetails.forEach((question, index) => {
+    if (question?.chart) {
+      const canvasId = `chart-${index}`;
+      const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
+      console.log('canvas', canvas)
+      if (canvas) {
+        console.log(`Initializing chart for canvas id: ${canvasId}`);
+        const chartType = question?.chart?.type === 'horizontalBar' ? 'bar' : question?.chart?.type;
+        const chartOptions = question?.chart?.options || {};
+        if (chartType === 'bar' && question?.chart?.type === 'horizontalBar') {
+          chartOptions.indexAxis = 'y'; // Make the bar chart horizontal
         }
-    });
+        new Chart(canvas, {
+          type: chartType,
+          data: question?.chart?.data,
+          options: chartOptions
+        });
+      } else {
+        console.warn(`Canvas with id ${canvasId} not found!`);
+      }
+    }
+  });
 }
   openDialog(url: string, type: string) {
     this.objectURL = url;

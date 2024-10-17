@@ -18,11 +18,13 @@
         <div class="question-header">
           <p class="questionTitle">{{qi + 1}}. {{ question.question }}</p>
         </div>
-        <canvas id="chart-{{qi}}"></canvas>
+<div style="width: 200px;height: 200px;">
+  <canvas id="chart-{{qi}}"></canvas>
+
+</div>        <!-- <canvas *ngIf="question.chart" id="chart-{{qi}}"></canvas> -->
+
+
         <!-- <canvas *ngIf="question.chart" id="chart-{{qi}}"></canvas> -->
-
-
-        <canvas *ngIf="question.chart" id="chart-{{qi}}"></canvas>
 
         <div class="question-content">
           <ng-container [ngSwitch]="question.responseType">
