@@ -8,23 +8,26 @@
   <div class="report-container">
     <div class="header-container">
       <p class="heading">{{surveyName}}</p>
-      <mat-icon matTooltip="Filter" class="filter-button" (click)="openFilter()">tune</mat-icon>
+    </div>
+    <div class="buttons-left">
+      <button [ngClass]="{'border-bottom-button': observationType === 'questions'}" (click)="toggleObservationType('questions')" class="switch-buttons">Questions</button>
+      <button [ngClass]="{'border-bottom-button': observationType === 'criteria'}" (click)="toggleObservationType('criteria')" class="switch-buttons">Criteria</button>
     </div>
 
-    <hr class="hrTag">
+    <hr>
+    <div class="buttons-right">
+      <button (click)="openFilter()" class="apply-filter">Filters</button>
+      <button class="apply-filter">Export As</button>
+    </div>
 
     <div class="questions-list">
       <div *ngFor="let question of reportDetails; let qi = index" class="question-card">
         <div class="question-header">
           <p class="questionTitle">{{qi + 1}}. {{ question.question }}</p>
         </div>
-<div style="width: 200px;height: 200px;">
-  <canvas id="chart-{{qi}}"></canvas>
-
-</div>        <!-- <canvas *ngIf="question.chart" id="chart-{{qi}}"></canvas> -->
-
-
-        <!-- <canvas *ngIf="question.chart" id="chart-{{qi}}"></canvas> -->
+        <div class="canvas-chart" *ngIf="isChartNotEmpty(question?.chart)">
+          <canvas class="chart-canvas"></canvas>
+        </div>
 
         <div class="question-content">
           <ng-container [ngSwitch]="question.responseType">
@@ -90,7 +93,7 @@
     <div *ngIf="isFilterModalOpen" class="modal">
       <div class="modal-content">
         <header>
-          <h2>Questions</h2>
+          <h2>Select Questions to filter</h2>
           <mat-icon (click)="closeFilter()">close</mat-icon>
         </header>
         <div>
@@ -101,9 +104,9 @@
             </li>
           </ul>
         </div>
-        <footer>
-          <button (click)="applyFilter()">Apply Filter</button>
-          <button (click)="resetFilter()">Reset Filter</button>
+        <footer class="question-footer">
+          <button (click)="applyFilter()" class="apply-filter">Apply Filters</button>
+          <!-- <button (click)="resetFilter()">Reset Filter</button> -->
         </footer>
       </div>
     </div>

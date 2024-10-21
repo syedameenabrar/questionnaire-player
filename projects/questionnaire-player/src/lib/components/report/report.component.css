@@ -79,6 +79,7 @@
     padding: 5px;
     border-radius: 3px;
     margin-right: 5px;
+    line-height: 30px;
   }
   
   /* Modal Styles */
@@ -134,13 +135,6 @@
   }
 
   /* I have added from below */
-
-  .hrTag{
-    margin: 10px 0;
-    background-color: #832215;
-    height: 1px;
-  }
-
   .heading{
     font-size: large;
   }
@@ -149,3 +143,55 @@
     font-size: 1rem;
   }
   
+  .canvas-chart{
+    height: 300px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .question-footer{
+    display: flex;
+    justify-content: center;
+  }
+
+  .buttons-right{
+    display: flex;
+    justify-content: end;
+  }
+
+  .buttons-left{
+    display: flex;
+    justify-content: start;
+  }
+
+  /* .switch-buttons{
+    background-color: transparent;
+    color: grey;
+    margin: 5px;
+    border-color: #007bff;
+    border-bottom: 2px solid #007bff;
+  } */
+
+  .apply-filter{
+    border-radius: 20px;
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: #ffff;
+    margin: 5px;
+    border-color: #007bff;
+  }
+
+  .switch-buttons{
+    background: none;        
+    border: none;             
+    padding: 10px 20px;       
+    font-size: 16px;         
+    cursor: pointer;         
+    transition: border-color 0.3s;
+    margin-bottom: -9px;
+  }
+  
+  .border-bottom-button{
+    /* border-bottom-color: #0056b3; */
+    border-bottom: 2px solid #007BFF; 
+  }
