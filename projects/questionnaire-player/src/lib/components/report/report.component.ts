@@ -88,7 +88,7 @@ export class ReportComponent implements OnInit {
       "observation": true,
       "entityType": "school",
       "pdf": false,
-      "criteria": criteria
+      "criteriaWise": criteria
     };
 
     this.apiService.post(urlConfig.survey.reportUrl, payload)
@@ -103,14 +103,15 @@ export class ReportComponent implements OnInit {
         this.totalSubmissions = res?.result?.totalSubmissions;
         this.observationId = res?.result?.observationId;
         this.allQuestions = res?.result?.reportSections;
-        this.reportDetails = this.processSurveyData(res?.result?.reportSections);
+        this.reportDetails = this.processSurveyData(this.allQuestions);
         this.cdr.detectChanges();
         this.renderCharts(this.reportDetails);
       });
   }
 
-  processSurveyData(data: any[]): any[] {
+  processSurveyData(data: any): any[] {
     const mapAnswersToLabels = (answers: any[], options: any[]) => {
+
       return answers.map((answer: any) => {
         if (typeof answer === 'string') {
           const trimmedAnswer = answer.trim();
@@ -118,8 +119,8 @@ export class ReportComponent implements OnInit {
             return 'No response is available';
           }
 
-          const option = options?.find((opt: { value: any }) => opt.value === trimmedAnswer);
-          return option ? option.label : trimmedAnswer;
+          const option = options?.find((opt: { value: any }) => opt?.value === trimmedAnswer);
+          return option ? option?.label : trimmedAnswer;
         }
         return answer;
       });
@@ -139,17 +140,38 @@ export class ReportComponent implements OnInit {
       return processedInstance;
     };
 
-    return data.map((question) => {
-      if (question.responseType === 'matrix' && question.instanceQuestions) {
-        const processedInstanceQuestions = question.instanceQuestions.map(processInstanceQuestions);
-        return { ...question, instanceQuestions: processedInstanceQuestions };
-      } else {
-        const processedQuestion = { ...question };
-        processedQuestion.answers = mapAnswersToLabels(question.answers, question.options);
-        delete processedQuestion.options;
-        return processedQuestion;
-      }
-    });
+    if (this.observationType === 'questions') {
+      return data.map((question) => {
+
+        if (question.responseType === 'matrix' && question?.instanceQuestions) {
+          const processedInstanceQuestions = question?.instanceQuestions.map(processInstanceQuestions);
+          return { ...question, instanceQuestions: processedInstanceQuestions };
+        } else {
+          const processedQuestion = { ...question };
+
+          processedQuestion.answers = mapAnswersToLabels(question?.answers, question?.options);
+          delete processedQuestion?.options;
+          return processedQuestion;
+        }return
+      });
+    } else {
+
+       return data.map((criterias) => {
+        let criteria = criterias?.questionArray
+        return criteria.map((question) => {
+
+          if (question?.responseType === 'matrix' && question?.instanceQuestions) {
+            const processedInstanceQuestions = question?.instanceQuestions.map(processInstanceQuestions);
+            return { ...question, instanceQuestions: processedInstanceQuestions };
+          } else {
+            const processedQuestion = { ...question };
+            processedQuestion.answers = mapAnswersToLabels(question?.answers, question?.options);
+            delete processedQuestion?.options;
+            return processedQuestion;
+          }
+        });
+      });
+    }
   }
 
   renderCharts(reportDetails: any[]) {
