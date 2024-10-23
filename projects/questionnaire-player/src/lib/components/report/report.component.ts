@@ -36,7 +36,7 @@ export class ReportComponent implements OnInit {
   surveyName!: string;
   objectKeys = Object.keys;
   submissionId: any;
-  entityType:any;
+  entityType: any;
   @Input() apiConfig: ApiConfiguration;
   @Input({ transform: booleanAttribute }) angular = false;
   resultData = [];
@@ -83,7 +83,7 @@ export class ReportComponent implements OnInit {
   }
 
 
-  loadObservationReport(submissionId: string, criteria: boolean, pdf:boolean) {
+  loadObservationReport(submissionId: string, criteria: boolean, pdf: boolean) {
     this.resultData = [];
     this.surveyName = '';
     this.totalSubmissions = [];
@@ -96,6 +96,8 @@ export class ReportComponent implements OnInit {
     this.apiService.post(urlConfig.survey.reportUrl, payload)
       .pipe(
         catchError((err) => {
+          this.toaster.showToast(err?.error?.message, 'danger', 5000)
+
           throw new Error('Could not fetch the details');
         })
       )
@@ -107,7 +109,7 @@ export class ReportComponent implements OnInit {
         this.allQuestions = res?.result?.reportSections;
         this.reportDetails = this.processSurveyData(this.allQuestions);
         this.cdr.detectChanges();
-        this.objectType == 'questions' ? this.renderCharts(this.reportDetails,false): this.renderCharts(this.reportDetails,true);
+        this.objectType == 'questions' ? this.renderCharts(this.reportDetails, false) : this.renderCharts(this.reportDetails, true);
       });
   }
 
@@ -129,15 +131,16 @@ export class ReportComponent implements OnInit {
           if (trimmedAnswer === '') {
             return 'No response is available';
           }
-  
+
           const option = options?.find((opt: { value: any }) => opt?.value === trimmedAnswer);
           return option ? option?.label : trimmedAnswer;
         }
         return answer;
       });
     };
-  
+
     const processQuestion = (question: any) => {
+
       if (question?.responseType === 'matrix' && question?.instanceQuestions) {
         const processedInstanceQuestions = question?.instanceQuestions.map(processInstanceQuestions);
         return { ...question, instanceQuestions: processedInstanceQuestions };
@@ -148,8 +151,9 @@ export class ReportComponent implements OnInit {
         return processedQuestion;
       }
     };
-  
+
     const processInstanceQuestions = (instance: any) => {
+
       const processedInstance = { ...instance };
       for (const key in processedInstance) {
         if (key !== 'instanceIdentifier') {
@@ -162,7 +166,7 @@ export class ReportComponent implements OnInit {
       }
       return processedInstance;
     };
-  
+
     if (this.observationType === 'questions') {
       return data.map(processQuestion);
     } else {
@@ -171,12 +175,12 @@ export class ReportComponent implements OnInit {
       });
     }
   }
-  
+
 
   renderCharts(reportDetails: any[], isCriteria: boolean = false) {
     const flattenedReportDetails = isCriteria ? reportDetails.flat() : reportDetails;
     const canvases = document.querySelectorAll('.chart-canvas');
-  
+
     canvases.forEach((canvas, index) => {
       if (canvas instanceof HTMLCanvasElement) {
         const question = flattenedReportDetails[index];
@@ -187,7 +191,7 @@ export class ReportComponent implements OnInit {
             barThickness: 15,
             maxBarThickness: 20,
           }];
-  
+
           new Chart(canvas, {
             type: chartType,
             data: question?.chart?.data,
@@ -199,7 +203,7 @@ export class ReportComponent implements OnInit {
       }
     });
   }
-  
+
   private getChartOptions(chartType: string, isHorizontalBar: boolean): any {
     const options: any = {
       maintainAspectRatio: true,
@@ -215,7 +219,7 @@ export class ReportComponent implements OnInit {
         },
       }
     };
-  
+
     if (chartType === 'bar') {
       options.scales = {
         x: {
@@ -233,12 +237,12 @@ export class ReportComponent implements OnInit {
           }
         }
       };
-  
+
       if (isHorizontalBar) {
         options.indexAxis = 'y';
       }
     }
-  
+
     return options;
   }
 
@@ -277,7 +281,7 @@ export class ReportComponent implements OnInit {
     const questionsToProcess = this.filteredQuestions.length > 0 ? this.filteredQuestions : this.allQuestions;
     this.reportDetails = this.processSurveyData(questionsToProcess);
     this.cdr.detectChanges();
-    this.objectType == 'questions' ? this.renderCharts(this.reportDetails,false): this.renderCharts(this.reportDetails,true);
+    this.objectType == 'questions' ? this.renderCharts(this.reportDetails, false) : this.renderCharts(this.reportDetails, true);
     if (!reset && this.filteredQuestions.length === 0) {
       this.toaster.showToast('Select at least one question', 'danger');
     }
@@ -310,7 +314,7 @@ export class ReportComponent implements OnInit {
     type == 'questions' ? this.loadObservationReport(this.submissionId, false, false) : this.loadObservationReport(this.submissionId, true, false);
   }
 
-  downloadPDF(submissionId: string, criteria: boolean, pdf:boolean) {
+  downloadPDF(submissionId: string, criteria: boolean, pdf: boolean) {
 
     let payload = this.createPayload(submissionId, criteria, pdf);
 
