@@ -5,7 +5,8 @@
         "reportUrl":"/survey/v1/reports/fetch"
     },
     "observation":{
-        "details":"/samiksha/v1/surveys/details/?solutionId=",
+        "listing":"/survey/v1/solutions/targetedSolutions",
+        "details":"//v1/surveys/details/?solutionId=",
         "update":"/samiksha/v1/surveySubmissions/update/"
     },
     "presignedUrl":"/survey/v1/files/preSignedUrls"

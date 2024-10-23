@@ -49,7 +49,16 @@ import { ApiInterceptor } from './services/api.interceptor';
 import { PrivacyPopupComponent } from './components/privacy-popup/privacy-popup.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import { ObservationWrapperComponent } from './components/observation-wrapper/observation-wrapper.component';
+import { RouterModule , Routes, Router } from '@angular/router';
+import { MatGridListModule } from '@angular/material/grid-list';
+import {MatToolbarModule} from '@angular/material/toolbar';
+import { ListingComponent } from './components/listing/listing.component';
 import { ReportComponent } from './components/report/report.component';
+
+const routes: Routes = [
+  { path: 'observation', component: ObservationWrapperComponent }
+];
 
 const MAT_CUSTOM_DATE_FORMATS = {
   parse: {
@@ -84,7 +93,9 @@ const MAT_CUSTOM_DATE_FORMATS = {
     PaginatorComponent,
     SortKeysPipe,
     TextAreaComponent,
-    PrivacyPopupComponent
+    PrivacyPopupComponent,
+    ObservationWrapperComponent,
+    ListingComponent
     ],
   imports: [
     CommonModule,
@@ -107,9 +118,12 @@ const MAT_CUSTOM_DATE_FORMATS = {
     MatPaginatorModule,
     HttpClientModule,
     MatSnackBarModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatGridListModule,
+    MatToolbarModule,
+    RouterModule.forChild(routes)
     ],
-  exports: [],
+  exports: [RouterModule],
   providers: [
     {
       provide: MAT_DATE_FORMATS,
@@ -128,7 +142,8 @@ const MAT_CUSTOM_DATE_FORMATS = {
       provide:HTTP_INTERCEPTORS,
       useClass:ApiInterceptor,
       multi:true
-    }
+    },
+    Router
   ]
 })
 export class QuestionnairePlayerModule {}
