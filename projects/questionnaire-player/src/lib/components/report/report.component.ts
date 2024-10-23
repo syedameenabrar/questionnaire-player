@@ -2,7 +2,6 @@ import { booleanAttribute, ChangeDetectorRef, Component, Input, OnInit, SimpleCh
 import { Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import * as urlConfig from '../../constants/url-config.json';
-import { MatDialog } from '@angular/material/dialog';
 import { ToastService } from '../../services/toast.service';
 import { catchError } from 'rxjs';
 import { ApiConfiguration } from '../../interfaces/questionnaire.type';
@@ -37,12 +36,13 @@ export class ReportComponent implements OnInit {
   surveyName!: string;
   objectKeys = Object.keys;
   submissionId: any;
+  entityType:any;
   @Input() apiConfig: ApiConfiguration;
   @Input({ transform: booleanAttribute }) angular = false;
   resultData = [];
   totalSubmissions: any;
   observationId: any;
-  observationType: any = 'questions'
+  observationType: any = 'questions';
 
   constructor(
     private router: Router,
@@ -52,6 +52,14 @@ export class ReportComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    if (typeof this.apiConfig === 'string') {
+      try {
+        this.apiConfig = JSON.parse(this.apiConfig);
+        this.setApiService();
+      } catch (error) {
+        throw new Error('Invalid Assessment Structure', error);
+      }
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -60,22 +68,22 @@ export class ReportComponent implements OnInit {
       changes['apiConfig']
     ) {
       this.setApiService();
-      this.submissionId = "66e03d1cbe48d96e6842d25d";
-      this.setApiService();
-      if (this.submissionId) {
-        this.loadObservationReport(this.submissionId, false);
-      }
     }
   }
 
   setApiService() {
-    this.apiService.baseUrl = this.apiConfig.baseURL;
-    this.apiService.token = this.apiConfig.userAuthToken;
-    this.apiService.solutionType = this.apiConfig.solutionType;
+    this.apiService.baseUrl = this.apiConfig?.baseURL;
+    this.apiService.token = this.apiConfig?.userAuthToken;
+    this.apiService.solutionType = this.apiConfig?.solutionType;
+    this.submissionId = this.apiConfig?.solutionId;
+    this.entityType = this.apiConfig?.entityType;
+    if (this.submissionId) {
+      this.loadObservationReport(this.submissionId, false, false);
+    }
   }
 
 
-  loadObservationReport(submissionId: string, criteria: any) {
+  loadObservationReport(submissionId: string, criteria: boolean, pdf:boolean) {
     this.resultData = [];
     this.surveyName = '';
     this.totalSubmissions = [];
@@ -83,13 +91,7 @@ export class ReportComponent implements OnInit {
     this.allQuestions = [];
     this.reportDetails = [];
 
-    let payload = {
-      "submissionId": submissionId,
-      "observation": true,
-      "entityType": "school",
-      "pdf": false,
-      "criteriaWise": criteria
-    };
+    let payload = this.createPayload(submissionId, criteria, pdf);
 
     this.apiService.post(urlConfig.survey.reportUrl, payload)
       .pipe(
@@ -105,27 +107,48 @@ export class ReportComponent implements OnInit {
         this.allQuestions = res?.result?.reportSections;
         this.reportDetails = this.processSurveyData(this.allQuestions);
         this.cdr.detectChanges();
-        this.renderCharts(this.reportDetails);
+        this.objectType == 'questions' ? this.renderCharts(this.reportDetails,false): this.renderCharts(this.reportDetails,true);
       });
+  }
+
+  createPayload(submissionId: string, criteria: boolean, pdf: boolean): any {
+    return {
+      submissionId,
+      observation: true,
+      entityType: this.entityType,
+      pdf,
+      criteriaWise: criteria,
+    };
   }
 
   processSurveyData(data: any): any[] {
     const mapAnswersToLabels = (answers: any[], options: any[]) => {
-
       return answers.map((answer: any) => {
         if (typeof answer === 'string') {
           const trimmedAnswer = answer.trim();
           if (trimmedAnswer === '') {
             return 'No response is available';
           }
-
+  
           const option = options?.find((opt: { value: any }) => opt?.value === trimmedAnswer);
           return option ? option?.label : trimmedAnswer;
         }
         return answer;
       });
     };
-
+  
+    const processQuestion = (question: any) => {
+      if (question?.responseType === 'matrix' && question?.instanceQuestions) {
+        const processedInstanceQuestions = question?.instanceQuestions.map(processInstanceQuestions);
+        return { ...question, instanceQuestions: processedInstanceQuestions };
+      } else {
+        const processedQuestion = { ...question };
+        processedQuestion.answers = mapAnswersToLabels(question?.answers, question?.options);
+        delete processedQuestion?.options;
+        return processedQuestion;
+      }
+    };
+  
     const processInstanceQuestions = (instance: any) => {
       const processedInstance = { ...instance };
       for (const key in processedInstance) {
@@ -139,118 +162,32 @@ export class ReportComponent implements OnInit {
       }
       return processedInstance;
     };
-
+  
     if (this.observationType === 'questions') {
-      return data.map((question) => {
-
-        if (question.responseType === 'matrix' && question?.instanceQuestions) {
-          const processedInstanceQuestions = question?.instanceQuestions.map(processInstanceQuestions);
-          return { ...question, instanceQuestions: processedInstanceQuestions };
-        } else {
-          const processedQuestion = { ...question };
-
-          processedQuestion.answers = mapAnswersToLabels(question?.answers, question?.options);
-          delete processedQuestion?.options;
-          return processedQuestion;
-        }return
-      });
+      return data.map(processQuestion);
     } else {
-
-       return data.map((criterias) => {
-        let criteria = criterias?.questionArray
-        return criteria.map((question) => {
-
-          if (question?.responseType === 'matrix' && question?.instanceQuestions) {
-            const processedInstanceQuestions = question?.instanceQuestions.map(processInstanceQuestions);
-            return { ...question, instanceQuestions: processedInstanceQuestions };
-          } else {
-            const processedQuestion = { ...question };
-            processedQuestion.answers = mapAnswersToLabels(question?.answers, question?.options);
-            delete processedQuestion?.options;
-            return processedQuestion;
-          }
-        });
+      return data.map((criterias) => {
+        return criterias?.questionArray.map(processQuestion);
       });
     }
   }
+  
 
-  renderCharts(reportDetails: any[]) {
+  renderCharts(reportDetails: any[], isCriteria: boolean = false) {
+    const flattenedReportDetails = isCriteria ? reportDetails.flat() : reportDetails;
     const canvases = document.querySelectorAll('.chart-canvas');
-
+  
     canvases.forEach((canvas, index) => {
       if (canvas instanceof HTMLCanvasElement) {
-        const question = reportDetails[index];
+        const question = flattenedReportDetails[index];
         if (question?.chart) {
           const chartType = question?.chart?.type === 'horizontalBar' ? 'bar' : question?.chart?.type;
-          const chartOptions = question?.chart?.options || {};
-          if (chartType === 'bar' && question?.chart?.type === 'horizontalBar') {
-            chartOptions.indexAxis = 'y';
-            chartOptions.maintainAspectRatio = true;
-            chartOptions.scales = {
-              x: {
-                beginAtZero: true,
-                ticks: {
-                  autoSkip: false,
-                  maxRotation: 0,
-                  minRotation: 0
-                }
-              },
-              y: {
-                beginAtZero: true,
-                ticks: {
-                  autoSkip: false
-                }
-              }
-            };
-
-            chartOptions.plugins = {
-              datalabels: {
-                display: true,
-              },
-              legend: {
-                display: false,
-              },
-              tooltip: {
-                enabled: true
-              },
-            };
-          } else if (chartType === 'bar') {
-            chartOptions.maintainAspectRatio = true;
-            chartOptions.scales = {
-              x: {
-                beginAtZero: true,
-                ticks: {
-                  autoSkip: false,
-                  maxRotation: 0,
-                  minRotation: 0
-                }
-              },
-              y: {
-                beginAtZero: true,
-                ticks: {
-                  autoSkip: false
-                }
-              }
-            };
-            chartOptions.plugins = {
-              datalabels: {
-                display: true,
-              },
-              legend: {
-                display: false,
-              },
-              tooltip: {
-                enabled: true
-              },
-            };
-          }
-
+          const chartOptions = this.getChartOptions(chartType, question?.chart?.type === 'horizontalBar');
           chartOptions.datasets = [{
             barThickness: 15,
             maxBarThickness: 20,
           }];
-
-
+  
           new Chart(canvas, {
             type: chartType,
             data: question?.chart?.data,
@@ -261,6 +198,48 @@ export class ReportComponent implements OnInit {
         console.warn(`Element at index ${index} is not a canvas!`);
       }
     });
+  }
+  
+  private getChartOptions(chartType: string, isHorizontalBar: boolean): any {
+    const options: any = {
+      maintainAspectRatio: true,
+      plugins: {
+        datalabels: {
+          display: true,
+        },
+        legend: {
+          display: false,
+        },
+        tooltip: {
+          enabled: true
+        },
+      }
+    };
+  
+    if (chartType === 'bar') {
+      options.scales = {
+        x: {
+          beginAtZero: true,
+          ticks: {
+            autoSkip: false,
+            maxRotation: 0,
+            minRotation: 0
+          }
+        },
+        y: {
+          beginAtZero: true,
+          ticks: {
+            autoSkip: false
+          }
+        }
+      };
+  
+      if (isHorizontalBar) {
+        options.indexAxis = 'y';
+      }
+    }
+  
+    return options;
   }
 
   openDialog(url: string, type: string) {
@@ -297,7 +276,8 @@ export class ReportComponent implements OnInit {
 
     const questionsToProcess = this.filteredQuestions.length > 0 ? this.filteredQuestions : this.allQuestions;
     this.reportDetails = this.processSurveyData(questionsToProcess);
-
+    this.cdr.detectChanges();
+    this.objectType == 'questions' ? this.renderCharts(this.reportDetails,false): this.renderCharts(this.reportDetails,true);
     if (!reset && this.filteredQuestions.length === 0) {
       this.toaster.showToast('Select at least one question', 'danger');
     }
@@ -327,6 +307,21 @@ export class ReportComponent implements OnInit {
 
   toggleObservationType(type: any) {
     this.observationType = type;
-    type == 'questions' ? this.loadObservationReport(this.submissionId, false) : this.loadObservationReport(this.submissionId, true);
+    type == 'questions' ? this.loadObservationReport(this.submissionId, false, false) : this.loadObservationReport(this.submissionId, true, false);
+  }
+
+  downloadPDF(submissionId: string, criteria: boolean, pdf:boolean) {
+
+    let payload = this.createPayload(submissionId, criteria, pdf);
+
+    this.apiService.post(urlConfig.survey.reportUrl, payload)
+      .pipe(
+        catchError((err) => {
+          throw new Error('Could not fetch the details');
+        })
+      )
+      .subscribe((res: any) => {
+        this.openUrl(res?.result?.pdfUrl);
+      });
   }
 }

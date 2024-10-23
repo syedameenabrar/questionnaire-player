@@ -18,12 +18,12 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     window.addEventListener('message', this.receiveMessage.bind(this), false);
-    // this.assessment = mockData;
     this.apiConfig ={
       baseURL:'https://survey-dev.elevate-apis.shikshalokam.org',
       userAuthToken:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoyNzYsIm5hbWUiOiJWaW5vZEZpdmVhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhIiwic2Vzc2lvbl9pZCI6OTA1MCwib3JnYW5pemF0aW9uX2lkIjoxLCJyb2xlcyI6W3siaWQiOjE2LCJ0aXRsZSI6ImhlYWRfbWFzdGVyIiwibGFiZWwiOiJIZWFkIE1hc3RlciIsInVzZXJfdHlwZSI6MCwic3RhdHVzIjoiQUNUSVZFIiwib3JnYW5pemF0aW9uX2lkIjoyNCwidmlzaWJpbGl0eSI6IlBVQkxJQyJ9XX0sImlhdCI6MTcyOTU4ODEzNCwiZXhwIjoxNzI5Njc0NTM0fQ.F1G47kKy-F5-hvOtMc--LqBlcWEhLy1Tw8RVCc4czX4',
-      solutionId:'66f297a59e0e301dadc4d042',
-      solutionType:'survey'
+      solutionId:'66e03d1cbe48d96e6842d25d',
+      solutionType:'survey',
+      entityType:'school'
     }
   }
 

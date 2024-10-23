@@ -17,7 +17,8 @@
     <hr>
     <div class="buttons-right">
       <button (click)="openFilter()" class="apply-filter">Filters</button>
-      <button class="apply-filter">Export As PDF</button>
+      <button class="apply-filter"  (click)="downloadPDF(submissionId, observationType === 'questions' ? false : true, true)"
+      >Export As PDF</button>
     </div>
 
     <ng-container *ngIf="observationType === 'questions';else criteriaBlock">
@@ -93,10 +94,10 @@
     </ng-container>
     <ng-template #criteriaBlock>
       <div class="questions-list">
-        <div *ngFor="let questions of reportDetails" class="question-card">
+        <div *ngFor="let questions of reportDetails" class="question-card2">
           <h4>{{questions[0]?.criteriaName}}</h4>
 
-          <div *ngFor="let question of questions; let qi = index">
+          <div *ngFor="let question of questions; let qi = index" class="question-card2-hover">
           <div class="question-header">
             <p class="questionTitle">{{qi + 1}}. {{ question.question }}</p>
           </div>
@@ -177,13 +178,12 @@
           <ul>
             <li *ngFor="let question of allQuestions">
               <input type="checkbox" [(ngModel)]="question.selected">
-              <label>{{ question.question }}</label>
+              <label>{{ question?.question }}</label>
             </li>
           </ul>
         </div>
         <footer class="question-footer">
           <button (click)="applyFilter()" class="apply-filter">Apply Filters</button>
-          <!-- <button (click)="resetFilter()">Reset Filter</button> -->
         </footer>
       </div>
     </div>
