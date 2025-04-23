@@ -97,23 +97,6 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
       changes['apiConfig'].previousValue == undefined &&
       changes['apiConfig'].currentValue
     ) {
-      // this.evidence = JSON.parse(localStorage.getItem("evidence") || 'null');
-      // this.sections = JSON.parse(localStorage.getItem("sections") || 'null');
-      // this.questionnaireForm = JSON.parse(localStorage.getItem("questionnaireForm") || 'null');
-      // this.isExpired = JSON.parse(localStorage.getItem("isExpired") || 'null');
-      // this.assessment = JSON.parse(localStorage.getItem("assessment") || 'null');
-      // this.endDate = JSON.parse(localStorage.getItem("endDate") || 'null');
-      // let loadedFromStorage = localStorage.getItem("loaded");
-      // this.loaded = loadedFromStorage === 'true';
-      // console.log("typeOF",typeof(this.loaded ))
-  
-      // console.log("this.evidence",this.evidence);
-      // console.log("this.sections",this.sections);
-      // console.log("this.questionnaireForm",this.questionnaireForm);
-      // console.log("this.isExpired",this.isExpired);
-      // console.log("this.assessment",this.assessment);
-      // console.log("this.endDate",this.endDate);
-      // console.log("this.loaded",this.loaded);
 
 
 let isDataInlocalSotrage = this.checkAndMapLocalStorageDataToVariables();
@@ -155,7 +138,7 @@ return url
     let url = this.getQueryParms();
 
 let allObservations = JSON.parse(localStorage.getItem("allObservations") || '{}');
-// Add or update one observation
+
 
 allObservations[url] = {
   evidence: this.evidence,
@@ -190,8 +173,7 @@ localStorage.setItem("allObservations", JSON.stringify(allObservations));
 
     const allObservations = JSON.parse(localStorage.getItem("allObservations") || '{}');
     const currentObservation = allObservations[url];
-          console.log("currentObservation",currentObservation);
-
+        
     this.evidence = currentObservation?.evidence;
     this.sections = currentObservation?.sections;
     this.questionnaireForm = currentObservation?.questionnaireForm;
@@ -207,16 +189,14 @@ localStorage.setItem("allObservations", JSON.stringify(allObservations));
     })
 
     const formData = currentObservation?.questionnaireForm;
-    console.log("formData",formData)
-      // Dynamically add controls based on keys
+    
       for (const key of Object.keys(formData)) {
         this.questionnaireForm.addControl(key, this.fb.control(formData[key]));
       }
     
-      // Now patch the values (in case any are missing above)
+     
       this.questionnaireForm.patchValue(formData);
       this.loaded = true;
-      console.log("questionnaireForm",this.questionnaireForm)
     }
     return currentObservation ? true :false;
   }
@@ -272,7 +252,6 @@ localStorage.setItem("allObservations", JSON.stringify(allObservations));
         this.toaster.showNetworkToast('You are offline');
       } else {
         this.toaster.showNetworkToast('Back online!');
-        console.log('Back online!')
       }
     });
 
