@@ -33,6 +33,8 @@ import { Location } from '@angular/common';
 import { BackNavigationHandlerComponent } from '../../shared/components/pie-chart/back-navigation-handler/back-navigation-handler.component';
 import { Router } from '@angular/router';
 import { SharedService } from '../../services/shared.service';
+import { NetworkDetectorService } from '../../services/network-detector.service';
+import { QueryParamsService } from '../../services/queryParams.service';
 @Component({
   selector: 'lib-main-wrapper',
   templateUrl: './main-wrapper.component.html',
@@ -62,6 +64,7 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
   isExpired: boolean;
   @Input() saveQuestioner: boolean = false;
   subscription: Subscription;
+  isOnline: boolean = true;
 
   constructor(
     public fb: FormBuilder,
@@ -72,7 +75,9 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
     public location: Location,
     private renderer: Renderer2, private el: ElementRef,
     public router: Router,
-    private sharedService: SharedService
+    private sharedService: SharedService,
+    private networkService: NetworkDetectorService,
+    private queryParamsService: QueryParamsService, 
   ) {
     super(router, location);
 
@@ -92,8 +97,37 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
       changes['apiConfig'].previousValue == undefined &&
       changes['apiConfig'].currentValue
     ) {
+      // this.evidence = JSON.parse(localStorage.getItem("evidence") || 'null');
+      // this.sections = JSON.parse(localStorage.getItem("sections") || 'null');
+      // this.questionnaireForm = JSON.parse(localStorage.getItem("questionnaireForm") || 'null');
+      // this.isExpired = JSON.parse(localStorage.getItem("isExpired") || 'null');
+      // this.assessment = JSON.parse(localStorage.getItem("assessment") || 'null');
+      // this.endDate = JSON.parse(localStorage.getItem("endDate") || 'null');
+      // let loadedFromStorage = localStorage.getItem("loaded");
+      // this.loaded = loadedFromStorage === 'true';
+      // console.log("typeOF",typeof(this.loaded ))
+  
+      // console.log("this.evidence",this.evidence);
+      // console.log("this.sections",this.sections);
+      // console.log("this.questionnaireForm",this.questionnaireForm);
+      // console.log("this.isExpired",this.isExpired);
+      // console.log("this.assessment",this.assessment);
+      // console.log("this.endDate",this.endDate);
+      // console.log("this.loaded",this.loaded);
+
+
+let isDataInlocalSotrage = this.checkAndMapLocalStorageDataToVariables();
+
+  if(isDataInlocalSotrage){
+      alert("Using localstorage data");
+      
+        
+      }else{
       this.setApiService();
-      this.fetchDetails();
+      this.fetchDetails()
+  
+      }
+        
       if (this.sections?.length == 1) {
         this.setSection(this.sections[0].name);
         document.getElementById('observation-ion-toolbar').style.display = 'none'
@@ -106,6 +140,85 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
         this.submission('draft');
       }
     }
+  }
+
+  getQueryParms(){
+    this.queryParamsService.parseQueryParams();
+    
+let url = `observationId=${this.queryParamsService?.observationId}&entityId=${this.queryParamsService?.entityId}&submissionNumber=${this.queryParamsService?.submissionNumber}&evidenceCode=${this.queryParamsService?.evidenceCode}&index=${this.queryParamsService?.index}`;
+    
+return url
+
+  }
+
+  setDataInLocalStorage(){
+    let url = this.getQueryParms();
+
+let allObservations = JSON.parse(localStorage.getItem("allObservations") || '{}');
+// Add or update one observation
+
+allObservations[url] = {
+  evidence: this.evidence,
+  sections: this.sections,
+  questionnaireForm: this.questionnaireForm.value, 
+  isExpired: this.isExpired,
+  endDate: this.endDate,
+  assessment: this.assessment
+
+};
+
+localStorage.setItem("allObservations", JSON.stringify(allObservations));
+
+
+
+        alert('Saved offline! Please save & submit it when online.');
+
+  }
+
+  deleteDataFromLocalStorage(){
+    let url = this.getQueryParms();
+
+    const allObservations = JSON.parse(localStorage.getItem("allObservations") || '{}');
+
+delete allObservations[url]; // Remove the specific observation
+
+localStorage.setItem("allObservations", JSON.stringify(allObservations));
+  }
+
+  checkAndMapLocalStorageDataToVariables(){
+    let url = this.getQueryParms();
+
+    const allObservations = JSON.parse(localStorage.getItem("allObservations") || '{}');
+    const currentObservation = allObservations[url];
+          console.log("currentObservation",currentObservation);
+
+    this.evidence = currentObservation?.evidence;
+    this.sections = currentObservation?.sections;
+    this.questionnaireForm = currentObservation?.questionnaireForm;
+    this.isExpired = currentObservation?.isExpired;
+    this.assessment = currentObservation?.assessment;
+    this.endDate = currentObservation?.endDate;
+
+    if(currentObservation){
+    this.questionnaireForm = this.fb.group({});
+    
+    this.questionnaireForm.valueChanges.subscribe((data: any) => {
+      this.checkFormValidity();
+    })
+
+    const formData = currentObservation?.questionnaireForm;
+    console.log("formData",formData)
+      // Dynamically add controls based on keys
+      for (const key of Object.keys(formData)) {
+        this.questionnaireForm.addControl(key, this.fb.control(formData[key]));
+      }
+    
+      // Now patch the values (in case any are missing above)
+      this.questionnaireForm.patchValue(formData);
+      this.loaded = true;
+      console.log("questionnaireForm",this.questionnaireForm)
+    }
+    return currentObservation ? true :false;
   }
 
   setApiService() {
@@ -152,11 +265,28 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
   }
 
   ngOnInit() {
+
+    this.networkService.getNetworkStatus().subscribe(status => {
+      this.isOnline = status;
+      if (!status) {
+        this.toaster.showNetworkToast('You are offline');
+      } else {
+        this.toaster.showNetworkToast('Back online!');
+        console.log('Back online!')
+      }
+    });
+
+let isDataInlocalSotrage = this.checkAndMapLocalStorageDataToVariables();
+
+
     if (typeof this.apiConfig === 'string') {
       try {
         this.apiConfig = JSON.parse(this.apiConfig);
-        this.setApiService();
-        this.fetchDetails()
+
+if(!isDataInlocalSotrage){
+    this.setApiService();
+    this.fetchDetails()
+    }
        
       } catch (error) {
         throw new Error('Invalid Assessment Structure', error);
@@ -167,10 +297,14 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
       document.getElementById('observation-ion-toolbar').style.display = 'none'
       this.listing = false;
     }
+
+
     this.questionnaireForm = this.fb.group({});
+    
     this.questionnaireForm.valueChanges.subscribe((data: any) => {
       this.checkFormValidity();
     })
+
     if (this.sections?.length == 1) {
     document.getElementById('observation-ion-toolbar').style.display = 'none'
     }
@@ -364,6 +498,7 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
         }
       }
     }
+    if (navigator.onLine) {
     this.apiService
       .post(
         `${urlConfig[this.apiConfig.solutionType].update}${this.assessment.assessment.submissionId}`,
@@ -397,6 +532,7 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
                 }
               }
             } else {
+              this.deleteDataFromLocalStorage();
               const footer = this.el.nativeElement.querySelector('.footer-buttons');
               this.renderer.setStyle(footer, 'display', 'none');
               this.toaster.showToast(`Your ${this.apiConfig.solutionType} has been submitted successfully.`, 'success', 5000);
@@ -405,6 +541,10 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
           }
         }
       });
+    }
+      else {
+        this.setDataInLocalStorage();
+      }
   }
 
   async openAlert(alertDialogConfig) {
