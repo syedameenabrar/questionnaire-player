@@ -35,6 +35,7 @@ import { Router } from '@angular/router';
 import { SharedService } from '../../services/shared.service';
 import { NetworkDetectorService } from '../../services/network-detector.service';
 import { QueryParamsService } from '../../services/queryParams.service';
+import { DbService } from '../../services/db/db.service';
 @Component({
   selector: 'lib-main-wrapper',
   templateUrl: './main-wrapper.component.html',
@@ -77,7 +78,8 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
     public router: Router,
     private sharedService: SharedService,
     private networkService: NetworkDetectorService,
-    private queryParamsService: QueryParamsService, 
+    private queryParamsService: QueryParamsService,
+    private db: DbService
   ) {
     super(router, location);
 
@@ -90,7 +92,7 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
     }, '*');
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  async ngOnChanges(changes: SimpleChanges) {
     if (
       this.angular &&
       changes['apiConfig'] &&
@@ -98,19 +100,15 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
       changes['apiConfig'].currentValue
     ) {
 
+      let isDataInlocalSotrage = await this.checkAndMapIndexDbDataToVariables();
 
-let isDataInlocalSotrage = this.checkAndMapLocalStorageDataToVariables();
-
-  if(isDataInlocalSotrage){
-      alert("Using localstorage data");
-      
-        
-      }else{
-      this.setApiService();
-      this.fetchDetails()
-  
+      if (isDataInlocalSotrage) {
+        console.log("Using localstorage data")
+      } else {
+        this.setApiService();
+        this.fetchDetails()
       }
-        
+
       if (this.sections?.length == 1) {
         this.setSection(this.sections[0].name);
         document.getElementById('observation-ion-toolbar').style.display = 'none'
@@ -125,55 +123,38 @@ let isDataInlocalSotrage = this.checkAndMapLocalStorageDataToVariables();
     }
   }
 
-  getQueryParms(){
+  getQueryParms() {
     this.queryParamsService.parseQueryParams();
-    
-let url = `observationId=${this.queryParamsService?.observationId}&entityId=${this.queryParamsService?.entityId}&submissionNumber=${this.queryParamsService?.submissionNumber}&evidenceCode=${this.queryParamsService?.evidenceCode}&index=${this.queryParamsService?.index}`;
-    
-return url
-
+    let url = `observationId=${this.queryParamsService?.observationId}&entityId=${this.queryParamsService?.entityId}&submissionNumber=${this.queryParamsService?.submissionNumber}&evidenceCode=${this.queryParamsService?.evidenceCode}&index=${this.queryParamsService?.index}`;
+    return url
   }
 
-  setDataInLocalStorage(){
+  async setDataInIndexDb(){
     let url = this.getQueryParms();
+    let allObservations = {};
+    allObservations = {
+      evidence: this.evidence,
+      sections: this.sections,
+      questionnaireForm: this.questionnaireForm.value,
+      isExpired: this.isExpired,
+      endDate: this.endDate,
+      assessment: this.assessment
+    };
+    console.log("storing data in indexdb")
 
-let allObservations = JSON.parse(localStorage.getItem("allObservations") || '{}');
-
-
-allObservations[url] = {
-  evidence: this.evidence,
-  sections: this.sections,
-  questionnaireForm: this.questionnaireForm.value, 
-  isExpired: this.isExpired,
-  endDate: this.endDate,
-  assessment: this.assessment
-
-};
-
-localStorage.setItem("allObservations", JSON.stringify(allObservations));
-
-
-
-        alert('Saved offline! Please save & submit it when online.');
-
+    let data = {
+      key: url,
+      data: allObservations
+    }
+    await this.db.addData(data);
   }
 
-  deleteDataFromLocalStorage(){
+  async checkAndMapIndexDbDataToVariables() {
     let url = this.getQueryParms();
+    let indexdbData = await this.db.getData(url);
+    let currentObservation = indexdbData?.data;
+    if (currentObservation) {
 
-    const allObservations = JSON.parse(localStorage.getItem("allObservations") || '{}');
-
-delete allObservations[url]; // Remove the specific observation
-
-localStorage.setItem("allObservations", JSON.stringify(allObservations));
-  }
-
-  checkAndMapLocalStorageDataToVariables(){
-    let url = this.getQueryParms();
-
-    const allObservations = JSON.parse(localStorage.getItem("allObservations") || '{}');
-    const currentObservation = allObservations[url];
-        
     this.evidence = currentObservation?.evidence;
     this.sections = currentObservation?.sections;
     this.questionnaireForm = currentObservation?.questionnaireForm;
@@ -181,24 +162,81 @@ localStorage.setItem("allObservations", JSON.stringify(allObservations));
     this.assessment = currentObservation?.assessment;
     this.endDate = currentObservation?.endDate;
 
-    if(currentObservation){
-    this.questionnaireForm = this.fb.group({});
-    
-    this.questionnaireForm.valueChanges.subscribe((data: any) => {
-      this.checkFormValidity();
-    })
+      this.questionnaireForm = this.fb.group({});
 
-    const formData = currentObservation?.questionnaireForm;
-    
+      this.questionnaireForm.valueChanges.subscribe((data: any) => {
+        this.checkFormValidity();
+      })
+
+      const formData = currentObservation?.questionnaireForm;
+
       for (const key of Object.keys(formData)) {
         this.questionnaireForm.addControl(key, this.fb.control(formData[key]));
       }
-    
-     
+
+
       this.questionnaireForm.patchValue(formData);
       this.loaded = true;
     }
-    return currentObservation ? true :false;
+    return currentObservation ? true : false;
+  }
+
+  setDataInLocalStorage() {
+    let url = this.getQueryParms();
+    let allObservations = JSON.parse(localStorage.getItem("allObservations") || '{}');
+    allObservations[url] = {
+      evidence: this.evidence,
+      sections: this.sections,
+      questionnaireForm: this.questionnaireForm.value,
+      isExpired: this.isExpired,
+      endDate: this.endDate,
+      assessment: this.assessment
+    };
+    localStorage.setItem("allObservations", JSON.stringify(allObservations));
+    alert('Saved offline! Please save & submit it when online.');
+  }
+
+  deleteDataFromLocalStorage() {
+    let url = this.getQueryParms();
+
+    const allObservations = JSON.parse(localStorage.getItem("allObservations") || '{}');
+
+    delete allObservations[url]; // Remove the specific observation
+
+    localStorage.setItem("allObservations", JSON.stringify(allObservations));
+  }
+
+  checkAndMapLocalStorageDataToVariables() {
+    let url = this.getQueryParms();
+
+    const allObservations = JSON.parse(localStorage.getItem("allObservations") || '{}');
+    const currentObservation = allObservations[url];
+
+    this.evidence = currentObservation?.evidence;
+    this.sections = currentObservation?.sections;
+    this.questionnaireForm = currentObservation?.questionnaireForm;
+    this.isExpired = currentObservation?.isExpired;
+    this.assessment = currentObservation?.assessment;
+    this.endDate = currentObservation?.endDate;
+
+    if (currentObservation) {
+      this.questionnaireForm = this.fb.group({});
+
+      this.questionnaireForm.valueChanges.subscribe((data: any) => {
+        this.checkFormValidity();
+      })
+
+      const formData = currentObservation?.questionnaireForm;
+
+      for (const key of Object.keys(formData)) {
+        this.questionnaireForm.addControl(key, this.fb.control(formData[key]));
+      }
+
+
+      this.questionnaireForm.patchValue(formData);
+      this.loaded = true;
+    }
+    return currentObservation ? true : false;
   }
 
   setApiService() {
@@ -237,6 +275,8 @@ localStorage.setItem("allObservations", JSON.stringify(allObservations));
           this.isExpired = this.assessment.assessment.status == 'expired';
           this.sections = this.evidence.sections;
           this.loaded = true;
+          // this.setDataInLocalStorage();
+          this.setDataInIndexDb();
         } else {
           this.toaster.showToast('Something went wrong, Please try again later', 'danger', 5000)
         }
@@ -244,7 +284,7 @@ localStorage.setItem("allObservations", JSON.stringify(allObservations));
       });
   }
 
-  ngOnInit() {
+  async ngOnInit() {
 
     this.networkService.getNetworkStatus().subscribe(status => {
       this.isOnline = status;
@@ -255,18 +295,20 @@ localStorage.setItem("allObservations", JSON.stringify(allObservations));
       }
     });
 
-let isDataInlocalSotrage = this.checkAndMapLocalStorageDataToVariables();
+    // let isDataInlocalSotrage = this.checkAndMapLocalStorageDataToVariables();
+    let isDataInlocalSotrage = await this.checkAndMapIndexDbDataToVariables();
+
 
 
     if (typeof this.apiConfig === 'string') {
       try {
         this.apiConfig = JSON.parse(this.apiConfig);
 
-if(!isDataInlocalSotrage){
-    this.setApiService();
-    this.fetchDetails()
-    }
-       
+        if (!isDataInlocalSotrage) {
+          this.setApiService();
+          this.fetchDetails()
+        }
+
       } catch (error) {
         throw new Error('Invalid Assessment Structure', error);
       }
@@ -279,13 +321,13 @@ if(!isDataInlocalSotrage){
 
 
     this.questionnaireForm = this.fb.group({});
-    
+
     this.questionnaireForm.valueChanges.subscribe((data: any) => {
       this.checkFormValidity();
     })
 
     if (this.sections?.length == 1) {
-    document.getElementById('observation-ion-toolbar').style.display = 'none'
+      document.getElementById('observation-ion-toolbar').style.display = 'none'
     }
   }
 
@@ -477,7 +519,8 @@ if(!isDataInlocalSotrage){
         }
       }
     }
-    if (navigator.onLine) {
+    // this.setDataInLocalStorage();
+    this.setDataInIndexDb();
     this.apiService
       .post(
         `${urlConfig[this.apiConfig.solutionType].update}${this.assessment.assessment.submissionId}`,
@@ -520,10 +563,7 @@ if(!isDataInlocalSotrage){
           }
         }
       });
-    }
-      else {
-        this.setDataInLocalStorage();
-      }
+
   }
 
   async openAlert(alertDialogConfig) {
@@ -552,7 +592,7 @@ if(!isDataInlocalSotrage){
     this.sectionName = name;
     this.enableRelevantPage();
     document.getElementById('observation-ion-toolbar').style.display = 'none'
-    this.mainComponent.enableRelevantPage();
+    this.mainComponent?.enableRelevantPage();
     let sectionElements = document.getElementsByClassName('section-listing');
     if (sectionElements.length > 0) {
       for (let i = 0; i < sectionElements.length; i++) {
@@ -574,7 +614,7 @@ if(!isDataInlocalSotrage){
         (sectionElements[i] as HTMLElement).style.display = 'block';
       }
     }
-    if(this.sections.length == 1){
+    if (this.sections.length == 1) {
       this.location.back();
     }
   }
@@ -601,7 +641,7 @@ if(!isDataInlocalSotrage){
     if (this.apiConfig.solutionType == 'observation' && this.questionnaireForm.dirty) {
       this.saveQuestioner = true;
       this.submission('draft');
-      this.subscription.unsubscribe();
+      this.subscription?.unsubscribe();
       this.sharedService.updateValue(false);
       this.questionnaireForm.reset();
       document.getElementById('observation-ion-toolbar').style.display = 'block';
