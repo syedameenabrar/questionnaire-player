@@ -1,0 +1,115 @@
+<div *ngIf="loaded" class="wrapper">
+  <form [formGroup]="questionnaireForm" class="main custom-font">
+    <div *ngIf="!listing && sections?.length != 1" style="color: var(--primary-color);">
+      <h1  class="sesion-title">List of Sections</h1>
+      <hr style="height: 1px;background:var(--primary-color);"/>
+    </div>
+    <!-- <div *ngIf="listing && sections?.length" (click)="backToSectionListing()" class="d-flex flex-gap-10 header-shadow">
+      <mat-icon class="m-10 ml-16" style="font-size: x-large;">arrow_back</mat-icon>
+    </div> -->
+    <div *ngFor="let section of sections; let secId = index">
+      <div class="section-listing" [ngStyle]="{display:sections.length == 1 ? 'none':'block'}">
+        <mat-card (click)="setSection(section.name)" class="px-16 py-16 m-20" style="color: var(--primary-color);">
+          <mat-card-title>{{secId+1}}. {{section.name}}</mat-card-title>
+        </mat-card>
+      </div>
+        <span [id]="section.name" [ngStyle]="{display:sections.length == 1 ? 'block':'none'}">
+          <lib-main #mainComponent  [questions]="section.questions" [questionnaireForm]="questionnaireForm"
+          [isSubmitted]="evidence?.isSubmitted" [isExpired]="isExpired" [fileSizeLimit]="apiConfig.fileSizeLimit"
+          ></lib-main>
+        </span>
+    </div>
+  </form>
+  <ng-container *ngIf="sections?.length > 1;else showAllButtons">
+  <span class="sticky-footer" [ngClass]="{'bg-white': !listing}">
+    <hr class="partition" />
+    <div class="footer-buttons">
+    <div *ngIf="!evidence?.isSubmitted && !isExpired"
+      class="m-16 d-flex flex-ai-center flex-jc-space-between flex-dr flex-gap-30">
+      <div>
+        <mat-icon tabindex="0" (keydown)="($event.key == 'Enter' || $event.key == ' ') && getQuestionMap()" (click)="getQuestionMap()" matTooltip="Question Map" style="height: auto;width: auto;color: var(--primary-color);font-size: 40px;margin-left: 15px;">map</mat-icon>
+        <p class="question-map">Question Map</p>
+      </div>
+      <div class="d-flex flex-jc-space-between">
+        <button class="btn btn-outline-secondary" (click)="submission('draft')" *ngIf="listing">
+          Save
+        </button>
+        <button class="btn btn-primary" (click)="!questionnaireForm?.valid ? getQuestionMap() : submission('submit')" *ngIf="!listing && sections?.length > 1">
+        Submit
+        </button>
+      </div>
+    </div>
+  </div>
+  </span>
+</ng-container>
+
+<ng-template #showAllButtons>
+  <span class="sticky-footer">
+    <hr class="partition" />
+    <div class="footer-buttons">
+    <div *ngIf="!evidence?.isSubmitted && !isExpired"
+      class="m-16 d-flex flex-ai-center flex-jc-space-between flex-dr flex-gap-30">
+      <div>
+        <mat-icon tabindex="0" (keydown)="($event.key == 'Enter' || $event.key == ' ') && getQuestionMap()" (click)="getQuestionMap()" matTooltip="Question Map" style="height: auto;width: auto;color: var(--primary-color);font-size: 40px; margin-left: 15px;">map</mat-icon>
+        <p class="question-map">Question Map</p>
+      </div>
+    <div>
+      <button class="btn btn-outline-secondary" (click)="submission('draft')">
+        Save
+      </button>
+      <button class="btn btn-primary mr-2" (click)="!questionnaireForm?.valid ? getQuestionMap() : submission('submit')">
+        Submit
+      </button>
+    </div>
+    </div>
+    </div>
+  </span>
+</ng-template>
+
+</div>
+<div class="spinner-overlay" *ngIf="!loaded">
+  <mat-progress-spinner class="spinner" [color]="color" [mode]="mode" 
+      [strokeWidth]="strokeWidth">
+  </mat-progress-spinner>
+</div>
+<ng-template #questionMapModal>
+  <div style="padding: 0 4px;">
+    <div mat-dialog-title class="d-flex flex-dr flex-ai-center flex-gap-3 flex-jc-flex-start p-10"
+      style="color: var(--primary-color)">
+      Question Map
+    </div>
+    <mat-divider></mat-divider>
+    <div mat-dialog-content class="qmap">
+      <div class="d-flex flex-dr flex-w-wrap flex-gap-8" style="margin-bottom: 8px;">
+        <span style="color: #080808;"><span style="color: #A30000;font-size: 48px;vertical-align: bottom;">&#x2022;</span> Required & unanswered</span>
+        <span style="color: #080808;"><span style="color:#006600;font-size: 48px;vertical-align: bottom;">&#x2022;</span> Answered</span>
+        <span style="color: #080808;"><span style="color: #595959;font-size: 48px;vertical-align: bottom;">&#x2022;</span> Optional & unanswered</span>
+      </div>
+      <div *ngFor="let page of questionMap | sortKeys" style="padding: 4px;">
+        <ng-container *ngIf="questionMap[page].length">
+          <div class="d-flex" style="color: #080808;">
+            <div><mat-icon style="vertical-align: middle;">arrow_right</mat-icon></div>
+            <div class="d-flex flex-dc">
+              <ng-container *ngIf="!pageMsg.has(page) else pageWithMsg">{{page}}</ng-container>
+              <ng-template #pageWithMsg> {{page + ' (' + pageMsg.get(page) + ')'}} </ng-template>
+                <div class="d-flex flex-dr flex-gap-8 flex-w-wrap" style="margin: 12px 0;">
+                <ng-container *ngFor="let question of questionMap[page]">
+                  <button (click)="goToQuestion(question._id,question.pageIndex,question.sectionName)" mat-mini-fab [ngStyle]="{
+                  'background-color':question.validity
+                }">
+                    {{ question.questionNumber }}
+                  </button>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+    <div mat-dialog-actions class="d-flex flex-jc-space-around">
+      <button class="btn btn-primary" type="button" (click)="closeModal()">
+        Close
+      </button>
+    </div>
+  </div>
+</ng-template>

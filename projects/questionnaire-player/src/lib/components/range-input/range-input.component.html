@@ -1,0 +1,23 @@
+<div class="d-flex flex-ai-center flex-jc-center flex-dc flex-gap-16"
+  [formGroup]="questionnaireForm"
+  *ngIf="questionnaireForm?.contains(question._id)"
+>
+  <div class="range-value">{{ this.question.value }}</div>
+  <mat-slider class="d-flex flex-jc-center flex-ai-center"
+  style="width: 90%;"
+    [max]="options.max"
+    [min]="options.min"
+    [step]="options.step"
+    showTickMarks
+    discrete
+  >
+    <input
+      matSliderThumb
+      (valueChange)="onChange($event)"
+      [formControlName]="question?._id"
+      #slider
+    />
+  </mat-slider>
+</div>
+<mat-error *ngIf="questionnaireForm?.contains(question._id) && isTouched && !isValid">{{ getValidationMessage(question._id) }}</mat-error>
+

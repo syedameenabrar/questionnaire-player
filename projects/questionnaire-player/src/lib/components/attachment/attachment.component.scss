@@ -1,0 +1,72 @@
+input[type="file"] {
+  display: none;
+}
+
+label {
+  cursor: pointer;
+}
+
+.attachment-btn {
+  background-color: var(--secondary-btn-bg);
+  color:var(--primary-color);
+  border: solid var(--primary-color) 0.063rem;
+  border-radius: 0.25rem;
+  padding: 0px 1rem;
+  cursor: pointer;
+  min-width: 5.6rem;
+  min-height: 2.5rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  display: flex;
+}
+
+.upload-label{
+  color: var(--primary-color);
+}
+
+.iconList {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-direction: column-reverse;
+}
+
+.btn:hover {
+  background-color: var(--secondary-btn-hover-bg);
+}
+
+mat-icon.customizeIcon {
+  color: var(--primary-color);
+  height: unset !important;
+  width: unset !important;
+  font-size: 36px;
+  cursor: pointer;
+}
+
+.cancelIcon {
+  position: absolute;
+  cursor: pointer;
+  top: -10px;
+  right: -15px;
+  color: var(--error-color);
+}
+
+.close-btn{
+  color: rgb(150, 4, 4);
+  font-size: large;
+  z-index: -1;
+}
+
+
+.close-canle-btn{
+  position: absolute;
+  top: 0.625rem;
+  right: 0.5rem;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.row-wrap{
+  flex-wrap: wrap !important;
+}

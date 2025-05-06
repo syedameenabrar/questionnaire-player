@@ -1,0 +1,33 @@
+<div
+  [formGroup]="questionnaireForm"
+  *ngIf="questionnaireForm?.contains(question._id)"
+>
+  <span>
+    <mat-form-field appearance="outline" style="width: 100%;">
+      <input
+        libDateInputValidator
+        style="width: 100%;"
+        matInput
+        [min]="min"
+        [max]="max"
+        [formControlName]="question?._id"
+        [matDatepicker]="picker"
+        (dateChange)="onChange($event)"
+      />
+      <mat-datepicker-toggle
+        matIconSuffix
+        [for]="picker"
+        #panel
+      ></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+
+    <ng-container *ngIf="question?.autoCapture && !question?.value">
+      <button class="btn" (click)="autoCapture()">
+        {{ autoCaptureText }}
+      </button>
+    </ng-container>
+  </span>
+</div>
+<mat-error *ngIf="questionnaireForm?.contains(question._id) && isTouched && !isValid">{{ getValidationMessage(question._id) }}</mat-error>
+

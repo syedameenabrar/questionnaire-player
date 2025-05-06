@@ -1,0 +1,32 @@
+<div *ngIf="questionnaireForm?.contains(question._id)">
+  <div *ngFor="let o of options; let i = index" [formGroup]="questionnaireForm" style="display: flex;gap: 0.5rem;">
+    <div [formArrayName]="question._id">
+      <mat-checkbox
+        (change)="onChange(o.value, $event.checked, i)"
+        [formControlName]="i"
+      >
+        {{ o.label }}
+      </mat-checkbox>
+    </div>
+    <ng-container *ngIf="question?.options && question?.options[i]?.hint">
+      <button
+        mat-icon-button
+        style="color: var(--primary-color);"
+        aria-label="Icon-button with a lightbulb icon"
+        (click)="openDialog(i)"
+        matTooltip="Hint about the option"
+      >
+        <mat-icon>emoji_objects_outline</mat-icon>
+      </button>
+    </ng-container>
+  </div>
+</div>
+<mat-error *ngIf="questionnaireForm?.contains(question._id) && isTouched && !isValid">{{ getValidationMessage(question._id) }}</mat-error>
+
+
+<lib-dialog
+  [isDimmed]="isDimmed"
+  [hint]="hint"
+  [hintModalNote] = "hintModalNote"
+  (closeHintEmitter)="closeHint()"
+></lib-dialog>

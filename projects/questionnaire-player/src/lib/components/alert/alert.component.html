@@ -1,0 +1,34 @@
+<div class="paddingAllSide">
+  <ng-container *ngIf="data?.title">
+    <div
+      mat-dialog-title
+      class="d-flex flex-dr flex-ai-center flex-jc-flex-start flex-gap-3 py-0 px-10"
+      [ngStyle]="{'color': data.type == 'success' ? '#008000':'var(--primary-color)'}"
+    >
+      <mat-icon>info</mat-icon>{{ data?.title }}
+    </div>
+    <mat-divider></mat-divider>
+  </ng-container>
+
+  <h2 mat-dialog-content class="flex-ai-self-start">
+    {{ data?.message }}
+  </h2>
+  <div mat-dialog-actions class="d-flex flex-jc-space-around">
+    <button
+      *ngIf="data?.acceptLabel"
+      mat-dialog-close
+      class="btn btnMargin"
+      (click)="acceptDialog()"
+    >
+      {{ data.acceptLabel }}
+    </button>
+    <button
+      *ngIf="data?.cancelLabel"
+      mat-dialog-close
+      class="btn btnMargin" 
+      (click)="rejectDialog()"
+    >
+      {{ data.cancelLabel }}
+    </button>
+  </div>
+</div>

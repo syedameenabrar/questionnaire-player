@@ -1,0 +1,25 @@
+{
+  "name": "diksha-questionnaire-webcomponent",
+  "version": "1.0.1",
+  "description": "The webcomponent for the questionnaire library",
+  "main": "diksha-questionnaire-player-webcomponent.js",
+  "scripts": {
+    "test": "n"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/5Amogh/questionnaire-player.git"
+  },
+  "keywords": [
+    "webcomponent",
+    "questionnaire",
+    "angular",
+    "library"
+  ],
+  "author": "Amoghavarsh",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/5Amogh/questionnaire-player/issues"
+  },
+  "homepage": "https://github.com/5Amogh/questionnaire-player#readme"
+}

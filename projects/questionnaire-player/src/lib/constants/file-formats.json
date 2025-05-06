@@ -1,0 +1,25 @@
+{
+    "types": {
+        "image": [
+            "png",
+            "jpg",
+            "jpeg",
+            "image/png",
+            "image/jpg",
+            "image/jpeg"
+        ],
+        "video": [
+            "mp4",
+            "video/mp4"
+        ],
+        "audio": [
+        ],
+        "pdf": [
+            "pdf",
+            "application/pdf"
+        ],
+        "doc":[
+        ]
+    },
+    "limit": 50
+}

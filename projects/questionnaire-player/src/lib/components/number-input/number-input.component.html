@@ -1,0 +1,19 @@
+<mat-form-field
+  style="width: 100%;"
+  appearance="outline"
+  [formGroup]="questionnaireForm"
+  *ngIf="questionnaireForm?.contains(question._id)"
+>
+  <input
+    matInput
+    style="width: 100%;"
+    type="number"
+    [formControlName]="question?._id"
+    min="0"
+    [placeholder]="placeholder"
+    (change)="onChange($event)"
+    [value]="question.value"
+  />
+</mat-form-field>
+<mat-error *ngIf="questionnaireForm?.contains(question._id) && isTouched && !isValid">{{ getValidationMessage(question._id) }}</mat-error>
+

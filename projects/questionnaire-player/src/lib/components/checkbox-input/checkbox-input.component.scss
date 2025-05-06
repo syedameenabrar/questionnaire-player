@@ -1,0 +1,25 @@
+::ng-deep{
+    @media screen and (max-width:768px) {
+        mat-checkbox{
+            margin-bottom: 1rem !important;
+        }
+    }
+}
+
+mat-checkbox{
+    font-size: 0.875rem;
+    letter-spacing: 0.12;
+    line-height: 1.25rem;
+    font-weight: 700;
+    font-family: 'Lato', sans-serif;
+}
+
+.mat-mdc-icon-button.mat-mdc-button-base {
+    padding: 0rem;
+}
+.mat-mdc-icon-button {
+    padding: 0rem;
+}
+.mat-icon {
+    height: 1.875rem;
+}
