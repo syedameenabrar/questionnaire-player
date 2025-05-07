@@ -120,7 +120,7 @@ export class AttachmentComponent {
         const headers = new HttpHeaders({
           'Content-Type': 'multipart/form-data',
           "Access-Control-Allow-Origin":"*",
-          ...(response['result'].cloudStorage === "azure" ? { "x-ms-blob-type": "BlockBlob" } : {})
+           "x-ms-blob-type": "BlockBlob"
         });
         this.http
           .put(`${presignedUrlData.url}`, data.file, { headers })
@@ -139,7 +139,7 @@ export class AttachmentComponent {
             const obj: any = {
               name: data.name,
               url: `${presignedUrlData.url}`.split('?')[0],
-              previewUrl: presignedUrlData.getDownloadableUrl[0],
+              previewUrl: `${presignedUrlData.url}`.split('?')[0]
             };
             for (const key of Object.keys(presignedUrlData.payload)) {
               obj[key] = presignedUrlData['payload'][key];
