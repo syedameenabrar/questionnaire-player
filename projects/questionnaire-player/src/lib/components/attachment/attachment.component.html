@@ -12,7 +12,7 @@
     <ng-container [ngSwitch]="getFileType(file.name)">
       <div *ngSwitchCase="'image'" class="iconList">
         <mat-icon class="customizeIcon" matTooltip="View the uploaded image" matTooltipClass="tooltip"
-          (click)="showFilePreview(file.previewUrl, 'image')">image</mat-icon>
+          (click)="showFilePreview(file?.previewUrl || file?.file, 'image')">image</mat-icon>
         <mat-icon matTooltip="Remove the uploaded image" class="cancelIcon"
           (click)="deleteAttachment(i)">cancel</mat-icon>
       </div>

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { DataService } from '../data/data.service';
 import { ToastService } from '../toast.service';
-
+import { Subject } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
@@ -50,5 +50,13 @@ export class AttachmentService {
     }else{
       return false
     }
+  }
+
+  private triggerSubject = new Subject<void>();
+
+  trigger$ = this.triggerSubject.asObservable();
+
+  triggerMainWrapperComponent() {
+    this.triggerSubject.next();
   }
 }

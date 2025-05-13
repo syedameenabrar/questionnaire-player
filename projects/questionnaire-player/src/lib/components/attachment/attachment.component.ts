@@ -9,12 +9,12 @@ import { MatDialog } from '@angular/material/dialog';
 import { AlertComponent } from '../alert/alert.component';
 import { Observable } from 'rxjs/internal/Observable';
 import { types, limit } from '../../constants/file-formats.json';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { ApiService } from '../../services/api.service';
-import * as urlConfig from '../../constants/url-config.json';
-import { catchError } from 'rxjs/operators';
 import { PrivacyPopupComponent } from '../privacy-popup/privacy-popup.component';
 import { ToastService } from '../../services/toast.service';
+import { DbService } from '../../services/db/db.service';
+import { AttachmentService } from '../../services/attachment/attachment.service';
 @Component({
   selector: 'lib-attachment',
   templateUrl: './attachment.component.html',
@@ -37,9 +37,9 @@ export class AttachmentComponent {
   public isConsentGiven = false;
   constructor(
     private dialog: MatDialog,
-    private http: HttpClient,
-    private apiService: ApiService,
-    public toastService: ToastService
+    public toastService: ToastService,
+    private db: DbService,
+    private attachmentService: AttachmentService
   ) {}
 
   onKeydown(event: KeyboardEvent): void {
@@ -81,20 +81,13 @@ export class AttachmentComponent {
           submissionId: this.data.submissionId,
           file: files[index],
         };
-        const alertDialogConfig = {
-          title: null,
-          message: `File Uploading Please Wait...`,
-          acceptLabel: null,
-          cancelLabel: null,
-        };
-        this.openAlert(alertDialogConfig);
         this.fileUpload(fileDetails);
       }
     });
     event.target.value = '';
   }
 
-  fileUpload(data) {
+  async fileUpload(data) {
     let payload: any = {};
     payload['ref'] = 'survey';
     payload['request'] = {};
@@ -102,68 +95,44 @@ export class AttachmentComponent {
     payload['request'][submissionId] = {
       files: [data.name],
     };
-    this.apiService
-      .post(urlConfig.presignedUrl, payload)
-      .pipe(
-        catchError((err: any) => {
-          console.error('Unable to upload the file. Please try again', err);
-          this.fileUploadResponse = {
-            status: 400,
-            data: null,
-            question_id: data.question_id,
-          };
-          throw Error(err);
-        })
-      )
-      .subscribe((response: any) => {
-        const presignedUrlData = response['result'][submissionId].files[0];
-        const headers = new HttpHeaders({
-          'Content-Type': 'multipart/form-data',
-          "Access-Control-Allow-Origin":"*",
-           "x-ms-blob-type": "BlockBlob"
-        });
-        this.http
-          .put(`${presignedUrlData.url}`, data.file, { headers })
-          .pipe(
-            catchError((err) => {
-              console.error('Unable to upload the file. Please try again');
-              this.fileUploadResponse = {
-                status: 400,
-                data: null,
-                question_id: data.question_id,
-              };
-              throw Error(err);
-            })
-          )
-          .subscribe((cloudResponse: any) => {
-            const obj: any = {
-              name: data.name,
-              url: `${presignedUrlData.url}`.split('?')[0],
-              previewUrl: `${presignedUrlData.url}`.split('?')[0]
-            };
-            for (const key of Object.keys(presignedUrlData.payload)) {
-              obj[key] = presignedUrlData['payload'][key];
-            }
-            this.fileUploadResponse = {
-              status: 200,
-              data: obj,
-              question_id: data.question_id,
-            };
-            this.closeDialog();
+
+
+    let convertedFile = await this.attachmentService.convertTobase64(data.file)
+
+    let dataToAdd = {
+      key: data?.name,
+      data: convertedFile
+    }
+    this.db.addData(dataToAdd)
+    this.closeDialog();
+
+    let abc = {
+      ...data,
+      file: convertedFile,
+       isUploaded : false,
+     }
+
+
+     this.fileUploadResponse = {
+      status: 200,
+      data: data,
+      question_id: data.question_id,
+    };
             const alertDialogConfig = {
               message: 'File uploaded successfully!',
               acceptLabel: 'Ok',
               cancelLabel: null,
             };
-            this.data.files.push(this.fileUploadResponse.data);
+            this.data.files.push(abc);
+
             this.openAlert(alertDialogConfig);
-          });
-      });
+            this.attachmentService.triggerMainWrapperComponent();
   }
 
   filesTrackBy(index, file) {
     return file.url;
   }
+  
   getFileType(fileName) {
     const type = fileName.split('.').pop();
     for (const key of Object.keys(this.formats)) {
@@ -174,7 +143,9 @@ export class AttachmentComponent {
   }
 
   closeDialog() {
-    this.dialogRef.close();
+    if (this.dialogRef) {
+      this.dialogRef?.close();
+    }
   }
 
   async showFilePreview(url: any, type: string) {
@@ -257,6 +228,7 @@ export class AttachmentComponent {
       return;
     }
     this.data.files.splice(fileIndex, 1);
+    this.attachmentService.triggerMainWrapperComponent();
   }
   async handleFileUpload(questionId: string) {
     try {

@@ -48,15 +48,6 @@ export class ObservationDomainComponent extends BackNavigationHandlerComponent i
     this.submissionId = this.queryParamsService?.id;
     this.submissionNumber = this.queryParamsService?.submissionNumber;
 
-    let typeFromPreviousUrl = this.queryParamsService.typeFromPreviousUrl;
-    if (typeFromPreviousUrl == "questionnairePlayer") {
-      setTimeout(() => {
-        // this.getObservationByEntityId();
-      }, 1000);
-    } else {
-      // this.getObservationByEntityId()
-    }
-
     let isDataInIndexDb = await this.checkAndMapIndexDbDataToVariables();
 
     if (!isDataInIndexDb) {

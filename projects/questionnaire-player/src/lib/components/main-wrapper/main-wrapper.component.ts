@@ -27,7 +27,7 @@ import * as urlConfig from '../../constants/url-config.json';
 import { ToastService } from '../../services/toast.service';
 import { ThemePalette } from '@angular/material/core';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
-import { Observable, Subscribable, Subscription } from 'rxjs';
+import { firstValueFrom, Observable, Subscribable, Subscription } from 'rxjs';
 import { AlertComponent } from '../alert/alert.component';
 import { Location } from '@angular/common';
 import { BackNavigationHandlerComponent } from '../../shared/components/pie-chart/back-navigation-handler/back-navigation-handler.component';
@@ -35,6 +35,8 @@ import { Router } from '@angular/router';
 import { SharedService } from '../../services/shared.service';
 import { QueryParamsService } from '../../services/queryParams.service';
 import { DbService } from '../../services/db/db.service';
+import { AttachmentService } from '../../services/attachment/attachment.service';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 @Component({
   selector: 'lib-main-wrapper',
   templateUrl: './main-wrapper.component.html',
@@ -77,7 +79,10 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
     public router: Router,
     private sharedService: SharedService,
     private queryParamsService: QueryParamsService,
-    private db: DbService
+    private db: DbService,
+    private attachmentService: AttachmentService,
+    private http: HttpClient,
+
   ) {
     super(router, location);
   }
@@ -105,8 +110,8 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
 
       if (this.sections?.length == 1) {
         this.setSection(this.sections[0].name);
-        if(document.getElementById('observation-ion-toolbar')){
-          document.getElementById('observation-ion-toolbar').style.display = 'none' 
+        if (document.getElementById('observation-ion-toolbar')) {
+          document.getElementById('observation-ion-toolbar').style.display = 'none'
         }
         this.listing = false;
       }
@@ -137,7 +142,7 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
     }
     if (this.sections?.length == 1) {
       this.setSection(this.sections[0].name);
-      if(document.getElementById('observation-ion-toolbar')){
+      if (document.getElementById('observation-ion-toolbar')) {
         document.getElementById('observation-ion-toolbar').style.display = 'none'
       }
       this.listing = false;
@@ -147,6 +152,20 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
     this.questionnaireForm.valueChanges.subscribe((data: any) => {
       this.checkFormValidity();
     })
+
+    this.attachmentService.trigger$.subscribe(() => {
+      const evidenceData = this.questionnaireService.getEvidenceData(
+        this.evidence,
+        this.questionnaireForm.value
+      );
+
+      evidenceData['status'] = 'draft';
+      const submissionData = {
+        status: "draft",
+        ...evidenceData,
+      };
+      this.updateDataInIndexDb(submissionData);
+    });
   }
 
   getQueryParms() {
@@ -235,7 +254,7 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
       this.sections = this.evidence?.sections;
       if (this.sections?.length == 1) {
         this.setSection(this.sections[0].name);
-        if(document.getElementById('observation-ion-toolbar')){
+        if (document.getElementById('observation-ion-toolbar')) {
           document.getElementById('observation-ion-toolbar').style.display = 'none'
         }
         this.listing = false
@@ -443,9 +462,9 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
       if (this.sections[i].name !== this.sectionName) {
         this.domQuery(this.sections[i].name, 'none');
       }
-    } 
+    }
     this.domQuery(this.sectionName, 'block');
-    if(document.getElementById('observation-ion-toolbar')){
+    if (document.getElementById('observation-ion-toolbar')) {
       document.getElementById('observation-ion-toolbar').style.display = 'block'
     }
 
@@ -471,8 +490,54 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
     this.submitSurvey(submissionData);
   }
 
+  async submitImageToCloud(data): Promise<any> {
+    const payload: any = {
+      ref: 'survey',
+      request: {
+        [data.submissionId]: {
+          files: [data.name],
+        }
+      }
+    };
+
+    try {
+      const response: any = await firstValueFrom(
+        this.apiService.post(urlConfig.presignedUrl, payload)
+      );
+
+      const presignedUrlData = response.result[data.submissionId].files[0];
+      const headers = new HttpHeaders({
+        'Content-Type': 'multipart/form-data',
+        "x-ms-blob-type": "BlockBlob",
+      });
+
+      await firstValueFrom(
+        this.http.put(presignedUrlData.url, data.file, { headers })
+      );
+
+      const obj: any = {
+        name: data.name,
+        url: presignedUrlData.url.split('?')[0],
+        previewUrl: presignedUrlData.url.split('?')[0],
+        question_id: data.question_id,
+      };
+
+      for (const key of Object.keys(presignedUrlData.payload)) {
+        obj[key] = presignedUrlData.payload[key];
+      }
+
+      return obj;
+
+    } catch (err) {
+      console.error('Upload failed', err);
+      throw err;
+    }
+  }
+
+
   async submitSurvey(submissionData) {
     if (submissionData.status !== 'draft') {
+  
       if (!this.saveQuestioner) {
         const confirmationParams = {
           title: 'Confirmation',
@@ -482,15 +547,63 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
           acceptLabel: 'Confirm',
         };
         const response = await this.openAlert(confirmationParams);
-        if (!response) {
-          return;
+        if(response){
+          const answers = submissionData?.answers;
+  
+          for (let [qid, answerObj] of Object.entries(answers)) {
+            const answer = answerObj as { fileName?: any[] }; 
+            const files = answer.fileName || [];
+            for (let file of files) {
+              if (!file?.isUploaded) {
+                const storedFile: any = await this.db.getData(file?.name);
+                if (!storedFile || !storedFile.data) continue;
+        
+                const convertedFile = this.attachmentService.base64ToFile(storedFile.data);
+                file.file = convertedFile;
+        
+                const presignedUrlData: any = await this.submitImageToCloud(file);
+        
+                file.isUploaded = true;
+                file.previewUrl = presignedUrlData.url.split('?')[0];
+                file.url = presignedUrlData.url.split('?')[0];
+                file.file = "";
+        
+                this.updateDataInIndexDb(submissionData);
+              }
+            }
+          }
+          
         }
+        if (!response) return;
       }
-    }
-
-
-    this.updateDataInIndexDb(submissionData);
-    if (submissionData.status == 'draft') {
+    
+      this.apiService
+        .post(
+          `${urlConfig[this.apiConfig.solutionType].update}${this.assessment.assessment.submissionId}`,
+          { evidence: submissionData }
+        )
+        .pipe(
+          catchError((err) => {
+            this.toaster.showToast(err?.error?.message, 'danger', 5000);
+            throw new Error(`Update API has failed`);
+          })
+        )
+        .subscribe((res: any) => {
+          if (res.status === 200 && !this.saveQuestioner) {
+            this.formIsNotDirty();
+            const footer = this.el.nativeElement.querySelector('.footer-buttons');
+            this.renderer.setStyle(footer, 'display', 'none');
+            this.toaster.showToast(
+              `Your ${this.apiConfig.solutionType} has been submitted successfully.`,
+              'success',
+              5000
+            );
+            this.evidence.isSubmitted = true;
+          }
+        });
+    } else {
+      this.updateDataInIndexDb(submissionData);
+  
       if (!this.saveQuestioner) {
         this.formIsNotDirty();
         const confirmationParams = {
@@ -498,7 +611,7 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
           message: `Successfully your ${this.apiConfig.solutionType} has been saved. Do you want to continue?`,
           acceptLabel: 'Later',
           cancelLabel: 'Continue',
-          type: 'success'
+          type: 'success',
         };
         const response = await this.openAlert(confirmationParams);
         if (response) {
@@ -509,35 +622,9 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
           }
         }
       }
-
-    } else {
-
-      this.apiService
-        .post(
-          `${urlConfig[this.apiConfig.solutionType].update}${this.assessment.assessment.submissionId}`,
-          {
-            evidence: submissionData,
-          })
-        .pipe(
-          catchError((err) => {
-            this.toaster.showToast(err?.error?.message, 'danger', 5000)
-            throw new Error(`Update api has failed`);
-          })
-        )
-        .subscribe(async (res: any) => {
-          if (res.status == 200) {
-            if (!this.saveQuestioner) {
-              this.formIsNotDirty();
-              const footer = this.el.nativeElement.querySelector('.footer-buttons');
-              this.renderer.setStyle(footer, 'display', 'none');
-              this.toaster.showToast(`Your ${this.apiConfig.solutionType} has been submitted successfully.`, 'success', 5000);
-              this.evidence.isSubmitted = true;
-            }
-          }
-        });
     }
-
   }
+  
 
   async openAlert(alertDialogConfig) {
     const dialogRef = await this.dialog.open(AlertComponent, {
@@ -564,7 +651,7 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
   setSection(name: string) {
     this.sectionName = name;
     this.enableRelevantPage();
-    if(document.getElementById('observation-ion-toolbar')){
+    if (document.getElementById('observation-ion-toolbar')) {
       document.getElementById('observation-ion-toolbar').style.display = 'none'
     }
     this.mainComponent?.enableRelevantPage();
@@ -580,7 +667,7 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
   backToSectionListing() {
     this.listing = false;
     this.domQuery(this.sectionName, 'none');
-    if(document.getElementById('observation-ion-toolbar')){
+    if (document.getElementById('observation-ion-toolbar')) {
       document.getElementById('observation-ion-toolbar').style.display = 'block'
     }
     let sectionElements = document.getElementsByClassName('section-listing');
@@ -621,8 +708,8 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
       this.subscription?.unsubscribe();
       this.sharedService.updateValue(false);
       this.questionnaireForm.reset();
-      if(document.getElementById('observation-ion-toolbar')){
-        document.getElementById('observation-ion-toolbar').style.display= 'block';
+      if (document.getElementById('observation-ion-toolbar')) {
+        document.getElementById('observation-ion-toolbar').style.display = 'block';
       }
     }
   }
