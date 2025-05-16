@@ -13,7 +13,7 @@
         "searchEntities": "/survey/v1/observations/searchEntities?observationId=",
         "updateEntities":"/survey/v1/observations/updateEntities/",
         "observationSubmissions":"/survey/v1/observationSubmissions/list/",
-        "update":"/observationSubmissions/mlsurvey/v1/update/",
+        "update":"/assessment/observationSubmissions/mlsurvey/v1/update/",
         "create":"/survey/v1/observationSubmissions/create/",
         "refreshTokenUrl":"/user/v1/account/generateToken"
     },
