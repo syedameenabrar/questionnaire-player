@@ -176,7 +176,7 @@ img {
 .apply-filter {
   border-radius: 1.25rem;
   padding: 0.625rem 0.9375rem;
-  background-color: var(--color-primary);
+  background-color: var(--color-primary) !important;
   color: var(--color-light);
   margin: 0.3125rem;
   border-color: var(--color-secondary);;
