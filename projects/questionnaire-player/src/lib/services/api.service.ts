@@ -20,6 +20,7 @@ export class ApiService {
   public evidenceCode:any;
   public index:any;
   public fileSizeLimit:any;
+  public stateData:any;
 
   constructor(private http:HttpClient) { }
 

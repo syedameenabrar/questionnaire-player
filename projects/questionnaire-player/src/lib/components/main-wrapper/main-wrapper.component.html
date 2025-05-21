@@ -13,7 +13,11 @@
           <mat-card-title>{{secId+1}}. {{section.name}}</mat-card-title>
         </mat-card>
       </div>
-        <span [id]="section.name" [ngStyle]="{display:sections.length == 1 ? 'block':'none'}">
+      <span [id]="section.name" [ngStyle]="{
+        display: sections.length == 1 ? 'block' : 'none',
+        'pointer-events': !stateData?.isSurvey ? 'none' : 'auto',
+        opacity: !stateData?.isSurvey ? 0.6 : 1
+      }">
           <lib-main #mainComponent  [questions]="section.questions" [questionnaireForm]="questionnaireForm"
           [isSubmitted]="evidence?.isSubmitted" [isExpired]="isExpired" [fileSizeLimit]="apiConfig.fileSizeLimit"
           ></lib-main>
@@ -54,10 +58,13 @@
         <p class="question-map">Question Map</p>
       </div>
     <div>
-      <button class="btn btn-outline-secondary" (click)="submission('draft')">
+      <button class="btn btn-primary mr-2" *ngIf="!stateData?.isSurvey" (click)="start()">
+        Start
+      </button>
+      <button class="btn btn-outline-secondary" (click)="submission('draft')" *ngIf="stateData?.isSurvey">
         Save
       </button>
-      <button class="btn btn-primary mr-2" (click)="!questionnaireForm?.valid ? getQuestionMap() : submission('submit')">
+      <button class="btn btn-primary mr-2" *ngIf="stateData?.isSurvey" (click)="!questionnaireForm?.valid ? getQuestionMap() : submission('submit')">
         Submit
       </button>
     </div>

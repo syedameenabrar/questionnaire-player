@@ -67,6 +67,7 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
   @Input() saveQuestioner: boolean = false;
   subscription: Subscription;
   isOnline: boolean = true;
+  stateData:any;
 
   constructor(
     public fb: FormBuilder,
@@ -105,7 +106,7 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
       let isDataInlocalSotrage = await this.checkAndMapIndexDbDataToVariables();
       if (!isDataInlocalSotrage) {
         this.setApiService();
-        this.fetchDetails()
+        this.apiService.stateData ? this.getQuestions(this.apiService.stateData):this.fetchDetails();
       }
 
       if (this.sections?.length == 1) {
@@ -133,7 +134,7 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
 
         if (!isDataInlocalSotrage) {
           this.setApiService();
-          this.fetchDetails()
+          this.apiService.stateData ? this.getQuestions(this.apiService.stateData):this.fetchDetails();
         }
 
       } catch (error) {
@@ -281,6 +282,9 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
     this.apiService.index = this.apiConfig.index;
 
     this.apiService.profileData = this.apiConfig.profileData;
+    this.apiService.stateData = this.apiConfig.stateData;
+
+    this.stateData=this.apiConfig.stateData
   }
 
   fetchDetails() {
@@ -713,4 +717,51 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
       }
     }
   }
+
+
+
+  async start(){
+
+    const message = { type: 'START', data: this.stateData };
+
+    window.postMessage(message, '*');
+
+  }
+
+  getQuestions(data){
+
+    if(data?.isATargetedSolution === false){
+
+      this.toaster.showToast('Dear User, this Observation is not relevant for your subrole and location', 'danger', 5000)
+
+    }
+
+    this.assessment = this.questionnaireService.mapSubmissionToAssessment(
+
+      data
+
+    );
+
+    this.evidence = this.apiConfig?.solutionType == 'observation' ? this.assessment?.assessment?.evidences[+[this.apiConfig.index]] : this.assessment?.assessment?.evidences[0];
+
+    this.evidence.startTime = Date.now();
+
+    this.endDate = new Date(
+
+      new Date(this.assessment?.assessment?.endDate).getTime() +
+
+      new Date(this.assessment?.assessment?.endDate).getTimezoneOffset() *
+
+      60000
+
+    );
+
+    this.isExpired = this.assessment?.assessment?.status == 'expired';
+
+    this.sections = this.evidence?.sections;
+
+    this.loaded = true;
+
+  }
+
 }
