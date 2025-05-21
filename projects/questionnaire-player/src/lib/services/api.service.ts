@@ -66,7 +66,7 @@ export class ApiService {
     downloadFile(url: string) {
       this.http.get(url, { responseType: 'blob' })
         .subscribe(blob => {
-          saveAs(blob, `observation_report${Date.now()}`);
+          saveAs(blob, `observation_report${Date.now()}.pdf`);
         }, error => {
           console.error('Error downloading file:', error);
       });
