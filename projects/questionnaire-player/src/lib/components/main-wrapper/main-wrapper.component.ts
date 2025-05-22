@@ -718,14 +718,18 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
     }
   }
 
-
-
-  async start(){
-    if(!this.stateData?.isATargetedSolution){
-      this.toaster.showToast('Dear User, this Observation is not relevant for your subrole and location', 'danger', 5000)
-    }else{
+  async start() {
+    const { observationAsTask, isATargetedSolution } = this.stateData || {};
+  
+    if (observationAsTask || isATargetedSolution) {
       const message = { type: 'START', data: this.stateData };
       window.postMessage(message, '*');
+    } else {
+      this.toaster.showToast(
+        'Dear User, this Observation is not relevant for your subrole and location',
+        'danger',
+        5000
+      );
     }
   }
 
