@@ -721,11 +721,12 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
 
 
   async start(){
-
-    const message = { type: 'START', data: this.stateData };
-
-    window.postMessage(message, '*');
-
+    if(!this.stateData?.isATargetedSolution){
+      this.toaster.showToast('Dear User, this Observation is not relevant for your subrole and location', 'danger', 5000)
+    }else{
+      const message = { type: 'START', data: this.stateData };
+      window.postMessage(message, '*');
+    }
   }
 
   getQuestions(data){
