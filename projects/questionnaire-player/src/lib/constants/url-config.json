@@ -1,8 +1,9 @@
 {
     "survey":{
-        "details":"/surveys/mlsurvey/v1/details?solutionId=",
+        "details":"ml/survey/v1/surveys/details/",
         "update":"/survey/v1/surveySubmissions/update/",
-        "reportUrl":"/survey/v1/reports/fetch"
+        "reportUrl":"/reports/mlreports/v1/fetch",
+        "surveyVerifyLink":"/surveys/mlsurvey/v1/details/"
     },
     "observation":{
         "listing":"/survey/v1/solutions/targetedSolutions",
