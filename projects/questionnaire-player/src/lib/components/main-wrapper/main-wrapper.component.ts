@@ -67,7 +67,7 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
   @Input() saveQuestioner: boolean = false;
   subscription: Subscription;
   isOnline: boolean = true;
-  stateData:any;
+  stateData: any;
 
   constructor(
     public fb: FormBuilder,
@@ -106,7 +106,7 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
       let isDataInlocalSotrage = await this.checkAndMapIndexDbDataToVariables();
       if (!isDataInlocalSotrage) {
         this.setApiService();
-        this.apiService.stateData ? this.getQuestions(this.apiService.stateData):this.fetchDetails();
+        this.apiService.stateData ? this.getQuestions(this.apiService.stateData) : this.fetchDetails();
       }
 
       if (this.sections?.length == 1) {
@@ -134,7 +134,7 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
 
         if (!isDataInlocalSotrage) {
           this.setApiService();
-          this.apiService.stateData ? this.getQuestions(this.apiService.stateData):this.fetchDetails();
+          this.apiService.stateData ? this.getQuestions(this.apiService.stateData) : this.fetchDetails();
         }
 
       } catch (error) {
@@ -171,12 +171,20 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
 
   getQueryParms() {
     this.queryParamsService.parseQueryParams();
-    let queryParamsData = {
-      indexDbKey: `${this.queryParamsService?.submissionId}`,
-      evidenceCode: `${this.queryParamsService?.evidenceCode}`
+    const submissionId = this.queryParamsService?.submissionId;
+    const evidenceCode = this.queryParamsService?.evidenceCode;
+
+    if (!submissionId || !evidenceCode) {
+      // console.warn("Missing query parameters", { submissionId, evidenceCode });
+      return null;
     }
-    return queryParamsData
+
+    return {
+      indexDbKey: `${submissionId}`,
+      evidenceCode
+    };
   }
+
 
   async setDataInIndexDb() {
     const queryParamsData = this.getQueryParms();
@@ -198,10 +206,15 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
     const indexDbKey = queryParamsData?.indexDbKey;
     const evidenceCode = queryParamsData?.evidenceCode;
 
+    if (!indexDbKey || indexDbKey === 'undefined') {
+      // console.error("❌ INVALID indexDbKey detected:", indexDbKey);
+      return false;
+    }
+
     if (this.assessment.assessment.submissions[evidenceCode]) {
       this.assessment.assessment.submissions[evidenceCode].answers = updatedAnswers?.answers;
-      this.assessment.assessment.submissions[evidenceCode].status = updatedAnswers?.status == 'draft' ? 'draft' : 'submit';
-      this.assessment.assessment.evidences[+[this.apiConfig.index]].isSubmitted = updatedAnswers?.status == 'draft' ? false : true;
+      this.assessment.assessment.submissions[evidenceCode].status = updatedAnswers?.status === 'save' ? 'save' : 'draft';
+      this.assessment.assessment.evidences[+this.apiConfig.index].isSubmitted = updatedAnswers?.status === 'save' ? false : true;
     } else {
       this.assessment.assessment.submissions[evidenceCode] = {
         externalId: evidenceCode,
@@ -213,20 +226,24 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
         submittedByName: '',
         submissionDate: new Date().toISOString(),
         isValid: true,
-        status: updatedAnswers?.status == 'draft' ? 'draft' : 'submit'
+        status: updatedAnswers?.status === 'draft' ? 'draft' : 'submit'
       };
     }
 
     const data = {
       key: indexDbKey,
       data: this.assessment
-    }
+    };
+
     try {
       await this.db.updateData(data);
+      return true;
     } catch (error) {
       console.error("Failed to store data in IndexedDB", error);
+      return false;
     }
   }
+
 
   deleteFromIndexDb() {
     const queryParamsData = this.getQueryParms();
@@ -284,7 +301,7 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
     this.apiService.profileData = this.apiConfig.profileData;
     this.apiService.stateData = this.apiConfig.stateData;
 
-    this.stateData=this.apiConfig.stateData
+    this.stateData = this.apiConfig.stateData
   }
 
   fetchDetails() {
@@ -541,7 +558,7 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
 
   async submitSurvey(submissionData) {
     if (submissionData.status !== 'draft') {
-  
+
       if (!this.saveQuestioner) {
         const confirmationParams = {
           title: 'Confirmation',
@@ -551,36 +568,38 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
           acceptLabel: 'Confirm',
         };
         const response = await this.openAlert(confirmationParams);
-        if(response){
+        if (response) {
           const answers = submissionData?.answers;
-  
+
           for (let [qid, answerObj] of Object.entries(answers)) {
-            const answer = answerObj as { fileName?: any[] }; 
+            const answer = answerObj as { fileName?: any[] };
             const files = answer.fileName || [];
             for (let file of files) {
               if (!file?.isUploaded) {
                 const storedFile: any = await this.db.getData(file?.name);
                 if (!storedFile || !storedFile.data) continue;
-        
+
                 const convertedFile = this.attachmentService.base64ToFile(storedFile.data);
                 file.file = convertedFile;
-        
+
                 const presignedUrlData: any = await this.submitImageToCloud(file);
-        
+
                 file.isUploaded = true;
                 file.previewUrl = presignedUrlData.url.split('?')[0];
                 file.url = presignedUrlData.url.split('?')[0];
                 file.file = "";
-        
-                this.updateDataInIndexDb(submissionData);
+
+                await this.updateDataInIndexDb(submissionData);
               }
             }
           }
-          
+
         }
         if (!response) return;
       }
-    
+
+      const responseFromUpdateDataFunction = await this.updateDataInIndexDb(submissionData);
+      if (responseFromUpdateDataFunction) {
       this.apiService
         .post(
           `${urlConfig[this.apiConfig.solutionType].update}${this.assessment.assessment.submissionId}`,
@@ -605,10 +624,10 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
             this.evidence.isSubmitted = true;
           }
         });
+      }
     } else {
-      this.updateDataInIndexDb(submissionData);
-  
-      if (!this.saveQuestioner) {
+      const responseFromUpdateDataFunction = await this.updateDataInIndexDb(submissionData);
+      if (responseFromUpdateDataFunction && !this.saveQuestioner) {
         this.formIsNotDirty();
         const confirmationParams = {
           title: 'Success',
@@ -627,8 +646,9 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
         }
       }
     }
+
   }
-  
+
 
   async openAlert(alertDialogConfig) {
     const dialogRef = await this.dialog.open(AlertComponent, {
@@ -720,7 +740,7 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
 
   async start() {
     const { observationAsTask, isATargetedSolution } = this.stateData || {};
-  
+
     if (observationAsTask || isATargetedSolution) {
       const message = { type: 'START', data: this.stateData };
       window.postMessage(message, '*');
@@ -733,9 +753,9 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
     }
   }
 
-  getQuestions(data){
+  getQuestions(data) {
 
-    if(data?.isATargetedSolution === false){
+    if (data?.isATargetedSolution === false) {
 
       this.toaster.showToast('Dear User, this Observation is not relevant for your subrole and location', 'danger', 5000)
 

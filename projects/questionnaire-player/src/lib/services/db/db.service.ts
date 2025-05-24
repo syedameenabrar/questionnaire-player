@@ -70,6 +70,11 @@ export class DbService {
 
   updateData(data: any) {
     let downloadData:any = null;
+
+    if (!data.key || data.key === 'undefined') {
+      // console.error('❌ Attempted to store with invalid key:', data.key);
+      return;
+    }
     if(data.data.isDownload){
       downloadData = {
         keyid: data.key,
