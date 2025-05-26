@@ -1,4 +1,5 @@
 import {
+  CSP_NONCE,
   Component,
   ElementRef,
   Input,
@@ -68,6 +69,8 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
   subscription: Subscription;
   isOnline: boolean = true;
   stateData: any;
+  submissionId:any;
+  evidenceCode:any
 
   constructor(
     public fb: FormBuilder,
@@ -126,7 +129,6 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
   }
 
   async ngOnInit() {
-
     let isDataInlocalSotrage = await this.checkAndMapIndexDbDataToVariables();
     if (typeof this.apiConfig === 'string') {
       try {
@@ -170,29 +172,28 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
     });
   }
 
-  getQueryParms() {
-    this.queryParamsService.parseQueryParams();
-    const submissionId = this.queryParamsService?.submissionId;
-    const evidenceCode = this.queryParamsService?.evidenceCode;
-
-    if (!submissionId || !evidenceCode) {
-      // console.warn("Missing query parameters", { submissionId, evidenceCode });
-      return null;
-    }
-
+  async getQueryParms() {
+    this.queryParamsService.parseQueryParams(); // make sure this is async
+    const submissionId = this.queryParamsService?.submissionId || this.submissionId || "";
+    const evidenceCode = this.queryParamsService?.evidenceCode || this.evidenceCode || "";
+    // if (!submissionId || !evidenceCode) {
+    //   return null;
+    // }
+  
     return {
       indexDbKey: `${submissionId}`,
       evidenceCode
     };
   }
+  
 
 
-  async setDataInIndexDb() {
-    const queryParamsData = this.getQueryParms();
+  async setDataInIndexDb(submissionId?:any) {
+    const queryParamsData = await this.getQueryParms(); 
     const indexDbKey = queryParamsData?.indexDbKey;
 
     const data = {
-      key: indexDbKey,
+      key: submissionId ? submissionId : indexDbKey,
       data: this.assessment
     }
     try {
@@ -229,36 +230,22 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
   
 
   async updateDataInIndexDb(updatedAnswers) {
-    const queryParamsData = this.getQueryParms();
+    const queryParamsData = await this.getQueryParms(); 
     const indexDbKey = queryParamsData?.indexDbKey;
     const evidenceCode = queryParamsData?.evidenceCode;
-
+  
     if (!indexDbKey || indexDbKey === 'undefined') {
-      // console.error("❌ INVALID indexDbKey detected:", indexDbKey);
       return false;
     }
-
-let progress:any ;
-progress = this.getProgressStatus(this.assessment.assessment.submissions[evidenceCode]);
-// console.log(`Progress: ${progress}%`);
-let progressStatus:any;
-if(progress == 100){
-  progressStatus = 'completed'
-}else if(progress > 0){
-  progressStatus = 'inProgress'
-}else{
-  progressStatus = 'notStarted'
-}
-    if (this.assessment.assessment.submissions[evidenceCode]) {
-      this.assessment.assessment.submissions[evidenceCode].answers = updatedAnswers?.answers;
-      this.assessment.assessment.submissions[evidenceCode].status = updatedAnswers?.status === 'save' ? 'save' : 'draft';
-      this.assessment.assessment.evidences[+this.apiConfig.index].isSubmitted = updatedAnswers?.status === 'save' ? true : false;
-      this.assessment.assessment.evidences[+this.apiConfig.index].completePercentage = progress || 0;
-      this.assessment.assessment.evidences[+this.apiConfig.index].progressStatus = progressStatus;
-    } else {
-      this.assessment.assessment.submissions[evidenceCode] = {
+  
+    const submissions = this.assessment.assessment.submissions;
+    const evidences = this.assessment.assessment.evidences;
+  
+    // ✅ Initialize submission if not present
+    if (!submissions[evidenceCode]) {
+      submissions[evidenceCode] = {
         externalId: evidenceCode,
-        answers: updatedAnswers?.answers,
+        answers: {},
         startTime: Date.now(),
         endTime: this.endDate,
         gpsLocation: null,
@@ -266,19 +253,40 @@ if(progress == 100){
         submittedByName: '',
         submissionDate: new Date().toISOString(),
         isValid: true,
-        status: updatedAnswers?.status === 'draft' ? 'draft' : 'submit',
-        progressStatus: progressStatus,
-        completePercentage: progress || 0
+        status: 'draft',
+        progressStatus: 'notStarted',
+        completePercentage: 0
       };
     }
-
-
-
+  
+    // ✅ Update answers first
+    submissions[evidenceCode].answers = updatedAnswers?.answers;
+    submissions[evidenceCode].status = updatedAnswers?.status === 'save' ? 'save' : 'draft';
+  
+    // ✅ Now calculate progress based on the updated answers
+    const progress = this.getProgressStatus(submissions[evidenceCode]);
+    let progressStatus: string;
+  
+    if (progress === 100) {
+      progressStatus = 'completed';
+    } else if (progress > 0) {
+      progressStatus = 'inProgress';
+    } else {
+      progressStatus = 'notStarted';
+    }
+  
+    // ✅ Update evidence data
+    const evidenceIndex = +this.apiConfig.index;
+    evidences[evidenceIndex].isSubmitted = updatedAnswers?.status === 'save';
+    evidences[evidenceIndex].completePercentage = progress;
+    evidences[evidenceIndex].progressStatus = progressStatus;
+  
+    // ✅ Save to IndexedDB
     const data = {
       key: indexDbKey,
       data: this.assessment
     };
-
+  
     try {
       await this.db.updateData(data);
       return true;
@@ -287,17 +295,18 @@ if(progress == 100){
       return false;
     }
   }
+  
 
 
-  deleteFromIndexDb() {
-    const queryParamsData = this.getQueryParms();
+  async deleteFromIndexDb() {
+    const queryParamsData = await this.getQueryParms(); 
     const indexDbKey = queryParamsData?.indexDbKey;
     this.db.deleteData(indexDbKey);
   }
 
 
   async checkAndMapIndexDbDataToVariables() {
-    const queryParamsData = this.getQueryParms();
+    const queryParamsData = await this.getQueryParms(); 
     const indexDbKey = queryParamsData?.indexDbKey;
     let indexdbData = await this.db.getData(indexDbKey);
     let currentObservation = indexdbData?.data;
@@ -357,6 +366,7 @@ if(progress == 100){
         })
       )
       .subscribe(async (res: any) => {
+        res.result.assessment.evidences[0].isSubmitted = false;
         if (res.result) {
           this.assessment = this.questionnaireService.mapSubmissionToAssessment(
             res.result
@@ -371,6 +381,15 @@ if(progress == 100){
           this.isExpired = this.assessment?.assessment?.status == 'expired';
           this.sections = this.evidence?.sections;
           this.loaded = true;
+
+
+    let isDataInlocalSotrage = await this.checkAndMapIndexDbDataToVariables();
+          if(!isDataInlocalSotrage){
+            console?.log("setting data in localstorage", this.assessment?.assessment?.submissionId);
+            this.submissionId = this.assessment?.assessment?.submissionId || "";
+            this.evidenceCode = this.assessment?.assessment?.evidences[0]?.code || "";
+            this.setDataInIndexDb(this.submissionId)
+          }
 
         } else {
           this.toaster.showToast('Something went wrong, Please try again later', 'danger', 5000)
@@ -641,9 +660,9 @@ if(progress == 100){
         }
         if (!response) return;
       }
-
       const responseFromUpdateDataFunction = await this.updateDataInIndexDb(submissionData);
       if (responseFromUpdateDataFunction) {
+
       this.apiService
         .post(
           `${urlConfig[this.apiConfig.solutionType].update}${this.assessment.assessment.submissionId}`,
