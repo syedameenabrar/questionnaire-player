@@ -226,75 +226,78 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
     const percentage = Math.round((answeredCount / totalQuestions) * 100);
     return percentage;
   }
-  
-  
 
-  async updateDataInIndexDb(updatedAnswers) {
-    const queryParamsData = await this.getQueryParms(); 
-    const indexDbKey = queryParamsData?.indexDbKey;
-    const evidenceCode = queryParamsData?.evidenceCode;
-  
-    if (!indexDbKey || indexDbKey === 'undefined') {
-      return false;
-    }
-  
-    const submissions = this.assessment.assessment.submissions;
-    const evidences = this.assessment.assessment.evidences;
-  
-    // ✅ Initialize submission if not present
-    if (!submissions[evidenceCode]) {
-      submissions[evidenceCode] = {
-        externalId: evidenceCode,
-        answers: {},
-        startTime: Date.now(),
-        endTime: this.endDate,
-        gpsLocation: null,
-        submittedBy: '',
-        submittedByName: '',
-        submissionDate: new Date().toISOString(),
-        isValid: true,
-        status: 'draft',
-        progressStatus: 'notStarted',
-        completePercentage: 0
-      };
-    }
-  
-    // ✅ Update answers first
-    submissions[evidenceCode].answers = updatedAnswers?.answers;
-    submissions[evidenceCode].status = updatedAnswers?.status === 'save' ? 'save' : 'draft';
-  
-    // ✅ Now calculate progress based on the updated answers
-    const progress = this.getProgressStatus(submissions[evidenceCode]);
-    let progressStatus: string;
-  
-    if (progress === 100) {
-      progressStatus = 'completed';
-    } else if (progress > 0) {
-      progressStatus = 'inProgress';
-    } else {
-      progressStatus = 'notStarted';
-    }
-  
-    // ✅ Update evidence data
-    const evidenceIndex = +this.apiConfig.index;
-    evidences[evidenceIndex].isSubmitted = updatedAnswers?.status === 'save';
-    evidences[evidenceIndex].completePercentage = progress;
-    evidences[evidenceIndex].progressStatus = progressStatus;
-  
-    // ✅ Save to IndexedDB
-    const data = {
-      key: indexDbKey,
-      data: this.assessment
-    };
-  
-    try {
-      await this.db.updateData(data);
-      return true;
-    } catch (error) {
-      console.error("Failed to store data in IndexedDB", error);
-      return false;
-    }
+async updateDataInIndexDb(updatedAnswers) {
+  const queryParamsData = await this.getQueryParms(); 
+  const indexDbKey = queryParamsData?.indexDbKey;
+  const evidenceCode = queryParamsData?.evidenceCode;
+
+  if (!indexDbKey || indexDbKey === 'undefined') {
+    return false;
   }
+
+  const assessmentClone = JSON.parse(JSON.stringify(this.assessment)); 
+  const submissions = assessmentClone.assessment.submissions;
+  const evidences = assessmentClone.assessment.evidences;
+  const evidenceIndex = +this.apiConfig.index;
+
+
+  if (!submissions[evidenceCode]) {
+    submissions[evidenceCode] = {
+      externalId: evidenceCode,
+      answers: {},
+      startTime: Date.now(),
+      endTime: this.endDate,
+      gpsLocation: null,
+      submittedBy: '',
+      submittedByName: '',
+      submissionDate: new Date().toISOString(),
+      isValid: true,
+      status: 'draft',
+      progressStatus: 'notStarted',
+      completePercentage: 0
+    };
+  }
+
+
+  submissions[evidenceCode].answers = { ...updatedAnswers?.answers }; // ensure fresh reference
+  submissions[evidenceCode].status = updatedAnswers?.status === 'save'
+    ? 'save'
+    : updatedAnswers?.status === 'draft'
+      ? 'draft'
+      : 'submit';
+
+
+  const progress = this.getProgressStatus(submissions[evidenceCode]);
+  let progressStatus = 'notStarted';
+  if (progress === 100) progressStatus = 'completed';
+  else if (progress > 0) progressStatus = 'inProgress';
+
+
+  evidences[evidenceIndex].completePercentage = progress;
+  evidences[evidenceIndex].progressStatus = progressStatus;
+  evidences[evidenceIndex].isSubmitted = ['save', 'submit'].includes(submissions[evidenceCode].status);
+
+  
+  const data = {
+    key: indexDbKey,
+    data: assessmentClone
+  };
+
+  try {
+    await this.db.updateData(data);
+
+    
+    this.assessment = assessmentClone;
+
+    return true;
+  } catch (error) {
+    console.error("❌ Failed to store data in IndexedDB", error);
+    return false;
+  }
+}
+
+
   
 
 
@@ -366,7 +369,6 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
         })
       )
       .subscribe(async (res: any) => {
-        res.result.assessment.evidences[0].isSubmitted = false;
         if (res.result) {
           this.assessment = this.questionnaireService.mapSubmissionToAssessment(
             res.result
@@ -385,7 +387,6 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
 
     let isDataInlocalSotrage = await this.checkAndMapIndexDbDataToVariables();
           if(!isDataInlocalSotrage){
-            console?.log("setting data in localstorage", this.assessment?.assessment?.submissionId);
             this.submissionId = this.assessment?.assessment?.submissionId || "";
             this.evidenceCode = this.assessment?.assessment?.evidences[0]?.code || "";
             this.setDataInIndexDb(this.submissionId)
