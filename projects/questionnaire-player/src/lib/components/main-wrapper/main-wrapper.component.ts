@@ -141,6 +141,7 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
         throw new Error('Invalid Assessment Structure', error);
       }
     }
+
     if (this.sections?.length == 1) {
       this.setSection(this.sections[0].name);
       if (document.getElementById('observation-ion-toolbar')) {
@@ -201,6 +202,32 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
     }
   }
 
+  getProgressStatus(evidenceCode: string): number {
+    let submission: any = evidenceCode;
+    if (!submission || !submission.answers) return 0;
+  
+    const answers = Object.values(submission.answers);
+    const totalQuestions = answers.length;
+    if (totalQuestions === 0) return 0;
+  
+    const answeredCount = answers.filter((ans: any) =>
+      ans.value !== undefined &&
+      ans.value !== null &&
+      (
+        Array.isArray(ans.value)
+          ? ans.value.some((v: any) =>
+              typeof v === 'string' ? v.trim() !== '' : v !== null && v !== undefined
+            )
+          : ans.value.toString().trim() !== ''
+      )
+    ).length;
+  
+    const percentage = Math.round((answeredCount / totalQuestions) * 100);
+    return percentage;
+  }
+  
+  
+
   async updateDataInIndexDb(updatedAnswers) {
     const queryParamsData = this.getQueryParms();
     const indexDbKey = queryParamsData?.indexDbKey;
@@ -211,10 +238,23 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
       return false;
     }
 
+let progress:any ;
+progress = this.getProgressStatus(this.assessment.assessment.submissions[evidenceCode]);
+// console.log(`Progress: ${progress}%`);
+let progressStatus:any;
+if(progress == 100){
+  progressStatus = 'completed'
+}else if(progress > 0){
+  progressStatus = 'inProgress'
+}else{
+  progressStatus = 'notStarted'
+}
     if (this.assessment.assessment.submissions[evidenceCode]) {
       this.assessment.assessment.submissions[evidenceCode].answers = updatedAnswers?.answers;
       this.assessment.assessment.submissions[evidenceCode].status = updatedAnswers?.status === 'save' ? 'save' : 'draft';
-      this.assessment.assessment.evidences[+this.apiConfig.index].isSubmitted = updatedAnswers?.status === 'save' ? false : true;
+      this.assessment.assessment.evidences[+this.apiConfig.index].isSubmitted = updatedAnswers?.status === 'save' ? true : false;
+      this.assessment.assessment.evidences[+this.apiConfig.index].completePercentage = progress || 0;
+      this.assessment.assessment.evidences[+this.apiConfig.index].progressStatus = progressStatus;
     } else {
       this.assessment.assessment.submissions[evidenceCode] = {
         externalId: evidenceCode,
@@ -226,9 +266,13 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
         submittedByName: '',
         submissionDate: new Date().toISOString(),
         isValid: true,
-        status: updatedAnswers?.status === 'draft' ? 'draft' : 'submit'
+        status: updatedAnswers?.status === 'draft' ? 'draft' : 'submit',
+        progressStatus: progressStatus,
+        completePercentage: progress || 0
       };
     }
+
+
 
     const data = {
       key: indexDbKey,
