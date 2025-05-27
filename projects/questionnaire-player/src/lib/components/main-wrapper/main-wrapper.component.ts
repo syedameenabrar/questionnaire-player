@@ -393,8 +393,8 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
               const confirmationParams = {
                 title: 'Success',
                 message: `Successfully your ${this.apiConfig.solutionType} has been saved. Do you want to continue?`,
-                acceptLabel: 'Later',
-                cancelLabel: 'Continue',
+                acceptLabel: 'No',
+                cancelLabel: 'Yes',
                 type: 'success'
               };
               const response = await this.openAlert(confirmationParams);

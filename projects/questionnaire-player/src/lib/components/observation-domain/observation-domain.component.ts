@@ -79,6 +79,8 @@ export class ObservationDomainComponent extends BackNavigationHandlerComponent i
           }
         )
         this.evidences = evidencesStatus.flat();
+          console.log("this.entities",this.entities)
+
         } else {
           this.toaster.showToast(res.message, 'danger');
         }

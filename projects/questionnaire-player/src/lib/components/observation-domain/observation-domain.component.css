@@ -69,3 +69,8 @@
   .heading{
     font-size: 1.563rem;
   }
+
+  .btn-inner-container {
+    display: flex;
+    justify-content: end;
+}
