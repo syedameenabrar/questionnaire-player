@@ -70,7 +70,8 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
   isOnline: boolean = true;
   stateData: any;
   submissionId:any;
-  evidenceCode:any
+  evidenceCode:any;
+  solutionType :any;
 
   constructor(
     public fb: FormBuilder,
@@ -317,7 +318,7 @@ async updateDataInIndexDb(updatedAnswers) {
       this.assessment = this.questionnaireService.mapSubmissionToAssessment(
         currentObservation
       );
-      this.evidence = this.apiConfig?.solutionType == 'observation' ? currentObservation?.assessment?.evidences[+[this.apiConfig.index]] : currentObservation?.assessment?.evidences[0];
+      this.evidence = this.solutionType == 'observation' ? currentObservation?.assessment?.evidences[+[this.apiConfig.index]] : currentObservation?.assessment?.evidences[0];
       this.evidence.startTime = Date.now();
       this.endDate = new Date(
         new Date(currentObservation?.assessment?.endDate).getTime() +
@@ -347,7 +348,7 @@ async updateDataInIndexDb(updatedAnswers) {
   setApiService() {
     this.apiService.baseUrl = this.apiConfig.baseURL;
     this.apiService.token = this.apiConfig.userAuthToken;
-    this.apiService.solutionType = this.apiConfig.solutionType;
+    this.apiService.solutionType = this.apiConfig.solutionType || 'observation';
     this.apiService.observationId = this.apiConfig.observationId;
     this.apiService.entityId = this.apiConfig.entityId;
     this.apiService.submissionNumber = this.apiConfig.submissionNumber;
@@ -357,12 +358,14 @@ async updateDataInIndexDb(updatedAnswers) {
     this.apiService.profileData = this.apiConfig.profileData;
     this.apiService.stateData = this.apiConfig.stateData;
 
-    this.stateData = this.apiConfig.stateData
+    this.stateData = this.apiConfig.stateData;
+    this.solutionType = this.apiConfig.solutionType || 'observation';
+
   }
 
   fetchDetails() {
-    const path = this.apiConfig.solutionType == 'observation' ? this.apiConfig.observationId + `?entityId=${this.apiConfig.entityId}&submissionNumber=${this.apiConfig.submissionNumber}&evidenceCode=${this.apiConfig.evidenceCode}` : this.apiConfig.solutionId
-    this.subscription = this.apiService.post(`${urlConfig[this.apiConfig.solutionType].details}` + path, this.apiConfig.profileData)
+    const path = this.solutionType == 'observation' ? this.apiConfig.observationId + `?entityId=${this.apiConfig.entityId}&submissionNumber=${this.apiConfig.submissionNumber}&evidenceCode=${this.apiConfig.evidenceCode}` : this.apiConfig.solutionId
+    this.subscription = this.apiService.post(`${urlConfig[this.solutionType].details}` + path, this.apiConfig.profileData)
       .pipe(
         catchError((err) => {
           throw new Error('Could not fetch the details');
@@ -373,7 +376,7 @@ async updateDataInIndexDb(updatedAnswers) {
           this.assessment = this.questionnaireService.mapSubmissionToAssessment(
             res.result
           );
-          this.evidence = this.apiConfig?.solutionType == 'observation' ? this.assessment?.assessment?.evidences[+[this.apiConfig.index]] : this.assessment?.assessment?.evidences[0];
+          this.evidence = this.solutionType == 'observation' ? this.assessment?.assessment?.evidences[+[this.apiConfig.index]] : this.assessment?.assessment?.evidences[0];
           this.evidence.startTime = Date.now();
           this.endDate = new Date(
             new Date(this.assessment?.assessment?.endDate).getTime() +
@@ -626,7 +629,7 @@ async updateDataInIndexDb(updatedAnswers) {
       if (!this.saveQuestioner) {
         const confirmationParams = {
           title: 'Confirmation',
-          message: `Are you sure you want to submit the ${this.apiConfig.solutionType}?`,
+          message: `Are you sure you want to submit the ${this.solutionType}?`,
           actionBtns: true,
           cancelLabel: 'Cancel',
           acceptLabel: 'Confirm',
@@ -666,7 +669,7 @@ async updateDataInIndexDb(updatedAnswers) {
 
       this.apiService
         .post(
-          `${urlConfig[this.apiConfig.solutionType].update}${this.assessment.assessment.submissionId}`,
+          `${urlConfig[this.solutionType].update}${this.assessment.assessment.submissionId}`,
           { evidence: submissionData }
         )
         .pipe(
@@ -681,7 +684,7 @@ async updateDataInIndexDb(updatedAnswers) {
             const footer = this.el.nativeElement.querySelector('.footer-buttons');
             this.renderer.setStyle(footer, 'display', 'none');
             this.toaster.showToast(
-              `Your ${this.apiConfig.solutionType} has been submitted successfully.`,
+              `Your ${this.solutionType} has been submitted successfully.`,
               'success',
               5000
             );
@@ -695,7 +698,7 @@ async updateDataInIndexDb(updatedAnswers) {
         this.formIsNotDirty();
         const confirmationParams = {
           title: 'Success',
-          message: `Successfully your ${this.apiConfig.solutionType} has been saved. Do you want to continue?`,
+          message: `Successfully your ${this.solutionType} has been saved. Do you want to continue?`,
           acceptLabel: 'Later',
           cancelLabel: 'Continue',
           type: 'success',
@@ -790,7 +793,7 @@ async updateDataInIndexDb(updatedAnswers) {
   }
 
   ngOnDestroy(): void {
-    if (this.apiConfig.solutionType == 'observation' && this.questionnaireForm.dirty) {
+    if (this.solutionType == 'observation' && this.questionnaireForm.dirty) {
       this.saveQuestioner = true;
       this.submission('draft');
       this.subscription?.unsubscribe();
@@ -831,7 +834,7 @@ async updateDataInIndexDb(updatedAnswers) {
 
     );
 
-    this.evidence = this.apiConfig?.solutionType == 'observation' ? this.assessment?.assessment?.evidences[+[this.apiConfig.index]] : this.assessment?.assessment?.evidences[0];
+    this.evidence = this.solutionType == 'observation' ? this.assessment?.assessment?.evidences[+[this.apiConfig.index]] : this.assessment?.assessment?.evidences[0];
 
     this.evidence.startTime = Date.now();
 
