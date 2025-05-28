@@ -15,13 +15,23 @@
 }
 
 .grid-container {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .grid-item {
   cursor: pointer;
+  width: 49%;
+  padding: 10px;
+}
+
+@media (max-width: 48rem) {
+  .grid-item {
+    cursor: pointer;
+    width: 100%;
+    padding: 10px;
+  }
 }
 
 .mat-card {

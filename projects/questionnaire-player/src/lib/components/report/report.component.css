@@ -227,6 +227,7 @@ mat-icon {
 .panel-content {
   border: 0.063rem solid var(--light-grey);
   overflow-x: auto;
+  width: fit-content;
 }
 
 .row {
@@ -327,11 +328,6 @@ mat-icon {
   font-weight: bold;
   background-color: var(--color-primary);
   color: var(--color-light);
-}
-
-.panel-content {
-  border: 0.063rem solid var(--light-grey);
-  overflow-x: auto;
 }
 
 .row {
