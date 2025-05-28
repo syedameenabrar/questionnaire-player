@@ -228,6 +228,7 @@ mat-icon {
   border: 0.063rem solid var(--light-grey);
   overflow-x: auto;
   width: fit-content;
+  min-width: 100%;
 }
 
 .row {
@@ -397,3 +398,6 @@ mat-icon {
   font-weight: bold;
 }
 
+.mat-expansion-panel-body {
+  overflow-x: auto !important;
+}
