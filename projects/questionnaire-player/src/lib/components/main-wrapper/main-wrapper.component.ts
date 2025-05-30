@@ -176,7 +176,7 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
   async getQueryParms() {
     this.queryParamsService.parseQueryParams(); // make sure this is async
     const submissionId = this.queryParamsService?.submissionId || this.submissionId || "";
-    const evidenceCode = this.queryParamsService?.evidenceCode || this.evidenceCode || "";
+    const evidenceCode = this.queryParamsService?.evidenceCode || this.evidenceCode;
     // if (!submissionId || !evidenceCode) {
     //   return null;
     // }
@@ -232,7 +232,6 @@ async updateDataInIndexDb(updatedAnswers) {
   const queryParamsData = await this.getQueryParms(); 
   const indexDbKey = queryParamsData?.indexDbKey;
   const evidenceCode = queryParamsData?.evidenceCode;
-
   if (!indexDbKey || indexDbKey === 'undefined') {
     return false;
   }
@@ -314,6 +313,12 @@ async updateDataInIndexDb(updatedAnswers) {
     const indexDbKey = queryParamsData?.indexDbKey;
     let indexdbData = await this.db.getData(indexDbKey);
     let currentObservation = indexdbData?.data;
+    if (this.solutionType === "survey") {
+      const submissions = currentObservation?.assessment?.submissions;
+      if (submissions && typeof submissions === 'object') {
+        this.evidenceCode = Object.keys(submissions)[0];
+      }
+    }
     if (currentObservation) {
       this.assessment = this.questionnaireService.mapSubmissionToAssessment(
         currentObservation
