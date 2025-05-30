@@ -268,6 +268,7 @@ export class QuestionnaireService {
       criteriaId: currentQuestion.payload.criteriaId,
       responseType: currentQuestion.responseType,
       evidenceMethod: currentQuestion.evidenceMethod,
+      visibleIf: currentQuestion.visibleIf,
       rubricLevel: '',
     };
   }

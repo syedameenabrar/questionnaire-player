@@ -174,7 +174,7 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
   }
 
   async getQueryParms() {
-    this.queryParamsService.parseQueryParams(); // make sure this is async
+    this.queryParamsService.parseQueryParams();
     const submissionId = this.queryParamsService?.submissionId || this.submissionId || "";
     const evidenceCode = this.queryParamsService?.evidenceCode || this.evidenceCode;
     // if (!submissionId || !evidenceCode) {
@@ -187,8 +187,6 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
     };
   }
   
-
-
   async setDataInIndexDb(submissionId?:any) {
     const queryParamsData = await this.getQueryParms(); 
     const indexDbKey = queryParamsData?.indexDbKey;
@@ -204,30 +202,70 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
     }
   }
 
-  getProgressStatus(evidenceCode: string): number {
-    let submission: any = evidenceCode;
+  getProgressStatus(submission: any): number {
     if (!submission || !submission.answers) return 0;
   
-    const answers = Object.values(submission.answers);
-    const totalQuestions = answers.length;
+    const answersObj = submission.answers;
+    
+    let totalQuestions = 0;
+    let answeredCount = 0;
+  
+    for (const qid of Object.keys(answersObj)) {
+      const answer = answersObj[qid];
+      const visibleIf = answer.visibleIf;
+     
+      if (Array.isArray(visibleIf) && visibleIf.length > 0) {
+        let isVisible = false;
+  
+        for (const condition of visibleIf) {
+          const targetQid = condition._id;
+          const targetValue = condition.value?.[0];
+          const operator = condition.operator;
+  
+          const targetAnswer = answersObj[targetQid];
+  
+          if (!targetAnswer || targetAnswer.value === undefined || targetAnswer.value === null) {
+            isVisible = false;
+            break; 
+          }
+  
+          const actualValue = targetAnswer.value;
+
+          if (operator === '===' && actualValue === targetValue) {
+            isVisible = true;
+          } else {
+            isVisible = false;
+          }
+        }
+  
+        if (!isVisible) continue; 
+      }
+  
+      totalQuestions++;
+  
+      const value = answer.value;
+  
+      const isAnswered =
+        value !== undefined &&
+        value !== null &&
+        (
+          Array.isArray(value)
+            ? value.some((v: any) =>
+                typeof v === 'string' ? v.trim() !== '' : v !== null && v !== undefined
+              )
+            : value.toString().trim() !== ''
+        );
+  
+      if (isAnswered) {
+        answeredCount++;
+      }
+    }
+  
     if (totalQuestions === 0) return 0;
   
-    const answeredCount = answers.filter((ans: any) =>
-      ans.value !== undefined &&
-      ans.value !== null &&
-      (
-        Array.isArray(ans.value)
-          ? ans.value.some((v: any) =>
-              typeof v === 'string' ? v.trim() !== '' : v !== null && v !== undefined
-            )
-          : ans.value.toString().trim() !== ''
-      )
-    ).length;
-  
-    const percentage = Math.round((answeredCount / totalQuestions) * 100);
-    return percentage;
+    return Math.round((answeredCount / totalQuestions) * 100);
   }
-
+  
 async updateDataInIndexDb(updatedAnswers) {
   const queryParamsData = await this.getQueryParms(); 
   const indexDbKey = queryParamsData?.indexDbKey;
@@ -286,8 +324,6 @@ async updateDataInIndexDb(updatedAnswers) {
 
   try {
     await this.db.updateData(data);
-
-    
     this.assessment = assessmentClone;
 
     return true;
