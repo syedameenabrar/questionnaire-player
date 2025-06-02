@@ -4,16 +4,20 @@
       <h1  class="sesion-title">List of Sections</h1>
       <hr style="height: 1px;background:var(--primary-color);"/>
     </div>
-    <div *ngIf="listing && sections?.length && apiConfig.solutionType == 'observation'" (click)="backToSectionListing()" class="d-flex flex-gap-10 header-shadow">
+    <!-- <div *ngIf="listing && sections?.length" (click)="backToSectionListing()" class="d-flex flex-gap-10 header-shadow">
       <mat-icon class="m-10 ml-16" style="font-size: x-large;">arrow_back</mat-icon>
-    </div>
+    </div> -->
     <div *ngFor="let section of sections; let secId = index">
       <div class="section-listing" [ngStyle]="{display:sections.length == 1 ? 'none':'block'}">
         <mat-card (click)="setSection(section.name)" class="px-16 py-16 m-20" style="color: var(--primary-color);">
           <mat-card-title>{{secId+1}}. {{section.name}}</mat-card-title>
         </mat-card>
       </div>
-        <span [id]="section.name" [ngStyle]="{display:sections.length == 1 ? 'block':'none'}">
+      <span [id]="section.name" [ngStyle]="{
+        display: sections.length == 1 ? 'block' : 'none',
+        'pointer-events': stateData && stateData?.isSurvey === false ? 'none' : 'auto',
+        opacity: stateData && stateData?.isSurvey === false ? 0.6 : 1
+      }">
           <lib-main #mainComponent  [questions]="section.questions" [questionnaireForm]="questionnaireForm"
           [isSubmitted]="evidence?.isSubmitted" [isExpired]="isExpired" [fileSizeLimit]="apiConfig.fileSizeLimit"
           ></lib-main>
@@ -54,12 +58,15 @@
         <p class="question-map">Question Map</p>
       </div>
     <div>
-      <button class="btn btn-outline-secondary" (click)="submission('draft')">
-        Save
+      <button class="btn btn-primary mr-2" (click)="start()" *ngIf="stateData && stateData?.isSurvey === false">
+        Start
       </button>
-      <button class="btn btn-primary mr-2" (click)="!questionnaireForm?.valid ? getQuestionMap() : submission('submit')">
-        Submit
-      </button>
+        <button class="btn btn-outline-secondary" (click)="submission('draft')" *ngIf="(stateData && stateData?.isSurvey === true) || !stateData">
+          Save
+        </button>
+        <button class="btn btn-primary mr-2"  (click)="!questionnaireForm?.valid ? getQuestionMap() : submission('submit')" *ngIf="(stateData && stateData?.isSurvey === true) || !stateData">
+          Submit
+        </button>
     </div>
     </div>
     </div>

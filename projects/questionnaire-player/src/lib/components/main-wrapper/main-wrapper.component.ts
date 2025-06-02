@@ -27,12 +27,16 @@ import * as urlConfig from '../../constants/url-config.json';
 import { ToastService } from '../../services/toast.service';
 import { ThemePalette } from '@angular/material/core';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
-import { Observable, Subscribable, Subscription } from 'rxjs';
+import { firstValueFrom, Observable, Subscription } from 'rxjs';
 import { AlertComponent } from '../alert/alert.component';
 import { Location } from '@angular/common';
 import { BackNavigationHandlerComponent } from '../../shared/components/pie-chart/back-navigation-handler/back-navigation-handler.component';
 import { Router } from '@angular/router';
 import { SharedService } from '../../services/shared.service';
+import { QueryParamsService } from '../../services/queryParams.service';
+import { DbService } from '../../services/db/db.service';
+import { AttachmentService } from '../../services/attachment/attachment.service';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 @Component({
   selector: 'lib-main-wrapper',
   templateUrl: './main-wrapper.component.html',
@@ -62,6 +66,10 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
   isExpired: boolean;
   @Input() saveQuestioner: boolean = false;
   subscription: Subscription;
+  isOnline: boolean = true;
+  stateData: any;
+  submissionId:any;
+  evidenceCode:any
 
   constructor(
     public fb: FormBuilder,
@@ -72,10 +80,14 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
     public location: Location,
     private renderer: Renderer2, private el: ElementRef,
     public router: Router,
-    private sharedService: SharedService
+    private sharedService: SharedService,
+    private queryParamsService: QueryParamsService,
+    private db: DbService,
+    private attachmentService: AttachmentService,
+    private http: HttpClient,
+
   ) {
     super(router, location);
-
   }
 
   checkFormValidity() {
@@ -85,7 +97,7 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
     }, '*');
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  async ngOnChanges(changes: SimpleChanges) {
     if (
       this.angular &&
       changes['apiConfig'] &&
@@ -93,13 +105,18 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
       changes['apiConfig'].currentValue
     ) {
       this.setApiService();
-      this.fetchDetails();
+      let isDataInlocalSotrage = await this.checkAndMapIndexDbDataToVariables();
+      if (!isDataInlocalSotrage) {
+        this.setApiService();
+        this.apiService.stateData ? this.getQuestions(this.apiService.stateData) : this.fetchDetails();
+      }
+
       if (this.sections?.length == 1) {
         this.setSection(this.sections[0].name);
-        if(document.getElementById('observation-ion-toolbar')){
-          document.getElementById('observation-ion-toolbar').style.display = 'none';
-          this.listing = false;
+        if (document.getElementById('observation-ion-toolbar')) {
+          document.getElementById('observation-ion-toolbar').style.display = 'none'
         }
+        this.listing = false;
       }
     }
 
@@ -108,6 +125,222 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
         this.submission('draft');
       }
     }
+  }
+
+  async ngOnInit() {
+    let isDataInlocalSotrage = await this.checkAndMapIndexDbDataToVariables();
+    if (typeof this.apiConfig === 'string') {
+      try {
+        this.apiConfig = JSON.parse(this.apiConfig);
+
+        if (!isDataInlocalSotrage) {
+          this.setApiService();
+          this.apiService.stateData ? this.getQuestions(this.apiService.stateData) : this.fetchDetails();
+        }
+
+      } catch (error) {
+        throw new Error('Invalid Assessment Structure', error);
+      }
+    }
+
+    if (this.sections?.length == 1) {
+      this.setSection(this.sections[0].name);
+      if (document.getElementById('observation-ion-toolbar')) {
+        document.getElementById('observation-ion-toolbar').style.display = 'none'
+      }
+      this.listing = false;
+    }
+    this.questionnaireForm = this.fb.group({});
+
+    this.questionnaireForm.valueChanges.subscribe((data: any) => {
+      this.checkFormValidity();
+    })
+
+    this.attachmentService.trigger$.subscribe(() => {
+      const evidenceData = this.questionnaireService.getEvidenceData(
+        this.evidence,
+        this.questionnaireForm.value
+      );
+
+      evidenceData['status'] = 'draft';
+      const submissionData = {
+        status: "draft",
+        ...evidenceData,
+      };
+      this.updateDataInIndexDb(submissionData);
+    });
+  }
+
+  async getQueryParms() {
+    this.queryParamsService.parseQueryParams(); // make sure this is async
+    const submissionId = this.queryParamsService?.submissionId || this.submissionId || "";
+    const evidenceCode = this.queryParamsService?.evidenceCode || this.evidenceCode || "";
+    // if (!submissionId || !evidenceCode) {
+    //   return null;
+    // }
+  
+    return {
+      indexDbKey: `${submissionId}`,
+      evidenceCode
+    };
+  }
+  
+
+
+  async setDataInIndexDb(submissionId?:any) {
+    const queryParamsData = await this.getQueryParms(); 
+    const indexDbKey = queryParamsData?.indexDbKey;
+
+    const data = {
+      key: submissionId ? submissionId : indexDbKey,
+      data: this.assessment
+    }
+    try {
+      await this.db.addData(data);
+    } catch (error) {
+      console.error("Failed to store data in IndexedDB", error);
+    }
+  }
+
+  getProgressStatus(evidenceCode: string): number {
+    let submission: any = evidenceCode;
+    if (!submission || !submission.answers) return 0;
+  
+    const answers = Object.values(submission.answers);
+    const totalQuestions = answers.length;
+    if (totalQuestions === 0) return 0;
+  
+    const answeredCount = answers.filter((ans: any) =>
+      ans.value !== undefined &&
+      ans.value !== null &&
+      (
+        Array.isArray(ans.value)
+          ? ans.value.some((v: any) =>
+              typeof v === 'string' ? v.trim() !== '' : v !== null && v !== undefined
+            )
+          : ans.value.toString().trim() !== ''
+      )
+    ).length;
+  
+    const percentage = Math.round((answeredCount / totalQuestions) * 100);
+    return percentage;
+  }
+
+async updateDataInIndexDb(updatedAnswers) {
+  const queryParamsData = await this.getQueryParms(); 
+  const indexDbKey = queryParamsData?.indexDbKey;
+  const evidenceCode = queryParamsData?.evidenceCode;
+
+  if (!indexDbKey || indexDbKey === 'undefined') {
+    return false;
+  }
+
+  const assessmentClone = JSON.parse(JSON.stringify(this.assessment)); 
+  const submissions = assessmentClone.assessment.submissions;
+  const evidences = assessmentClone.assessment.evidences;
+  const evidenceIndex = +this.apiConfig.index;
+
+
+  if (!submissions[evidenceCode]) {
+    submissions[evidenceCode] = {
+      externalId: evidenceCode,
+      answers: {},
+      startTime: Date.now(),
+      endTime: this.endDate,
+      gpsLocation: null,
+      submittedBy: '',
+      submittedByName: '',
+      submissionDate: new Date().toISOString(),
+      isValid: true,
+      status: 'draft',
+      progressStatus: 'notStarted',
+      completePercentage: 0
+    };
+  }
+
+
+  submissions[evidenceCode].answers = { ...updatedAnswers?.answers }; // ensure fresh reference
+  submissions[evidenceCode].status = updatedAnswers?.status === 'save'
+    ? 'save'
+    : updatedAnswers?.status === 'draft'
+      ? 'draft'
+      : 'submit';
+
+
+  const progress = this.getProgressStatus(submissions[evidenceCode]);
+  let progressStatus = 'notStarted';
+  if (progress === 100) progressStatus = 'completed';
+  else if (progress > 0) progressStatus = 'inProgress';
+
+
+  evidences[evidenceIndex].completePercentage = progress;
+  evidences[evidenceIndex].progressStatus = progressStatus;
+  evidences[evidenceIndex].isSubmitted = ['save', 'submit'].includes(submissions[evidenceCode].status);
+
+  
+  const data = {
+    key: indexDbKey,
+    data: assessmentClone
+  };
+
+  try {
+    await this.db.updateData(data);
+
+    
+    this.assessment = assessmentClone;
+
+    return true;
+  } catch (error) {
+    console.error("❌ Failed to store data in IndexedDB", error);
+    return false;
+  }
+}
+
+
+  
+
+
+  async deleteFromIndexDb() {
+    const queryParamsData = await this.getQueryParms(); 
+    const indexDbKey = queryParamsData?.indexDbKey;
+    this.db.deleteData(indexDbKey);
+  }
+
+
+  async checkAndMapIndexDbDataToVariables() {
+    const queryParamsData = await this.getQueryParms(); 
+    const indexDbKey = queryParamsData?.indexDbKey;
+    let indexdbData = await this.db.getData(indexDbKey);
+    let currentObservation = indexdbData?.data;
+    if (currentObservation) {
+      this.assessment = this.questionnaireService.mapSubmissionToAssessment(
+        currentObservation
+      );
+      this.evidence = this.apiConfig?.solutionType == 'observation' ? currentObservation?.assessment?.evidences[+[this.apiConfig.index]] : currentObservation?.assessment?.evidences[0];
+      this.evidence.startTime = Date.now();
+      this.endDate = new Date(
+        new Date(currentObservation?.assessment?.endDate).getTime() +
+        new Date(currentObservation?.assessment?.endDate).getTimezoneOffset() *
+        60000
+      );
+      this.isExpired = currentObservation?.assessment?.status == 'expired' || false;
+      this.sections = this.evidence?.sections;
+      if (this.sections?.length == 1) {
+        this.setSection(this.sections[0].name);
+        if (document.getElementById('observation-ion-toolbar')) {
+          document.getElementById('observation-ion-toolbar').style.display = 'none'
+        }
+        this.listing = false
+      }
+      this.questionnaireForm = this.fb.group({});
+
+      this.questionnaireForm.valueChanges.subscribe((data: any) => {
+        this.checkFormValidity();
+      })
+      this.loaded = true;
+
+    }
+    return currentObservation ? true : false;
   }
 
   setApiService() {
@@ -121,6 +354,9 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
     this.apiService.index = this.apiConfig.index;
 
     this.apiService.profileData = this.apiConfig.profileData;
+    this.apiService.stateData = this.apiConfig.stateData;
+
+    this.stateData = this.apiConfig.stateData
   }
 
   fetchDetails() {
@@ -131,21 +367,30 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
           throw new Error('Could not fetch the details');
         })
       )
-      .subscribe((res: any) => {
+      .subscribe(async (res: any) => {
         if (res.result) {
           this.assessment = this.questionnaireService.mapSubmissionToAssessment(
             res.result
           );
-          this.evidence = this.apiConfig.solutionType == 'observation' ? this.assessment?.assessment?.evidences[+[this.apiConfig.index]] : this.assessment?.assessment?.evidences[0];
+          this.evidence = this.apiConfig?.solutionType == 'observation' ? this.assessment?.assessment?.evidences[+[this.apiConfig.index]] : this.assessment?.assessment?.evidences[0];
           this.evidence.startTime = Date.now();
           this.endDate = new Date(
-            new Date(this.assessment.assessment.endDate).getTime() +
-            new Date(this.assessment.assessment.endDate).getTimezoneOffset() *
+            new Date(this.assessment?.assessment?.endDate).getTime() +
+            new Date(this.assessment?.assessment?.endDate).getTimezoneOffset() *
             60000
           );
-          this.isExpired = this.assessment.assessment.status == 'expired';
-          this.sections = this.evidence.sections;
+          this.isExpired = this.assessment?.assessment?.status == 'expired';
+          this.sections = this.evidence?.sections;
           this.loaded = true;
+
+
+    let isDataInlocalSotrage = await this.checkAndMapIndexDbDataToVariables();
+          if(!isDataInlocalSotrage){
+            this.submissionId = this.assessment?.assessment?.submissionId || "";
+            this.evidenceCode = this.assessment?.assessment?.evidences[0]?.code || "";
+            this.setDataInIndexDb(this.submissionId)
+          }
+
         } else {
           this.toaster.showToast('Something went wrong, Please try again later', 'danger', 5000)
         }
@@ -153,34 +398,7 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
       });
   }
 
-  ngOnInit() {
-    if (typeof this.apiConfig === 'string') {
-      try {
-        this.apiConfig = JSON.parse(this.apiConfig);
-        this.setApiService();
-        this.fetchDetails()
-       
-      } catch (error) {
-        throw new Error('Invalid Assessment Structure', error);
-      }
-    }
-    if (this.sections?.length == 1) {
-      this.setSection(this.sections[0].name);
-      if(document.getElementById('observation-ion-toolbar')){
-        document.getElementById('observation-ion-toolbar').style.display = 'none';
-        this.listing = false;
-      }
-    }
-    this.questionnaireForm = this.fb.group({});
-    this.questionnaireForm.valueChanges.subscribe((data: any) => {
-      this.checkFormValidity();
-    })
-    if (this.sections?.length == 1) {
-      if(document.getElementById('observation-ion-toolbar')){
-        document.getElementById('observation-ion-toolbar').style.display = 'none'
-      }
-    }
-  }
+
 
   getQuestionMap() {
     for (
@@ -330,9 +548,8 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
       }
     }
     this.domQuery(this.sectionName, 'block');
-    if(document.getElementById('observation-ion-toolbar')){
-      document.getElementById('observation-ion-toolbar').style.display = 'none';
-      this.listing = true;
+    if (document.getElementById('observation-ion-toolbar')) {
+      document.getElementById('observation-ion-toolbar').style.display = 'block'
     }
 
   }
@@ -357,6 +574,51 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
     this.submitSurvey(submissionData);
   }
 
+  async submitImageToCloud(data): Promise<any> {
+    const payload: any = {
+      ref: 'survey',
+      request: {
+        [data.submissionId]: {
+          files: [data.name],
+        }
+      }
+    };
+
+    try {
+      const response: any = await firstValueFrom(
+        this.apiService.post(urlConfig.presignedUrl, payload)
+      );
+
+      const presignedUrlData = response.result[data.submissionId].files[0];
+      const headers = new HttpHeaders({
+        'Content-Type': 'multipart/form-data',
+        "x-ms-blob-type": "BlockBlob",
+      });
+
+      await firstValueFrom(
+        this.http.put(presignedUrlData.url, data.file, { headers })
+      );
+
+      const obj: any = {
+        name: data.name,
+        url: presignedUrlData.url.split('?')[0],
+        previewUrl: presignedUrlData.url.split('?')[0],
+        question_id: data.question_id,
+      };
+
+      for (const key of Object.keys(presignedUrlData.payload)) {
+        obj[key] = presignedUrlData.payload[key];
+      }
+
+      return obj;
+
+    } catch (err) {
+      console.error('Upload failed', err);
+      throw err;
+    }
+  }
+
+
   async submitSurvey(submissionData) {
     if (submissionData.status !== 'draft') {
       if (!this.saveQuestioner) {
@@ -368,52 +630,85 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
           acceptLabel: 'Confirm',
         };
         const response = await this.openAlert(confirmationParams);
-        if (!response) {
-          return;
-        }
-      }
-    }
-    this.apiService
-      .post(
-        `${urlConfig[this.apiConfig.solutionType].update}${this.assessment.assessment.submissionId}`,
-        {
-          evidence: submissionData,
-        })
-      .pipe(
-        catchError((err) => {
-          this.toaster.showToast(err?.error?.message, 'danger', 5000)
-          throw new Error(`Update api has failed`);
-        })
-      )
-      .subscribe(async (res: any) => {
-        if (res.status == 200) {
-          if (!this.saveQuestioner) {
-            this.formIsNotDirty();
-            if (submissionData.status == 'draft') {
-              const confirmationParams = {
-                title: 'Success',
-                message: `Successfully your ${this.apiConfig.solutionType} has been saved. Do you want to continue?`,
-                acceptLabel: 'No',
-                cancelLabel: 'Yes',
-                type: 'success'
-              };
-              const response = await this.openAlert(confirmationParams);
-              if (response) {
-                if (this.sections?.length > 1) {
-                  this.backToSectionListing();
-                } else {
-                  this.location.back();
-                }
+        if (response) {
+          const answers = submissionData?.answers;
+
+          for (let [qid, answerObj] of Object.entries(answers)) {
+            const answer = answerObj as { fileName?: any[] };
+            const files = answer.fileName || [];
+            for (let file of files) {
+              if (!file?.isUploaded) {
+                const storedFile: any = await this.db.getData(file?.name);
+                if (!storedFile || !storedFile.data) continue;
+
+                const convertedFile = this.attachmentService.base64ToFile(storedFile.data);
+                file.file = convertedFile;
+
+                const presignedUrlData: any = await this.submitImageToCloud(file);
+
+                file.isUploaded = true;
+                file.previewUrl = presignedUrlData.url.split('?')[0];
+                file.url = presignedUrlData.url.split('?')[0];
+                file.file = "";
+
+                await this.updateDataInIndexDb(submissionData);
               }
-            } else {
-              const footer = this.el.nativeElement.querySelector('.footer-buttons');
-              this.renderer.setStyle(footer, 'display', 'none');
-              this.toaster.showToast(`Your ${this.apiConfig.solutionType} has been submitted successfully.`, 'success', 5000);
-              this.evidence.isSubmitted = true;
             }
           }
+
         }
-      });
+        if (!response) return;
+      }
+      const responseFromUpdateDataFunction = await this.updateDataInIndexDb(submissionData);
+      if (responseFromUpdateDataFunction) {
+
+      this.apiService
+        .post(
+          `${urlConfig[this.apiConfig.solutionType].update}${this.assessment.assessment.submissionId}`,
+          { evidence: submissionData }
+        )
+        .pipe(
+          catchError((err) => {
+            this.toaster.showToast(err?.error?.message, 'danger', 5000);
+            throw new Error(`Update API has failed`);
+          })
+        )
+        .subscribe((res: any) => {
+          if (res.status === 200 && !this.saveQuestioner) {
+            this.formIsNotDirty();
+            const footer = this.el.nativeElement.querySelector('.footer-buttons');
+            this.renderer.setStyle(footer, 'display', 'none');
+            this.toaster.showToast(
+              `Your ${this.apiConfig.solutionType} has been submitted successfully.`,
+              'success',
+              5000
+            );
+            this.evidence.isSubmitted = true;
+          }
+        });
+      }
+    } else {
+      const responseFromUpdateDataFunction = await this.updateDataInIndexDb(submissionData);
+      if (responseFromUpdateDataFunction && !this.saveQuestioner) {
+        this.formIsNotDirty();
+        const confirmationParams = {
+          title: 'Success',
+          message: `Successfully your ${this.apiConfig.solutionType} has been saved. Do you want to continue?`,
+          acceptLabel: 'Later',
+          cancelLabel: 'Continue',
+          type: 'success',
+        };
+        const response = await this.openAlert(confirmationParams);
+        if (response) {
+          if (this.sections?.length > 1) {
+            this.backToSectionListing();
+          } else {
+            this.location.back();
+          }
+        }
+
+      }
+}
   }
 
   async openAlert(alertDialogConfig) {
@@ -441,10 +736,10 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
   setSection(name: string) {
     this.sectionName = name;
     this.enableRelevantPage();
-    if(document.getElementById('observation-ion-toolbar')){
+    if (document.getElementById('observation-ion-toolbar')) {
       document.getElementById('observation-ion-toolbar').style.display = 'none'
     }
-    this.mainComponent.enableRelevantPage();
+    this.mainComponent?.enableRelevantPage();
     let sectionElements = document.getElementsByClassName('section-listing');
     if (sectionElements.length > 0) {
       for (let i = 0; i < sectionElements.length; i++) {
@@ -457,7 +752,7 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
   backToSectionListing() {
     this.listing = false;
     this.domQuery(this.sectionName, 'none');
-    if(document.getElementById('observation-ion-toolbar')){
+    if (document.getElementById('observation-ion-toolbar')) {
       document.getElementById('observation-ion-toolbar').style.display = 'block'
     }
     let sectionElements = document.getElementsByClassName('section-listing');
@@ -468,7 +763,7 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
         (sectionElements[i] as HTMLElement).style.display = 'block';
       }
     }
-    if(this.sections.length == 1){
+    if (this.sections.length == 1) {
       this.location.back();
     }
   }
@@ -495,12 +790,64 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
     if (this.apiConfig.solutionType == 'observation' && this.questionnaireForm.dirty) {
       this.saveQuestioner = true;
       this.submission('draft');
-      this.subscription.unsubscribe();
+      this.subscription?.unsubscribe();
       this.sharedService.updateValue(false);
       this.questionnaireForm.reset();
-      if(document.getElementById('observation-ion-toolbar')){
+      if (document.getElementById('observation-ion-toolbar')) {
         document.getElementById('observation-ion-toolbar').style.display = 'block';
       }
     }
   }
+
+  async start() {
+    const { observationAsTask, isATargetedSolution } = this.stateData || {};
+
+    if (observationAsTask || isATargetedSolution) {
+      const message = { type: 'START', data: this.stateData };
+      window.postMessage(message, '*');
+    } else {
+      this.toaster.showToast(
+        'Dear User, this Observation is not relevant for your subrole and location',
+        'danger',
+        5000
+      );
+    }
+  }
+
+  getQuestions(data) {
+
+    if (data?.isATargetedSolution === false) {
+
+      this.toaster.showToast('Dear User, this Observation is not relevant for your subrole and location', 'danger', 5000)
+
+    }
+
+    this.assessment = this.questionnaireService.mapSubmissionToAssessment(
+
+      data
+
+    );
+
+    this.evidence = this.apiConfig?.solutionType == 'observation' ? this.assessment?.assessment?.evidences[+[this.apiConfig.index]] : this.assessment?.assessment?.evidences[0];
+
+    this.evidence.startTime = Date.now();
+
+    this.endDate = new Date(
+
+      new Date(this.assessment?.assessment?.endDate).getTime() +
+
+      new Date(this.assessment?.assessment?.endDate).getTimezoneOffset() *
+
+      60000
+
+    );
+
+    this.isExpired = this.assessment?.assessment?.status == 'expired';
+
+    this.sections = this.evidence?.sections;
+
+    this.loaded = true;
+
+  }
+
 }
