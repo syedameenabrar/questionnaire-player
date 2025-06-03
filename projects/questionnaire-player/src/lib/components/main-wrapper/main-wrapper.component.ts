@@ -417,6 +417,16 @@ async updateDataInIndexDb(updatedAnswers) {
           this.assessment = this.questionnaireService.mapSubmissionToAssessment(
             res.result
           );
+          this.submissionId = this.assessment.assessment.submissionId;
+            this.evidenceCode = this.assessment.assessment.evidences[0].code;
+
+
+          let isDataInlocalSotrage = await this.checkAndMapIndexDbDataToVariables();
+
+          if(!isDataInlocalSotrage){
+
+          this.setDataInIndexDb(this.submissionId);
+              
           this.evidence = this.solutionType == 'observation' ? this.assessment?.assessment?.evidences[+[this.apiConfig.index]] : this.assessment?.assessment?.evidences[0];
           this.evidence.startTime = Date.now();
           this.endDate = new Date(
@@ -427,13 +437,6 @@ async updateDataInIndexDb(updatedAnswers) {
           this.isExpired = this.assessment?.assessment?.status == 'expired';
           this.sections = this.evidence?.sections;
           this.loaded = true;
-
-
-    let isDataInlocalSotrage = await this.checkAndMapIndexDbDataToVariables();
-          if(!isDataInlocalSotrage){
-            this.submissionId = this.assessment?.assessment?.submissionId || "";
-            this.evidenceCode = this.assessment?.assessment?.evidences[0]?.code || "";
-            this.setDataInIndexDb(this.submissionId)
           }
 
         } else {
