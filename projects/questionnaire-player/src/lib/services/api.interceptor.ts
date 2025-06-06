@@ -88,14 +88,14 @@ export class ApiInterceptor implements HttpInterceptor {
   }
 
   private addAuthHeader(request: HttpRequest<any>, token: string | null): HttpRequest<any> {
+    let headers: any = localStorage.getItem('headers');
+    let extraHeaders = JSON.parse(headers);
     if (token) {
       return request.clone({
-        setHeaders: {
-          'X-auth-token': token,
-        },
-      });
+        setHeaders: extraHeaders ? { 'X-auth-token': token,...extraHeaders } : { 'X-auth-token': token }
+      });; 
     }
-    return request;
+    return request
   }
 
   private handleError(error: HttpErrorResponse): Observable<never> {
