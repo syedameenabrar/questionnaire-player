@@ -2,7 +2,7 @@
     "survey":{
         "details":"/ml/surveys/mlsurvey/v1/details?solutionId=",
         "update":"/ml/surveySubmissions/mlsurvey/v1/update/",
-        "reportUrl":"/ml/reports/mlreports/v1/fetch",
+        "reportUrl":"/ml/reports/mlreports/v1/fetch/",
         "surveyVerifyLink":"/ml/surveys/mlsurvey/v1/details/"
     },
     "observation":{

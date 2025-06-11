@@ -148,7 +148,15 @@ export class AttachmentComponent {
     }
   }
 
-  async showFilePreview(url: any, type: string) {
+  async showFilePreview(file: any, type: string) {
+    let url:any ="";
+    if(file.previewUrl){
+      url = file.previewUrl
+    }else{
+      const blob = this.attachmentService.base64ToFile(file.file);
+      url = URL.createObjectURL(blob);
+    }
+
     this.objectURL = url;
     this.objectType = type;
     this.dialogRef = this.dialog.open(this.previewModal, {
@@ -168,9 +176,18 @@ export class AttachmentComponent {
     }
   }
 
-  openUrl(url: string) {
+  openUrl(file: any) {
+    let url:any ="";
+    if(file.previewUrl){
+      url = file.previewUrl
+    }else{
+      const blob = this.attachmentService.base64ToFile(file.file);
+      url = URL.createObjectURL(blob);
+    }
+
     window.open(url, '_blank');
   }
+  
 
   fileLimitCross() {
     const alertDialogConfig = {
