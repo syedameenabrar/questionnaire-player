@@ -837,6 +837,7 @@ async updateDataInIndexDb(updatedAnswers) {
   }
 
   ngOnDestroy(): void {
+    this.toaster.clearToaster()
     if (this.solutionType == 'observation' && this.questionnaireForm.dirty) {
       this.saveQuestioner = true;
       this.submission('draft');
