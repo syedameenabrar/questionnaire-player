@@ -368,6 +368,10 @@ async updateDataInIndexDb(updatedAnswers) {
         })
       )
       .subscribe(async (res: any) => {
+        if(!res.result && res.message === "Link is expired"){
+          this.surveyExpired(res)
+          return ;
+        }
         if (res.result) {
           this.assessment = this.questionnaireService.mapSubmissionToAssessment(
             res.result
@@ -848,6 +852,11 @@ async updateDataInIndexDb(updatedAnswers) {
 
     this.loaded = true;
 
+  }
+
+  surveyExpired(data){
+    const message = { type: 'EXPIRED', data: data };
+    window.postMessage(message, '*');
   }
 
 }
