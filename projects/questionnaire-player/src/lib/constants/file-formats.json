@@ -6,19 +6,59 @@
             "jpeg",
             "image/png",
             "image/jpg",
-            "image/jpeg"
+            "image/jpeg",
+            "image/heic",
+            "heic",
+            "image/heif",
+            "heif",
+            "image/webp",
+            "webp",
+            "image/hevc",
+            "hevc"
         ],
         "video": [
             "mp4",
-            "video/mp4"
+            "video/mp4",
+            "avi",
+            "video/avi",
+            "flv",
+            "video/flv",
+            "3gp",
+            "video/3gp",
+            "m4v",
+            "video/m4v",
+            "mkv",
+            "video/mkv",
+            "mov",
+            "video/mov",
+            "ogg",
+            "video/ogg",
+            "webm",
+            "video/webm",
+            "wmv",
+            "video/wmv"
         ],
         "audio": [
+            "mp3",
+            "audio/mp3",
+            "wav",
+            "audio/wav",
+            "mpeg",
+            "audio/mpeg"
         ],
         "pdf": [
             "pdf",
             "application/pdf"
         ],
-        "doc":[
+        "doc": [
+            "csv",
+            "doc",
+            "docx",
+            "pptx",
+            "txt",
+            "xls",
+            "xlsx",
+            "ppt"
         ]
     },
     "limit": 50

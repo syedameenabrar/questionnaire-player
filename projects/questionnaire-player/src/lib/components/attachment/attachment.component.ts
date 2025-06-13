@@ -149,12 +149,33 @@ export class AttachmentComponent {
   }
 
   async showFilePreview(file: any, type: string) {
-    let url:any ="";
-    if(file.previewUrl){
-      url = file.previewUrl
-    }else{
+    let url: any = "";
+    if (file.previewUrl) {
+      url = file.previewUrl;
+    } else {
       const blob = this.attachmentService.base64ToFile(file.file);
       url = URL.createObjectURL(blob);
+    }
+  
+    const unsupportedPreviewTypes = [
+      'avi', 'flv', 'csv', 'doc', 'docx', 'ppt', 'pptx', 'txt', 'xls', 'xlsx', 'mpeg'
+    ];
+  
+    if (unsupportedPreviewTypes.includes(type.toLowerCase())) {
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = file.name || `download.${type}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      this.openAlert({
+        title: 'Preview Not Supported',
+        message: `${type.toUpperCase()} files cannot be previewed. The file will be downloaded instead.`,
+        acceptLabel: 'OK',
+        cancelLabel: null
+      });
+      return;
     }
 
     this.objectURL = url;
@@ -165,16 +186,18 @@ export class AttachmentComponent {
       enterAnimationDuration: 300,
       exitAnimationDuration: 150,
     });
+  
     if (this.objectType == 'doc') {
       const alertDialogConfig = {
         title: null,
-        message: `Please wait it may take up to a minute to load`,
+        message: `Please wait, it may take up to a minute to load.`,
         acceptLabel: 'Close Preview',
         cancelLabel: null,
       };
       this.openAlert(alertDialogConfig, true);
     }
   }
+  
 
   openUrl(file: any) {
     let url:any ="";
