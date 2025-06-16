@@ -413,7 +413,7 @@ async updateDataInIndexDb(updatedAnswers) {
         })
       )
       .subscribe(async (res: any) => {
-        if(!res.result && res.message === "Link is expired"){
+        if(!res.result){
           this.surveyExpired(res)
           return ;
         }
