@@ -53,6 +53,7 @@ export class MainComponent implements OnInit, AfterViewInit {
   }
   
   enableRelevantPage(questionId?){
+    window.scrollTo(0, 0);
     if(!this.questionnaireInstance){
       for(let i = 0; i < this.questions.length; i++){
         if(i !== this.pageIndex){
