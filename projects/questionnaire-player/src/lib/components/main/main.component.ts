@@ -49,7 +49,9 @@ export class MainComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-   this.enableRelevantPage();
+    setTimeout(() => {
+      this.enableRelevantPage();
+    });
   }
   
   enableRelevantPage(questionId?){
@@ -76,6 +78,7 @@ export class MainComponent implements OnInit, AfterViewInit {
   }
 
   handlePageEvent(e) {
+    this.pageIndex = e.pageIndex;
     if (this.questions[e.pageIndex] && !this.findNextVisibleQuestion(e.pageIndex, this.pageIndex)) {
       this.paginatorLength = this.pageIndex +1;
     }
