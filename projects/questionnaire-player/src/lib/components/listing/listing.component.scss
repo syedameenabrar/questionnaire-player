@@ -26,12 +26,24 @@
   padding: 10px;
 }
 
-@media (max-width: 48rem) {
-  .grid-item {
-    cursor: pointer;
-    width: 100%;
-    padding: 10px;
-  }
+
+.name-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tag-not-started {
+  background-color: #ffffff;
+  color: #000;
+  border: 1px solid #ccc;
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  min-width: 20%;
 }
 
 .mat-card {
@@ -51,7 +63,15 @@
   font-weight: bold;
   margin-bottom: 0.5rem;
   color: var(--primary-color);
-  ;
+  word-break: break-all;
+}
+
+.not-started-container {
+  display: flex;
+  position: relative;
+  bottom: 0;
+  justify-content: end;
+  width: 100%;
 }
 
 ::ng-deep {
@@ -261,3 +281,14 @@ img {
 //     grid-template-columns: 1fr;
 //   }
 // }
+@media (max-width: 48rem) {
+  .grid-item {
+    cursor: pointer;
+    width: 100%;
+    padding: 10px;
+  }
+  .tag-not-started {
+    min-width: 45%;
+  }
+
+}

@@ -35,7 +35,7 @@
     color: var(--general-btn-text-color);
     border: none;
 }
-  
+
 .primary-btn {
     background-color: var(--color-light);
     color: var(--primary-color);
@@ -47,7 +47,7 @@
     justify-content: space-between;
     padding: 0.5rem 1.5rem 1.5rem;
 }
-  
+
 .mat-dialog-actions button {
     cursor: pointer;
     text-transform: none;
@@ -74,4 +74,15 @@
   .btn-inner-container {
     display: flex;
     justify-content: end;
+}
+
+.observation-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin-bottom: .5rem;
+    color: var(--primary-color);
+    word-break: break-all;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    min-width: 60%;
 }

@@ -10,19 +10,19 @@
           <span class="icon">
             <i class="material-icons">search</i>
           </span>
-          <input 
-            [(ngModel)]="searchTerm" 
-            (keydown)="handleKeyDown($event)" 
-            placeholder="Search your observation here" 
+          <input
+            [(ngModel)]="searchTerm"
+            (input)="onInputChange($event)"
+            placeholder="Search your observation here"
             class="search-input"
           />
-          <button *ngIf="searchTerm" aria-label="Clear" class="clear-btn" (click)="handleInput()">
+          <button *ngIf="searchTerm" aria-label="Clear" class="clear-btn">
             <i class="material-icons">close</i>
           </button>
         </div>
       </div>
     </div>
-  
+
     <div class="observation-list" *ngIf="solutionListCount !== 0">
 
      <div class="select-filter" *ngIf="reportPage">
@@ -40,8 +40,13 @@
           <div class="grid-item" *ngFor="let solution of solutionList" (click)="navigateTo(solution)">
             <mat-card class="observation-card">
               <mat-card-content>
-                <h2 class="observation-name">{{ solution?.name }}</h2>
+                <section class="name-container">
+                  <h2 class="observation-name">{{ solution?.name }}</h2>
+                </section>
                 <p>{{ reportPage == 'true' ? solution?.programName : solution?.description }}</p>
+                <div class="not-started-container">
+                  <span _ngcontent-ng-c4087934057="" class="tag-not-started" *ngIf="solution._id == ''"> Not Started </span>
+                </div>
               </mat-card-content>
             </mat-card>
           </div>
@@ -65,7 +70,7 @@
       <div>
         <ul>
           <li *ngFor="let question of allEntities; let i = index">
-            <input type="checkbox" [(ngModel)]="question.selected" class="modal-input" [id]="'question-' + i" (change)="onEntityChange(i)" > 
+            <input type="checkbox" [(ngModel)]="question.selected" class="modal-input" [id]="'question-' + i" (change)="onEntityChange(i)" >
             <label [for]="'question-' + i">
               {{ question.name }}
             </label>

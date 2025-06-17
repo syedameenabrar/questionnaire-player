@@ -15,6 +15,7 @@ import * as urlConfig from '../../constants/url-config.json';
 import { catchError } from 'rxjs/operators';
 import { PrivacyPopupComponent } from '../privacy-popup/privacy-popup.component';
 import { ToastService } from '../../services/toast.service';
+import { DialogComponent } from '../dialog/dialog.component';
 @Component({
   selector: 'lib-attachment',
   templateUrl: './attachment.component.html',
@@ -28,6 +29,7 @@ export class AttachmentComponent {
   objectURL: string;
   formats = types;
   @ViewChild('previewModal') previewModal: TemplateRef<any>;
+  @ViewChild(DialogComponent) childDialogComponent: DialogComponent;
   @ViewChild('fileInput') fileInput: ElementRef;
   fileUploadResponse = null;
   objectType: string;
@@ -35,6 +37,9 @@ export class AttachmentComponent {
   dialogRef: any;
   @Input() questionFile;
   public isConsentGiven = false;
+  isDimmed: any;
+  hint: string;
+  hintModalNote: string;
   constructor(
     private dialog: MatDialog,
     private http: HttpClient,
@@ -265,7 +270,7 @@ export class AttachmentComponent {
         if (data.isChecked && data.upload) {
           this.isConsentGiven = true;
           this.questionId = questionId;
-  
+
           const fileInputElement = document.getElementById(
             questionId
           ) as HTMLInputElement;
@@ -279,7 +284,7 @@ export class AttachmentComponent {
           );
         }
       }
-   
+
     } catch (error) {
       console.error('Error handling file upload:', error);
       this.toastService.showToast(
@@ -308,6 +313,17 @@ export class AttachmentComponent {
     });
 
     return dialogRef.afterClosed();
+  }
+
+  openDialog() {
+    this.isDimmed = !this.isDimmed;
+    this.hint = "Accepted formats are png,jpg,jpeg,pdf,mp4 and Maximum file size upload limit is 50MB.";
+    this.hintModalNote = "Note: This is the hint for the following attachment";
+    this.childDialogComponent.openDialog('300ms', '150ms');
+  }
+
+  closeHint(){
+    this.isDimmed = false;
   }
 
   docLoader() {

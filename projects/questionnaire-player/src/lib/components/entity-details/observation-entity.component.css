@@ -169,14 +169,14 @@
     gap: 0.5rem;
     height: 2.375rem;
   }
-  
+
   .icon {
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--color-grey);
   }
-  
+
   .search-input {
     flex: 1;
     border: none;
@@ -185,11 +185,11 @@
     color: var(--color-dark);
     padding: 0.25rem 0;
   }
-  
+
   .search-input::placeholder {
     color: var(--color-grey);
   }
-  
+
   .clear-btn {
     background: none;
     border: none;
@@ -200,4 +200,11 @@
     color: var(--color-grey);
     padding: 0.25rem;
   }
-  
+
+  .fixed-bottom-button {
+    width: 100%;
+    position: absolute;
+    background-color: var(--primary-color) !important;
+    z-index: 100;
+    bottom: 0rem;
+  }

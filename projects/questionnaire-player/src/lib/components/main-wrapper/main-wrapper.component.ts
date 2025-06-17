@@ -159,7 +159,7 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
         this.apiConfig = JSON.parse(this.apiConfig);
         this.setApiService();
         this.fetchDetails()
-       
+
       } catch (error) {
         throw new Error('Invalid Assessment Structure', error);
       }
@@ -410,6 +410,11 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
               this.renderer.setStyle(footer, 'display', 'none');
               this.toaster.showToast(`Your ${this.apiConfig.solutionType} has been submitted successfully.`, 'success', 5000);
               this.evidence.isSubmitted = true;
+              console.log("submitted____________")
+              // if(this.apiConfig.solutionType == 'observation') {
+              //   this.router.navigate(["/observation"], { queryParams: { type: "listing" } });
+              // }
+              this.location.back();
             }
           }
         }

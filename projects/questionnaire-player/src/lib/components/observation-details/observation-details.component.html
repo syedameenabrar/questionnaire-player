@@ -1,9 +1,10 @@
 
   <div class="list-title">
+      <h1 class="heading">{{observations[0]?.observationName}}</h1>
       <h1 class="heading">{{entityName}}</h1>
       <p class="heading-paragraph">Select Observation from the list to observe</p>
   </div>
-  
+
   <div *ngIf="loaded">
     <mat-tab-group mat-stretch-tabs="true" [(selectedIndex)]="selectedTabIndex" class="mb-5" (selectedTabChange)="toggleTabs($event)">
 
@@ -20,12 +21,12 @@
                       <p *ngIf="entity?.status == 'completed'">Submitted On : {{entity?.submissionDate | date:'shortDate'}}</p>
 
                     </mat-card-content>
-    
+
                     <div *ngIf="!entity?.isRubricDriven || allowMultipleAssessemts == 'true'">
                     <button mat-icon-button [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()">
                       <mat-icon>more_vert</mat-icon>
                     </button>
-    
+
                     <mat-menu #menu="matMenu">
                       <button mat-menu-item (click)="editEntity(entity?.title, entity?._id)">Edit</button>
                       <button mat-menu-item (click)="deleteEntity(entity?._id)">Delete</button>
@@ -41,7 +42,7 @@
           </div>
         </div>
       </mat-tab>
-    
+
       <mat-tab label="Completed" >
         <div class="observation-list">
           <div class="grid-container">
@@ -66,7 +67,7 @@
         </div>
       </mat-tab>
     </mat-tab-group>
-    
+
     <div class="fixed-bottom-buttons">
       <button mat-raised-button (click)="observeAgain()" *ngIf="allowMultipleAssessemts == 'true' && isPendingTabSelected">Observe again</button>
       <button mat-raised-button color="accent" (click)="viewReport()" *ngIf="!isPendingTabSelected && filteredObservations?.length > 0">View report</button>

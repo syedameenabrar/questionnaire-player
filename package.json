@@ -1,6 +1,6 @@
 {
-  "name": "questionnaire-webcomponent",
-  "version": "4.1.17",
+  "name": "questionnaire-ram-webcomponent",
+  "version": "1.0.12",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",

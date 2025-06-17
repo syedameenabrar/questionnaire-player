@@ -10,10 +10,10 @@
         <span class="icon">
           <i class="material-icons">search</i>
         </span>
-        <input 
-          [(ngModel)]="searchValue" 
+        <input
+          [(ngModel)]="searchValue"
           (input)="handleEntitySearchInput($event)"
-          [placeholder]="'Search '+ entityToAdd" class="search"  
+          [placeholder]="'Search '+ entityToAdd" class="search"
           class="search-input"
         />
         <button *ngIf="searchValue" aria-label="Clear" class="clear-btn" (click)="handleEntitySearchInput()">
@@ -26,7 +26,7 @@
     <div class="add-btn-container">
       <button class="add-entity-btn" (click)="openAllEntityList()" [disabled]="!observationId" [ngClass]="{ 'disabled-button': !observationId }">Add {{entityToAdd}}</button>
     </div>
-  
+
     <div class="d-flex flex-dc gap-4">
       <div class="observation-list">
         <div class="grid-container">
@@ -46,7 +46,7 @@
                 </div>
               </mat-card-content>
             </mat-card>
-            
+
           </div>
         </div>
       </div>
@@ -74,8 +74,8 @@
           <span class="icon">
             <i class="material-icons">search</i>
           </span>
-          <input 
-            [(ngModel)]="searchAddEntityValue" 
+          <input
+            [(ngModel)]="searchAddEntityValue"
             (input)="handleSearchInput($event)"
             [placeholder]="'Search ' + (selectedEntities?.entityType || 'items')"
             class="search-input"
@@ -85,18 +85,24 @@
           </button>
         </div>
       </div>
-      <mat-selection-list 
-      [multiple]="true" 
+      <mat-selection-list
+      [multiple]="true"
       (selectionChange)="onSelectionChange($event)">
-      <mat-list-option 
-        *ngFor="let entity of filteredEntities" 
+      <mat-list-option
+        *ngFor="let entity of filteredEntities"
         [value]="entity?._id"
         [selected]="isEntitySelected(entity)"
         [disabled]="isEntityInFilteredEntitiesOne(entity)">
         {{ entity?.name }}
       </mat-list-option>
+      <mat-list-option>
+        <div  *ngIf="filteredEntities?.length >= this.pageCount" class="fixed-bottom-button">
+          <button mat-raised-button color="accent" class="fixed-bottom-button" (click)="loadMore()">LOAD MORE</button>
+        </div>
+      </mat-list-option>
+
     </mat-selection-list>
-    
+
 
       <p class="no-data" *ngIf="!filteredEntities?.length">No {{ selectedEntities?.entityType }} found</p>
     </div>

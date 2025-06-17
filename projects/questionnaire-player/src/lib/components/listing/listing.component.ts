@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, debounceTime, distinctUntilChanged, finalize, switchMap } from 'rxjs/operators';
 import * as urlConfig from '../../constants/url-config.json';
 import { ToastService } from '../../services/toast.service';
 import { ApiService } from '../../services/api.service';
 import { QueryParamsService } from '../../services/queryParams.service';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'lib-listing',
@@ -31,6 +32,7 @@ export class ListingComponent implements OnInit {
   solutionListCount :any = 0;
   selectedObservation:any;
   isAnyEntitySelected: boolean = false;
+  private searchTerms = new Subject<string>();
 
   constructor(
     public router: Router,
@@ -41,10 +43,18 @@ export class ListingComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log("----------working----------")
     this.queryParamsService.parseQueryParams();
     this.reportPage = this.queryParamsService.reportPage === 'true';
     this.pageTitle = this.reportPage ? 'Observation Reports' : 'Observations';
     this.loadInitialData();
+    this.searchTerms.pipe(
+      debounceTime(300), // wait 300ms after each keystroke before considering the term
+      distinctUntilChanged(), // ignore new term if same as previous term
+    ).subscribe((results) => {
+      this.handleInput(results)
+    });
+
   }
 
   loadInitialData(): void {
@@ -53,14 +63,9 @@ export class ListingComponent implements OnInit {
     this.getListData();
   }
 
-  handleKeyDown(event: KeyboardEvent): void {
-    if (event.key === 'Enter') {
-      this.handleInput(event);
-    }
-  }
 
-  handleInput(event?: any): void {
-    this.searchTerm = event ? event?.target?.value : "";
+  handleInput(term: any): void {
+    this.searchTerm = term
     this.page = 1;
     this.solutionList = [];
     this.solutionListCount = 0;
@@ -132,6 +137,11 @@ export class ListingComponent implements OnInit {
     let selectedEntity = this.allEntities.filter(question => question.selected);
     this.router.navigate(['/observation'], { queryParams: { 'type': 'reports', 'observationId': `${this.selectedObservation?.observationId}`, entityId: `${selectedEntity[0]?._id}`, 'entityType': this.selectedObservation?.entityType, isMultiple: false, scores:this.selectedObservation?.isRubricDriven ? true : false  } })
   }
+
+  onInputChange(event: any): void {
+    this.searchTerms.next(event.target.value);
+  }
+
 
   onEntityChange(selectedIndex: number): void {
     this.allEntities.forEach((entity, index) => {
