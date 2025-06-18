@@ -72,6 +72,9 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
   submissionId:any;
   evidenceCode:any;
   solutionType :any;
+  uploading:boolean= false;
+  totalFileToUpload:any = 0;
+  currentFileUploaded = 0;
 
   constructor(
     public fb: FormBuilder,
@@ -670,10 +673,9 @@ async updateDataInIndexDb(updatedAnswers) {
     }
   }
 
-
   async submitSurvey(submissionData) {
     if (submissionData.status !== 'draft') {
-
+  
       if (!this.saveQuestioner) {
         const confirmationParams = {
           title: 'Confirmation',
@@ -682,64 +684,97 @@ async updateDataInIndexDb(updatedAnswers) {
           cancelLabel: 'Cancel',
           acceptLabel: 'Confirm',
         };
+  
         const response = await this.openAlert(confirmationParams);
-        if (response) {
-          const answers = submissionData?.answers;
-
-          for (let [qid, answerObj] of Object.entries(answers)) {
+        if (!response) return;
+  
+        this.totalFileToUpload = 0;
+        this.currentFileUploaded = 0;
+  
+        const answers = submissionData?.answers;
+  
+        for (let [_, answerObj] of Object.entries(answers)) {
+          const answer = answerObj as { fileName?: any[] };
+          const files = answer.fileName || [];
+          for (let file of files) {
+            if (!file?.isUploaded) {
+              this.totalFileToUpload++;
+            }
+          }
+        }
+  
+        this.uploading = true;
+  
+        try {
+          for (let [_, answerObj] of Object.entries(answers)) {
             const answer = answerObj as { fileName?: any[] };
             const files = answer.fileName || [];
+  
             for (let file of files) {
               if (!file?.isUploaded) {
-                const storedFile: any = await this.db.getData(file?.name);
-                if (!storedFile || !storedFile.data) continue;
-
-                const convertedFile = this.attachmentService.base64ToFile(storedFile.data);
-                file.file = convertedFile;
-
-                const presignedUrlData: any = await this.submitImageToCloud(file);
-
-                file.isUploaded = true;
-                file.previewUrl = presignedUrlData.url.split('?')[0];
-                file.url = presignedUrlData.url.split('?')[0];
-                file.file = "";
-
-                await this.updateDataInIndexDb(submissionData);
+                try {
+                  const storedFile: any = await this.db.getData(file?.name);
+                  if (!storedFile || !storedFile.data) {
+                    throw new Error(`No stored data found for file: ${file?.name}`);
+                  }
+  
+                  const convertedFile = this.attachmentService.base64ToFile(storedFile.data);
+                  file.file = convertedFile;
+  
+                  const presignedUrlData: any = await this.submitImageToCloud(file);
+  
+                  file.isUploaded = true;
+                  file.previewUrl = presignedUrlData.url.split('?')[0];
+                  file.url = presignedUrlData.url.split('?')[0];
+                  file.file = "";
+  
+                  this.currentFileUploaded++;
+                  await this.updateDataInIndexDb(submissionData);
+  
+                } catch (uploadErr) {
+                  console.error('File upload failed:', file?.name, uploadErr);
+                  this.toaster.showToast(`Failed to upload file: ${file?.name}`, 'danger', 5000);
+                  this.uploading = false;
+                  return; 
+                }
               }
             }
           }
-
+  
+        } finally {
+          this.uploading = false;
         }
-        if (!response) return;
       }
+  
+     
       const responseFromUpdateDataFunction = await this.updateDataInIndexDb(submissionData);
       if (responseFromUpdateDataFunction) {
-
-      this.apiService
-        .post(
-          `${urlConfig[this.solutionType].update}${this.assessment.assessment.submissionId}`,
-          { evidence: submissionData }
-        )
-        .pipe(
-          catchError((err) => {
-            this.toaster.showToast(err?.error?.message, 'danger', 5000);
-            throw new Error(`Update API has failed`);
-          })
-        )
-        .subscribe((res: any) => {
-          if (res.status === 200 && !this.saveQuestioner) {
-            this.formIsNotDirty();
-            const footer = this.el.nativeElement.querySelector('.footer-buttons');
-            this.renderer.setStyle(footer, 'display', 'none');
-            this.toaster.showToast(
-              `Your ${this.solutionType} has been submitted successfully.`,
-              'success',
-              5000
-            );
-            this.evidence.isSubmitted = true;
-          }
-        });
+        this.apiService
+          .post(
+            `${urlConfig[this.solutionType].update}${this.assessment.assessment.submissionId}`,
+            { evidence: submissionData }
+          )
+          .pipe(
+            catchError((err) => {
+              this.toaster.showToast(err?.error?.message, 'danger', 5000);
+              throw new Error(`Update API has failed`);
+            })
+          )
+          .subscribe((res: any) => {
+            if (res.status === 200 && !this.saveQuestioner) {
+              this.formIsNotDirty();
+              const footer = this.el.nativeElement.querySelector('.footer-buttons');
+              this.renderer.setStyle(footer, 'display', 'none');
+              this.toaster.showToast(
+                `Your ${this.solutionType} has been submitted successfully.`,
+                'success',
+                5000
+              );
+              this.evidence.isSubmitted = true;
+            }
+          });
       }
+  
     } else {
       const responseFromUpdateDataFunction = await this.updateDataInIndexDb(submissionData);
       if (responseFromUpdateDataFunction && !this.saveQuestioner) {
@@ -761,10 +796,9 @@ async updateDataInIndexDb(updatedAnswers) {
         }
       }
     }
-
   }
-
-
+  
+  
   async openAlert(alertDialogConfig) {
     const dialogRef = await this.dialog.open(AlertComponent, {
       data: alertDialogConfig,

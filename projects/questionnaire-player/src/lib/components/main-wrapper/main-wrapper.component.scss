@@ -176,3 +176,69 @@
   box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12);
   z-index: 10;
 }
+
+.uploading-content{
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #fcedea;
+  color: #5e3d2a;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.upload-screen {
+  width: 100%;
+  max-width: 500px;
+  padding: 16px;
+}
+
+
+.upload-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.cloud-icon {
+  width: 12rem;
+    height: 12rem;
+    font-size: 12rem;
+}
+
+.upload-text {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #000000;
+}
+
+.uploading{
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  color: #000000;
+}
+
+.upload-text .progress {
+  font-size: 1.3rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.upload-text .note {
+  font-size: 1rem;
+  color: #333;
+}
+
+@media (max-width: 600px) {
+  .upload-text,
+  .upload-text .progress {
+    font-size: 1.5rem;
+  }
+
+  .upload-text .note {
+    font-size: 1rem;
+  }
+}

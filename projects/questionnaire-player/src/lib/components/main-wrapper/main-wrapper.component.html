@@ -1,5 +1,5 @@
 <div *ngIf="loaded" class="wrapper">
-  <form [formGroup]="questionnaireForm" class="main custom-font">
+  <form [formGroup]="questionnaireForm" class="main custom-font" *ngIf="!uploading;else uplodingModal">
     <div *ngIf="!listing && sections?.length != 1" style="color: var(--primary-color);">
       <h1  class="sesion-title">List of Sections</h1>
       <hr style="height: 1px;background:var(--primary-color);"/>
@@ -24,6 +24,7 @@
         </span>
     </div>
   </form>
+  <ng-container *ngIf="!uploading">
   <ng-container *ngIf="sections?.length > 1;else showAllButtons">
   <span class="sticky-footer" [ngClass]="{'bg-white': !listing}">
     <hr class="partition" />
@@ -45,6 +46,7 @@
     </div>
   </div>
   </span>
+</ng-container>
 </ng-container>
 
 <ng-template #showAllButtons>
@@ -117,6 +119,21 @@
       <button class="btn btn-primary" type="button" (click)="closeModal()">
         Close
       </button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #uplodingModal>
+  <div class="uploading-content">
+    <div class="upload-screen">
+      <div class="upload-body">
+        <mat-icon class="cloud-icon">cloud_upload</mat-icon>
+        <div class="upload-text">
+          <p class="uploading">Uploading</p>
+          <p class="progress">{{ currentFileUploaded }} Of {{totalFileToUpload}} Evidences.</p>
+          <p class="note">Please don't close the app or go back.</p>
+        </div>
+      </div>
     </div>
   </div>
 </ng-template>
