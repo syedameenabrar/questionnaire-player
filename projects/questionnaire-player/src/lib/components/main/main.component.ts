@@ -31,7 +31,7 @@ export class MainComponent implements OnInit, AfterViewInit {
   hintModalNote:string
   @Input() isExpired:boolean;
 
-  pageSize = 1; //Each Question object from Question representing each page irrespective of number of questions it includes
+  pageSize = 1; 
   pageIndex = 0;
   hidePageSize = true;
   showFirstLastButtons = true;

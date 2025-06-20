@@ -658,6 +658,7 @@ async updateDataInIndexDb(updatedAnswers) {
         name: data.name,
         url: presignedUrlData.url.split('?')[0],
         previewUrl: presignedUrlData.url.split('?')[0],
+        sourcePath: presignedUrlData.sourcePath,
         question_id: data.question_id,
       };
 
@@ -727,7 +728,7 @@ async updateDataInIndexDb(updatedAnswers) {
                   file.previewUrl = presignedUrlData.url.split('?')[0];
                   file.url = presignedUrlData.url.split('?')[0];
                   file.file = "";
-  
+                  file.sourcePath = presignedUrlData.sourcePath
                   this.currentFileUploaded++;
                   await this.updateDataInIndexDb(submissionData);
   
