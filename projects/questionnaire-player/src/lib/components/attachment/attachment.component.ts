@@ -175,6 +175,19 @@ export class AttachmentComponent {
         acceptLabel: 'OK',
         cancelLabel: null
       });
+
+
+      const shareOptions = {
+        type: "download",
+        title: file.name,
+        fileType: type,
+        isBase64: file.previewUrl ? false : true,
+        url: file.previewUrl ? file.previewUrl :file.file
+      }
+  
+      let response = await this.postMessageListener(shareOptions)
+
+
       return;
     }
 
@@ -199,7 +212,7 @@ export class AttachmentComponent {
   }
   
 
-  openUrl(file: any) {
+ async openUrl(file: any) {
     let url:any ="";
     if(file.previewUrl){
       url = file.previewUrl
@@ -208,7 +221,19 @@ export class AttachmentComponent {
       url = URL.createObjectURL(blob);
     }
 
-    window.open(url, '_blank');
+    const shareOptions = {
+      type: "download",
+      title: file.name,
+      fileType: "pdf",
+      isBase64: file.previewUrl ? false : true,
+      url: file.previewUrl ? file.previewUrl :file.file
+    }
+
+    let response = await this.postMessageListener(shareOptions)
+if(!response){
+  window.open(url, '_blank');
+}
+
   }
   
 
@@ -324,5 +349,21 @@ export class AttachmentComponent {
 
   docLoader() {
     this.docPreviewAlertRef.close();
+  }
+
+  postMessageListener(data:any):Promise<boolean>{
+    return new Promise((resolve) => {
+      try {
+        if ((window as any).FlutterChannel) {
+          (window as any).FlutterChannel.postMessage(data);
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      } catch (err: any) {
+        console.error('FlutterChannel Error:', err);
+        resolve(false);
+      }
+    });
   }
 }
