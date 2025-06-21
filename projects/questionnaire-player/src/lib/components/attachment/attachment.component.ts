@@ -181,11 +181,11 @@ export class AttachmentComponent {
         type: "download",
         title: file.name,
         fileType: type,
-        isBase64: file.previewUrl ? false : true,
-        url: file.previewUrl ? file.previewUrl :file.file
+        isBase64: !file.previewUrl,
+        url: file.previewUrl || file.file
       }
   
-      let response = await this.postMessageListener(shareOptions)
+      await this.postMessageListener(shareOptions)
 
 
       return;
@@ -225,8 +225,8 @@ export class AttachmentComponent {
       type: "download",
       title: file.name,
       fileType: "pdf",
-      isBase64: file.previewUrl ? false : true,
-      url: file.previewUrl ? file.previewUrl :file.file
+      isBase64: !file.previewUrl,
+      url: file.previewUrl || file.file
     }
 
     let response = await this.postMessageListener(shareOptions)
