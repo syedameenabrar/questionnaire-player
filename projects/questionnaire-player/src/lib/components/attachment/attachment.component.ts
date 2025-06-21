@@ -148,8 +148,16 @@ export class AttachmentComponent {
     }
   }
 
+
   async showFilePreview(file: any, type: string) {
-    let url: any = "";
+    // console.log("file2", file, type);
+  
+    // Determine extension safely
+    const fileName = file.name || '';
+    const extension = fileName.split('.').pop()?.toLowerCase() || 'unknown';
+  
+    // Build object URL
+    let url: any = '';
     if (file.previewUrl) {
       url = file.previewUrl;
     } else {
@@ -157,40 +165,17 @@ export class AttachmentComponent {
       url = URL.createObjectURL(blob);
     }
   
-    const unsupportedPreviewTypes = [
-      'avi', 'flv', 'csv', 'doc', 'docx', 'ppt', 'pptx', 'txt', 'xls', 'xlsx', 'mpeg'
-    ];
+    const allSupportedTypes = [
+      ...this.formats.image,
+      ...this.formats.video,
+      ...this.formats.audio,
+      ...this.formats.pdf
+    ].map(t => t.toLowerCase());
   
-    if (unsupportedPreviewTypes.includes(type.toLowerCase())) {
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = file.name || `download.${type}`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      this.openAlert({
-        title: 'Preview Not Supported',
-        message: `${type.toUpperCase()} files cannot be previewed. The file will be downloaded instead.`,
-        acceptLabel: 'OK',
-        cancelLabel: null
-      });
-
-
-      const shareOptions = {
-        type: "download",
-        title: file.name,
-        fileType: type,
-        isBase64: !file.previewUrl,
-        url: file.previewUrl || file.file
-      }
+    const isSupported = allSupportedTypes.includes(type.toLowerCase()) || allSupportedTypes.includes(extension);
   
-      await this.postMessageListener(shareOptions)
-
-
-      return;
-    }
-
+    if(type == "image" || type == "video"){
+          // Supported file – open in preview dialog
     this.objectURL = url;
     this.objectType = type;
     this.dialogRef = this.dialog.open(this.previewModal, {
@@ -199,20 +184,53 @@ export class AttachmentComponent {
       enterAnimationDuration: 300,
       exitAnimationDuration: 150,
     });
+    return
+    }
+    if (!isSupported) {
+      // Not supported – download instead
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = file.name || `download.${extension}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
   
-    if (this.objectType == 'doc') {
-      const alertDialogConfig = {
+      this.openAlert({
+        title: 'Preview Not Supported',
+        message: `${extension.toUpperCase()} files cannot be previewed. The file will be downloaded instead.`,
+        acceptLabel: 'OK',
+        cancelLabel: null
+      });
+  
+      const shareOptions = {
+        type: "download",
+        title: file.name,
+        fileType: extension,
+        isBase64: !file.previewUrl,
+        url: file.previewUrl || file.file
+      };
+  
+      // console.log(":shareOptions", shareOptions);
+      await this.postMessageListener(shareOptions);
+  
+      return;
+    }
+  
+  
+    if (extension === 'doc') {
+      this.openAlert({
         title: null,
         message: `Please wait, it may take up to a minute to load.`,
         acceptLabel: 'Close Preview',
         cancelLabel: null,
-      };
-      this.openAlert(alertDialogConfig, true);
+      }, true);
     }
   }
   
+  
 
  async openUrl(file: any) {
+  // console.log("file1",file)
     let url:any ="";
     if(file.previewUrl){
       url = file.previewUrl
