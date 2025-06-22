@@ -47,17 +47,49 @@
     padding: 0.75rem;
     margin-top: 0.75rem;
     border-radius: 0.75rem;
+    width: 100% !important;
 }
 
-.display {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-  }
+
 
 // @media only screen and (max-width: 700px) {
 //     .display {
 //         display: block;
 //     }
 // }
+
+
+.display-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+  
+  .instance-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .header-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .student-label {
+    font-weight: 600;
+    color: var(--primary-color);
+    font-size: 1rem;
+  }
+  
+  .updated-label {
+    font-size: 0.875rem;
+    color: gray;
+  }
+  
+  ::ng-deep .mat-mdc-dialog-content.mdc-dialog__content {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
