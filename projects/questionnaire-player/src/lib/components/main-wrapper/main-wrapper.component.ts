@@ -638,7 +638,7 @@ async updateDataInIndexDb(updatedAnswers) {
       const uploadResults: any[] = [];
   
       for (let file of uploadQueue) {
-        const presignedUrlData = response.result[file.submissionId].files.find((f) => f.name === file.name);
+        const presignedUrlData = response.result[file.submissionId].files.find((f) => f.file.endsWith(file.name));
   
         if (!presignedUrlData) {
           console.error(`Presigned URL not found for file: ${file.name}`);
@@ -654,19 +654,12 @@ async updateDataInIndexDb(updatedAnswers) {
           this.http.put(presignedUrlData.url, file.file, { headers })
         );
   
-        const obj: any = {
-          name: file.name,
-          url: presignedUrlData.url.split('?')[0],
-          previewUrl: presignedUrlData.url.split('?')[0],
-          sourcePath: presignedUrlData.sourcePath,
-          question_id: file.question_id,
-        };
+        file.isUploaded = true;
+        file.previewUrl = presignedUrlData.url.split('?')[0];
+        file.url = presignedUrlData.url.split('?')[0];
+        file.sourcePath = presignedUrlData.payload?.sourcePath || '';
   
-        for (const key of Object.keys(presignedUrlData.payload)) {
-          obj[key] = presignedUrlData.payload[key];
-        }
-  
-        uploadResults.push(obj);
+        uploadResults.push(file);
       }
   
       return uploadResults;
@@ -676,7 +669,6 @@ async updateDataInIndexDb(updatedAnswers) {
     }
   }
   
-  // Keep submitSurvey logic unchanged
   
   async submitSurvey(submissionData) {
     if (submissionData.status !== 'draft') {
