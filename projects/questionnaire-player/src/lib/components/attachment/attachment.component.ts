@@ -203,14 +203,14 @@ export class AttachmentComponent {
       });
   
       const shareOptions = {
-        type: "download",
-        title: file.name,
+        type: "preview",
+        title: `${file.name }.${extension}`,
         fileType: extension,
         isBase64: !file.previewUrl,
         url: file.previewUrl || file.file
       };
   
-      // console.log(":shareOptions", shareOptions);
+      console.log(":shareOptions", shareOptions);
       await this.postMessageListener(shareOptions);
   
       return;
@@ -240,8 +240,8 @@ export class AttachmentComponent {
     }
 
     const shareOptions = {
-      type: "download",
-      title: file.name,
+      type: "preview",
+      title: `${file.name }.pdf`,
       fileType: "pdf",
       isBase64: !file.previewUrl,
       url: file.previewUrl || file.file
