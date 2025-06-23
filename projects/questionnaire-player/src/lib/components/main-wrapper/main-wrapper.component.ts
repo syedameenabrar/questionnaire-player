@@ -629,54 +629,57 @@ async updateDataInIndexDb(updatedAnswers) {
     this.submitSurvey(submissionData);
   }
 
-  async submitImageToCloud(data): Promise<any> {
-    const payload: any = {
-      ref: 'survey',
-      request: {
-        [data.submissionId]: {
-          files: [data.name],
-        }
-      }
-    };
-
+  async submitImageToCloud(payload: any, uploadQueue: any[]): Promise<any[]> {
     try {
       const response: any = await firstValueFrom(
         this.apiService.post(urlConfig.presignedUrl, payload)
       );
-
-      const presignedUrlData = response.result[data.submissionId].files[0];
-      const headers = new HttpHeaders({
-        'Content-Type': 'multipart/form-data',
-        "x-ms-blob-type": "BlockBlob",
-      });
-
-      await firstValueFrom(
-        this.http.put(presignedUrlData.url, data.file, { headers })
-      );
-
-      const obj: any = {
-        name: data.name,
-        url: presignedUrlData.url.split('?')[0],
-        previewUrl: presignedUrlData.url.split('?')[0],
-        sourcePath: presignedUrlData.sourcePath,
-        question_id: data.question_id,
-      };
-
-      for (const key of Object.keys(presignedUrlData.payload)) {
-        obj[key] = presignedUrlData.payload[key];
+  
+      const uploadResults: any[] = [];
+  
+      for (let file of uploadQueue) {
+        const presignedUrlData = response.result[file.submissionId].files.find((f) => f.name === file.name);
+  
+        if (!presignedUrlData) {
+          console.error(`Presigned URL not found for file: ${file.name}`);
+          continue;
+        }
+  
+        const headers = new HttpHeaders({
+          'Content-Type': 'multipart/form-data',
+          'x-ms-blob-type': 'BlockBlob'
+        });
+  
+        await firstValueFrom(
+          this.http.put(presignedUrlData.url, file.file, { headers })
+        );
+  
+        const obj: any = {
+          name: file.name,
+          url: presignedUrlData.url.split('?')[0],
+          previewUrl: presignedUrlData.url.split('?')[0],
+          sourcePath: presignedUrlData.sourcePath,
+          question_id: file.question_id,
+        };
+  
+        for (const key of Object.keys(presignedUrlData.payload)) {
+          obj[key] = presignedUrlData.payload[key];
+        }
+  
+        uploadResults.push(obj);
       }
-
-      return obj;
-
+  
+      return uploadResults;
     } catch (err) {
-      console.error('Upload failed', err);
+      console.error('Batch upload failed', err);
       throw err;
     }
   }
-
+  
+  // Keep submitSurvey logic unchanged
+  
   async submitSurvey(submissionData) {
     if (submissionData.status !== 'draft') {
-  
       if (!this.saveQuestioner) {
         const confirmationParams = {
           title: 'Confirmation',
@@ -693,13 +696,23 @@ async updateDataInIndexDb(updatedAnswers) {
         this.currentFileUploaded = 0;
   
         const answers = submissionData?.answers;
+        const uploadQueue: any[] = [];
   
-        for (let [_, answerObj] of Object.entries(answers)) {
-          const answer = answerObj as { fileName?: any[] };
-          const files = answer.fileName || [];
+        // Collect all files that need uploading
+        for (let [submissionId, answerObj] of Object.entries(answers)) {
+          const files = (answerObj as any).fileName || [];
           for (let file of files) {
             if (!file?.isUploaded) {
               this.totalFileToUpload++;
+              const storedFile: any = await this.db.getData(file.name);
+              if (!storedFile || !storedFile.data) {
+                this.toaster.showToast(`No stored data found for file: ${file.name}`, 'danger', 5000);
+                continue;
+              }
+              const convertedFile = this.attachmentService.base64ToFile(storedFile.data);
+              file.file = convertedFile;
+              file.submissionId = submissionId;
+              uploadQueue.push(file);
             }
           }
         }
@@ -707,47 +720,48 @@ async updateDataInIndexDb(updatedAnswers) {
         this.uploading = true;
   
         try {
-          for (let [_, answerObj] of Object.entries(answers)) {
-            const answer = answerObj as { fileName?: any[] };
-            const files = answer.fileName || [];
+          if (uploadQueue.length > 0) {
+            // Prepare payload for bulk upload
+            const payload = {
+              ref: 'survey',
+              request: {},
+            };
   
-            for (let file of files) {
-              if (!file?.isUploaded) {
-                try {
-                  const storedFile: any = await this.db.getData(file?.name);
-                  if (!storedFile || !storedFile.data) {
-                    throw new Error(`No stored data found for file: ${file?.name}`);
-                  }
-  
-                  const convertedFile = this.attachmentService.base64ToFile(storedFile.data);
-                  file.file = convertedFile;
-  
-                  const presignedUrlData: any = await this.submitImageToCloud(file);
-  
-                  file.isUploaded = true;
-                  file.previewUrl = presignedUrlData.url.split('?')[0];
-                  file.url = presignedUrlData.url.split('?')[0];
-                  file.file = "";
-                  file.sourcePath = presignedUrlData.sourcePath
-                  this.currentFileUploaded++;
-                  await this.updateDataInIndexDb(submissionData);
-  
-                } catch (uploadErr) {
-                  console.error('File upload failed:', file?.name, uploadErr);
-                  this.toaster.showToast(`Failed to upload file: ${file?.name}`, 'danger', 5000);
-                  this.uploading = false;
-                  return; 
-                }
+            uploadQueue.forEach(file => {
+              const sid = file.submissionId;
+              if (!payload.request[sid]) {
+                payload.request[sid] = { files: [] };
               }
-            }
-          }
+              payload.request[sid].files.push(file.name);
+            });
   
+            const uploadedFiles = await this.submitImageToCloud(payload, uploadQueue);
+  
+            for (let i = 0; i < uploadQueue.length; i++) {
+              const file = uploadQueue[i];
+              const presignedUrlData = uploadedFiles[i];
+  
+              file.isUploaded = true;
+              file.previewUrl = presignedUrlData.url.split('?')[0];
+              file.url = presignedUrlData.url.split('?')[0];
+              file.sourcePath = presignedUrlData.sourcePath;
+              file.file = '';
+  
+              this.currentFileUploaded++;
+            }
+  
+            await this.updateDataInIndexDb(submissionData);
+          }
+        } catch (uploadErr) {
+          console.error('Batch upload failed:', uploadErr);
+          this.toaster.showToast(`Failed to upload files`, 'danger', 5000);
+          this.uploading = false;
+          return;
         } finally {
           this.uploading = false;
         }
       }
   
-     
       const responseFromUpdateDataFunction = await this.updateDataInIndexDb(submissionData);
       if (responseFromUpdateDataFunction) {
         this.apiService
@@ -758,7 +772,7 @@ async updateDataInIndexDb(updatedAnswers) {
           .pipe(
             catchError((err) => {
               this.toaster.showToast(err?.error?.message, 'danger', 5000);
-              throw new Error(`Update API has failed`);
+              throw new Error('Update API has failed');
             })
           )
           .subscribe((res: any) => {
@@ -775,7 +789,6 @@ async updateDataInIndexDb(updatedAnswers) {
             }
           });
       }
-  
     } else {
       const responseFromUpdateDataFunction = await this.updateDataInIndexDb(submissionData);
       if (responseFromUpdateDataFunction && !this.saveQuestioner) {
@@ -798,6 +811,7 @@ async updateDataInIndexDb(updatedAnswers) {
       }
     }
   }
+  
   
   
   async openAlert(alertDialogConfig) {
