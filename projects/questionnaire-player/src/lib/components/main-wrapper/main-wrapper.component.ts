@@ -655,7 +655,7 @@ async updateDataInIndexDb(updatedAnswers) {
         );
   
         file.isUploaded = true;
-        file.previewUrl = presignedUrlData.url.split('?')[0];
+        // file.previewUrl = presignedUrlData.url.split('?')[0];
         file.url = presignedUrlData.url.split('?')[0];
         file.sourcePath = presignedUrlData.payload?.sourcePath || '';
   
@@ -701,8 +701,8 @@ async updateDataInIndexDb(updatedAnswers) {
                 this.toaster.showToast(`No stored data found for file: ${file.name}`, 'danger', 5000);
                 continue;
               }
-              const convertedFile = this.attachmentService.base64ToFile(storedFile.data);
-              file.file = convertedFile;
+              // const convertedFile = this.attachmentService.base64ToFile(storedFile.data);
+              // file.file = convertedFile;
               file.submissionId = submissionId;
               uploadQueue.push(file);
             }
@@ -734,10 +734,10 @@ async updateDataInIndexDb(updatedAnswers) {
               const presignedUrlData = uploadedFiles[i];
   
               file.isUploaded = true;
-              file.previewUrl = presignedUrlData.url.split('?')[0];
+              // file.previewUrl = presignedUrlData.url.split('?')[0];
               file.url = presignedUrlData.url.split('?')[0];
               file.sourcePath = presignedUrlData.sourcePath;
-              file.file = '';
+              // file.file = '';
   
               this.currentFileUploaded++;
             }
@@ -910,7 +910,7 @@ async updateDataInIndexDb(updatedAnswers) {
     }
   }
 
-  getQuestions(data) {
+  async getQuestions(data) {
 
     if (data?.isATargetedSolution === false) {
 
@@ -924,25 +924,28 @@ async updateDataInIndexDb(updatedAnswers) {
 
     );
 
+    this.submissionId = this.assessment.assessment.submissionId;
+    this.evidenceCode = this.assessment.assessment.evidences[0].code;
+    this.apiConfig.index = 0;
+
+    let isDataInlocalSotrage = await this.checkAndMapIndexDbDataToVariables();
+
+    if(!isDataInlocalSotrage){
+
+    this.setDataInIndexDb(this.submissionId);
+        
     this.evidence = this.solutionType == 'observation' ? this.assessment?.assessment?.evidences[+[this.apiConfig.index]] : this.assessment?.assessment?.evidences[0];
-
+    
     this.evidence.startTime = Date.now();
-
     this.endDate = new Date(
-
       new Date(this.assessment?.assessment?.endDate).getTime() +
-
       new Date(this.assessment?.assessment?.endDate).getTimezoneOffset() *
-
       60000
-
     );
-
     this.isExpired = this.assessment?.assessment?.status == 'expired';
-
     this.sections = this.evidence?.sections;
-
     this.loaded = true;
+    }
 
   }
 
