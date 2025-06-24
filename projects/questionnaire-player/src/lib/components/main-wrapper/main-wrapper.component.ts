@@ -634,7 +634,6 @@ async updateDataInIndexDb(updatedAnswers) {
       const response: any = await firstValueFrom(
         this.apiService.post(urlConfig.presignedUrl, payload)
       );
-  
       const submissionId = Object.keys(response.result)[0]; // Use single known submissionId
   
       const uploadResults: any[] = [];
@@ -654,7 +653,12 @@ async updateDataInIndexDb(updatedAnswers) {
           'Content-Type': 'multipart/form-data',
           'x-ms-blob-type': 'BlockBlob',
         });
-  
+
+        const storedFile: any = await this.db.getData(file.name);
+         if(storedFile.data){
+          const convertedFile = this.attachmentService.base64ToFile(storedFile.data);
+              file.file = convertedFile;
+         }
         await firstValueFrom(
           this.http.put(presignedUrlData.url, file.file, { headers })
         );
