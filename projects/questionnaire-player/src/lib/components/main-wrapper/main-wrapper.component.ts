@@ -178,14 +178,14 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
 
   async getQueryParms() {
     this.queryParamsService.parseQueryParams();
-    const submissionId = this.queryParamsService?.submissionId || this.submissionId || "";
+    this.submissionId = this.queryParamsService?.submissionId || this.submissionId || "";
     const evidenceCode = this.queryParamsService?.evidenceCode || this.evidenceCode;
     // if (!submissionId || !evidenceCode) {
     //   return null;
     // }
   
     return {
-      indexDbKey: `${submissionId}`,
+      indexDbKey: `${this.submissionId}`,
       evidenceCode
     };
   }
@@ -635,10 +635,15 @@ async updateDataInIndexDb(updatedAnswers) {
         this.apiService.post(urlConfig.presignedUrl, payload)
       );
   
+      const submissionId = Object.keys(response.result)[0]; // Use single known submissionId
+  
       const uploadResults: any[] = [];
   
       for (let file of uploadQueue) {
-        const presignedUrlData = response.result[file.submissionId].files.find((f) => f.file.endsWith(file.name));
+        const fileList = response.result[submissionId].files;
+        const presignedUrlData = fileList.find((f: any) =>
+          f.file.endsWith(file.name)
+        );
   
         if (!presignedUrlData) {
           console.error(`Presigned URL not found for file: ${file.name}`);
@@ -647,7 +652,7 @@ async updateDataInIndexDb(updatedAnswers) {
   
         const headers = new HttpHeaders({
           'Content-Type': 'multipart/form-data',
-          'x-ms-blob-type': 'BlockBlob'
+          'x-ms-blob-type': 'BlockBlob',
         });
   
         await firstValueFrom(
@@ -655,19 +660,21 @@ async updateDataInIndexDb(updatedAnswers) {
         );
   
         file.isUploaded = true;
-        // file.previewUrl = presignedUrlData.url.split('?')[0];
         file.url = presignedUrlData.url.split('?')[0];
+        file.previewUrl = presignedUrlData.url.split('?')[0];
         file.sourcePath = presignedUrlData.payload?.sourcePath || '';
-  
+        this.currentFileUploaded++;
         uploadResults.push(file);
       }
   
       return uploadResults;
+  
     } catch (err) {
       console.error('Batch upload failed', err);
       throw err;
     }
   }
+  
   
   
   async submitSurvey(submissionData) {
@@ -716,16 +723,12 @@ async updateDataInIndexDb(updatedAnswers) {
             // Prepare payload for bulk upload
             const payload = {
               ref: 'survey',
-              request: {},
-            };
-  
-            uploadQueue.forEach(file => {
-              const sid = file.submissionId;
-              if (!payload.request[sid]) {
-                payload.request[sid] = { files: [] };
+              request: {
+                [this.submissionId]: {
+                  files: uploadQueue.map(file => file.name)
+                }
               }
-              payload.request[sid].files.push(file.name);
-            });
+            };
   
             const uploadedFiles = await this.submitImageToCloud(payload, uploadQueue);
   
