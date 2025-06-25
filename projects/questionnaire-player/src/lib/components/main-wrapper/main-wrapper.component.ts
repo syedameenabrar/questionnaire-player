@@ -31,7 +31,7 @@ import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { firstValueFrom, Observable, Subscribable, Subscription } from 'rxjs';
 import { AlertComponent } from '../alert/alert.component';
 import { Location } from '@angular/common';
-import { BackNavigationHandlerComponent } from '../../shared/components/pie-chart/back-navigation-handler/back-navigation-handler.component';
+// import { BackNavigationHandlerComponent } from '../../shared/components/pie-chart/back-navigation-handler/back-navigation-handler.component';
 import { Router } from '@angular/router';
 import { SharedService } from '../../services/shared.service';
 import { QueryParamsService } from '../../services/queryParams.service';
@@ -43,7 +43,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
   templateUrl: './main-wrapper.component.html',
   styleUrls: ['./main-wrapper.component.scss'],
 })
-export class MainWrapperComponent extends BackNavigationHandlerComponent implements OnInit, OnChanges, OnDestroy {
+export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
   questions: Array<Question>;
   @Input({ transform: booleanAttribute }) angular = false;
   evidence: Evidence;
@@ -92,7 +92,7 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
     private http: HttpClient,
 
   ) {
-    super(router, location);
+    // super(router, location);
   }
 
   checkFormValidity() {
