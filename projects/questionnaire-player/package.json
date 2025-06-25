@@ -1,6 +1,6 @@
 {
   "name": "diksha-questionnaire-player",
-  "version": "1.0.34",
+  "version": "1.0.35",
   "peerDependencies": {
     "@angular/common": "^16.2.0",
     "@angular/core": "^16.2.0",
