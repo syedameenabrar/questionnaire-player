@@ -179,13 +179,13 @@ export class AttachmentComponent {
     const isSupported = allSupportedTypes.includes(type.toLowerCase()) || allSupportedTypes.includes(extension);
   
     let url: string = '';
-  
+    let result = await this.db.getData(file.name);
+    let base64Data = result?.data;
 
     if (file.previewUrl) {
       url = file.previewUrl;
     } else {
-      const result = await this.db.getData(file.name);
-const base64Data = result?.data;
+     
       if (!base64Data || typeof base64Data !== 'string') {
         this.openAlert({
           title: 'File Error',
@@ -215,41 +215,43 @@ const base64Data = result?.data;
   
     // 🔸 Unsupported preview – fallback to download
     if (!isSupported) {
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = file.name || `download.${extension}`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-  
-      this.openAlert({
-        title: 'Preview Not Supported',
-        message: `${extension.toUpperCase()} files cannot be previewed. The file will be downloaded instead.`,
-        acceptLabel: 'OK',
-        cancelLabel: null
-      });
+
   
       const shareOptions = {
         type: "preview",
         title: file.name,
         fileType: extension,
         isBase64: !file.previewUrl,
-        url: file.previewUrl || file.file
+        url: file.previewUrl ? file.previewUrl : base64Data
       };
   
-      await this.postMessageListener(shareOptions);
-      return;
+      const response =await this.postMessageListener(shareOptions);
+      if (!response) {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = file.name || `download.${extension}`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    
+        this.openAlert({
+          title: 'Preview Not Supported',
+          message: `${extension.toUpperCase()} files cannot be previewed. The file will be downloaded instead.`,
+          acceptLabel: 'OK',
+          cancelLabel: null
+        });
+      }
     }
   
     // 🔸 Optional alert for specific types
-    if (extension === 'doc') {
-      this.openAlert({
-        title: null,
-        message: `Please wait, it may take up to a minute to load.`,
-        acceptLabel: 'Close Preview',
-        cancelLabel: null,
-      }, true);
-    }
+    // if (extension === 'doc') {
+    //   this.openAlert({
+    //     title: null,
+    //     message: `Please wait, it may take up to a minute to load.`,
+    //     acceptLabel: 'Close Preview',
+    //     cancelLabel: null,
+    //   }, true);
+    // }
   }
   
   
@@ -257,15 +259,28 @@ const base64Data = result?.data;
   
   async openUrl(file: any) {
     let url: string = "";
+      let result = await this.db.getData(file.name);
+      let base64Data = result?.data;
+ 
   
-    // Step 1: Try using previewUrl if available
+    // Step 4: Prepare Share Options
+    const shareOptions = {
+      type: "preview",
+      title: file.name,
+      fileType: "pdf",
+      isBase64: !file.previewUrl,
+      url: file.previewUrl ? file.previewUrl : base64Data
+    };
+  
+    // Step 5: Post to WebView (if applicable), else fallback to new tab
+    const response = await this.postMessageListener(shareOptions);
+    if (!response) {
+         // Step 1: Try using previewUrl if available
     if (file.previewUrl) {
       url = file.previewUrl;
     } else {
       // Step 2: Fetch base64 data from IndexedDB
-      const result = await this.db.getData(file.name);
-      const base64Data = result?.data;
-  
+      
       if (!base64Data || typeof base64Data !== 'string' || base64Data.trim() === "") {
         this.openAlert({
           title: 'File Error',
@@ -280,19 +295,6 @@ const base64Data = result?.data;
       const blob = this.attachmentService.base64ToFile(base64Data);
       url = URL.createObjectURL(blob);
     }
-  
-    // Step 4: Prepare Share Options
-    const shareOptions = {
-      type: "preview",
-      title: file.name,
-      fileType: "pdf",
-      isBase64: !file.previewUrl,
-      url: url
-    };
-  
-    // Step 5: Post to WebView (if applicable), else fallback to new tab
-    const response = await this.postMessageListener(shareOptions);
-    if (!response) {
       window.open(url, '_blank');
     }
   }
