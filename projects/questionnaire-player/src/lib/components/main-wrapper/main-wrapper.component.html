@@ -1,5 +1,8 @@
 <div *ngIf="loaded" class="wrapper">
-  <form [formGroup]="questionnaireForm" class="main custom-font" *ngIf="!uploading;else uplodingModal">
+  <form [formGroup]="questionnaireForm" class="main custom-font" *ngIf="!uploading;else uplodingModal" [ngStyle]="{
+    'pointer-events': stateData && stateData?.isSurvey === false ? 'none' : 'auto',
+    opacity: stateData && stateData?.isSurvey === false ? 0.6 : 1
+  }">
     <div *ngIf="!listing && sections?.length != 1" style="color: var(--primary-color);">
       <h1  class="sesion-title">List of Sections</h1>
       <hr style="height: 1px;background:var(--primary-color);"/>
@@ -36,10 +39,13 @@
         <p class="question-map">Question Map</p>
       </div>
       <div class="d-flex flex-jc-space-between">
-        <button class="btn btn-outline-secondary" (click)="submission('draft')" *ngIf="listing">
+        <button class="btn btn-primary mr-2" (click)="start()" *ngIf="(!listing && sections?.length > 1) && (stateData && stateData?.isSurvey === false)">
+          Start
+        </button>
+        <button class="btn btn-outline-secondary" (click)="submission('draft')" *ngIf="listing && (stateData && stateData?.isSurvey === true)">
           Save
         </button>
-        <button class="btn btn-primary" (click)="!questionnaireForm?.valid ? getQuestionMap() : submission('submit')" *ngIf="!listing && sections?.length > 1">
+        <button class="btn btn-primary" (click)="!questionnaireForm?.valid ? getQuestionMap() : submission('submit')" *ngIf="(!listing && sections?.length > 1) && (stateData && stateData?.isSurvey === true)">
         Submit
         </button>
       </div>
