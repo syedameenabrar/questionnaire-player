@@ -26,7 +26,7 @@
   </form>
   <ng-container *ngIf="!uploading">
   <ng-container *ngIf="sections?.length > 1;else showAllButtons">
-  <span class="sticky-footer" [ngClass]="{'bg-white': !listing}">
+  <div class="sticky-footer" [ngClass]="{'bg-white': !listing}">
     <hr class="partition" />
     <div class="footer-buttons">
     <div *ngIf="!evidence?.isSubmitted && !isExpired"
@@ -45,12 +45,12 @@
       </div>
     </div>
   </div>
-  </span>
+</div>
 </ng-container>
 </ng-container>
 
 <ng-template #showAllButtons>
-  <span class="sticky-footer">
+  <div class="sticky-footer">
     <hr class="partition" />
     <div class="footer-buttons">
     <div *ngIf="!evidence?.isSubmitted && !isExpired"
@@ -72,7 +72,7 @@
     </div>
     </div>
     </div>
-  </span>
+  </div>
 </ng-template>
 
 </div>
