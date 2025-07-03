@@ -25,6 +25,7 @@ export class QueryParamsService implements OnDestroy {
   public reportPage: any;
   public scores: any;
   public typeFromPreviousUrl: string | null = null;
+  public sectionCode: any;
 
 
   constructor(private router: Router) {
@@ -57,6 +58,7 @@ export class QueryParamsService implements OnDestroy {
     this.isMultiple = queryParams?.isMultiple;
     this.reportPage = queryParams?.reportPage;
     this.scores = queryParams?.scores;
+    this.sectionCode = queryParams?.sectionCode
   }
 
   getQueryParams(queryParams: any) {

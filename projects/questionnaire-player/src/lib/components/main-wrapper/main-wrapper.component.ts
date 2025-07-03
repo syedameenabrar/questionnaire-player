@@ -56,8 +56,8 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
   questionMap = {};
   pageMsg = new Map();
   endDate: Date;
-  sectionName: string;
-  listing = false;
+  // sectionName: string;
+  // listing = false;
   assessment: any;
   loaded = false;
   color: ThemePalette = 'primary';
@@ -75,6 +75,7 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
   uploading:boolean= false;
   totalFileToUpload:any = 0;
   currentFileUploaded = 0;
+  sectionCode:any;
 
   constructor(
     public fb: FormBuilder,
@@ -116,13 +117,25 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
         this.apiService.stateData ? this.getQuestions(this.apiService.stateData) : this.fetchDetails();
       }
 
-      if (this.sections?.length == 1) {
-        this.setSection(this.sections[0].name);
+      // if (this.sectionCode) {
+      //   console.log("ngonchange",this.sectionCode)
+        // this.setSection(this.sectionCode);
+        this.setSection(this.sections[0].code);
+
         if (document.getElementById('observation-ion-toolbar')) {
           document.getElementById('observation-ion-toolbar').style.display = 'none'
         }
-        this.listing = false;
-      }
+        // this.listing = false;
+      // }
+      // else{
+      // console.log("noSectionCodeChange",this.sections[0].code)
+
+      //   this.setSection(this.sections[0].code);
+  
+      //   if (document.getElementById('observation-ion-toolbar')) {
+      //     document.getElementById('observation-ion-toolbar').style.display = 'none'
+      //   }
+      // }
     }
 
     if (changes['saveQuestioner']) {
@@ -130,7 +143,6 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
         this.submission('draft');
       }
     }
-    console.log("ngOnChange", this.stateData)
 
   }
 
@@ -150,13 +162,25 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
       }
     }
 
-    if (this.sections?.length == 1) {
-      this.setSection(this.sections[0].name);
+    // if (this.sectionCode) {
+    //   console.log("ngoninit",this.sectionCode)
+
+    // this.setSection(this.sectionCode);
+    this.setSection(this.sections[0].code); 
       if (document.getElementById('observation-ion-toolbar')) {
         document.getElementById('observation-ion-toolbar').style.display = 'none'
       }
-      this.listing = false;
-    }
+      // this.listing = false;
+    // }else{
+    //   console.log("noSectionCode",this.sections[0].code)
+
+    //   this.setSection(this.sections[0].code);
+
+    //   if (document.getElementById('observation-ion-toolbar')) {
+    //     document.getElementById('observation-ion-toolbar').style.display = 'none'
+    //   }
+    //   // this.listing = false;
+    // }
     this.questionnaireForm = this.fb.group({});
 
     this.questionnaireForm.valueChanges.subscribe((data: any) => {
@@ -176,7 +200,6 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
       };
       this.updateDataInIndexDb(submissionData);
     });
-    console.log("ngOninit", this.stateData)
 
   }
 
@@ -184,6 +207,9 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
     this.queryParamsService.parseQueryParams();
     this.submissionId = this.queryParamsService?.submissionId || this.submissionId || "";
     this.evidenceCode = this.queryParamsService?.evidenceCode || this.evidenceCode;
+    this.sectionCode = this.queryParamsService?.sectionCode;
+
+    console.log("sectionCode",this.sectionCode);
     // if (!submissionId || !evidenceCode) {
     //   return null;
     // }
@@ -374,14 +400,31 @@ async updateDataInIndexDb(updatedAnswers) {
         60000
       );
       this.isExpired = currentObservation?.assessment?.status == 'expired' || false;
-      this.sections = this.evidence?.sections;
-      if (this.sections?.length == 1) {
-        this.setSection(this.sections[0].name);
-        if (document.getElementById('observation-ion-toolbar')) {
-          document.getElementById('observation-ion-toolbar').style.display = 'none'
-        }
-        this.listing = false
+      if (this.evidence?.sections?.length > 1 && this.sectionCode) {
+        this.sections = this.evidence.sections.filter(
+          (section) => section.code === this.sectionCode
+        );
       }
+      console.log("fetchSections3", this.sections)
+      // this.sections = this.evidence?.sections;
+      // if (this.sectionCode) {
+      //   console.log("1",this.sectionCode)
+       // this.setSection(this.sectionCode);
+        // this.setSection(this.sections[0].code);
+        // if (document.getElementById('observation-ion-toolbar')) {
+        //   document.getElementById('observation-ion-toolbar').style.display = 'none'
+        // }
+        // this.listing = false;
+      // }else{
+      // console.log("2",this.sections[0].code)
+
+      //   this.setSection(this.sections[0].code);
+  
+      //   if (document.getElementById('observation-ion-toolbar')) {
+      //     document.getElementById('observation-ion-toolbar').style.display = 'none'
+      //   }
+      //   // this.listing = false;
+      // }
       this.questionnaireForm = this.fb.group({});
 
       this.questionnaireForm.valueChanges.subscribe((data: any) => {
@@ -408,7 +451,7 @@ async updateDataInIndexDb(updatedAnswers) {
 
     this.stateData = this.apiConfig.stateData;
     this.solutionType = this.apiConfig.solutionType || 'observation';
-    console.log("setApiService()", this.stateData)
+    this.getQueryParms();
 
   }
 
@@ -2385,7 +2428,17 @@ async updateDataInIndexDb(updatedAnswers) {
             60000
           );
           this.isExpired = this.assessment?.assessment?.status == 'expired';
-          this.sections = this.evidence?.sections;
+          if (this.evidence?.sections?.length > 1 && this.sectionCode) {
+            this.sections = this.evidence.sections.filter(
+              (section) => section.code === this.sectionCode
+            );
+          }
+          console.log("fetchSections", this.sections)
+          // this.sections = this.evidence?.sections;
+          this.setSection(this.sections[0].code);
+          // if (document.getElementById('observation-ion-toolbar')) {
+          //   document.getElementById('observation-ion-toolbar').style.display = 'none'
+          // }
           this.loaded = true;
           }
 
@@ -2410,7 +2463,7 @@ async updateDataInIndexDb(updatedAnswers) {
         questionIndex++
       ) {
         this.questionMap[
-          `${this.sections[sectionIndex].name} - Page ${questionIndex + 1}`
+          `${this.sections[sectionIndex].code} - Page ${questionIndex + 1}`
         ] = [];
         if (
           this.sections[sectionIndex].questions[questionIndex].responseType ==
@@ -2451,7 +2504,7 @@ async updateDataInIndexDb(updatedAnswers) {
                   .pageQuestions[pqIndex].responseType == 'slider'
               ) {
                 this.pageMsg.set(
-                  `${this.sections[sectionIndex].name} - Page ${questionIndex + 1}`,
+                  `${this.sections[sectionIndex].code} - Page ${questionIndex + 1}`,
                   'Please review your response to the slider question on this page'
                 );
               }
@@ -2493,7 +2546,7 @@ async updateDataInIndexDb(updatedAnswers) {
                 .responseType == 'slider'
             ) {
               this.pageMsg.set(
-                `${this.sections[sectionIndex].name} - Page ${questionIndex + 1}`,
+                `${this.sections[sectionIndex].code} - Page ${questionIndex + 1}`,
                 'Please review your response to the slider question on this page'
               );
             }
@@ -2530,22 +2583,25 @@ async updateDataInIndexDb(updatedAnswers) {
           : typeof validation !== 'string' && validation.required
             ? '#A30000'
             : '#595959',
-      sectionName: this.sections[sectionIndex].name,
+            sectionCode: this.sections[sectionIndex].code,
       pageIndex: qIndex,
       questionNumber: qNum,
     };
-    this.questionMap[`${this.sections[sectionIndex].name} - Page ${qIndex + 1}`].push(
+    this.questionMap[`${this.sections[sectionIndex].code} - Page ${qIndex + 1}`].push(
       question
     );
   }
 
   enableRelevantPage() {
     for (let i = 0; i < this.sections.length; i++) {
-      if (this.sections[i].name !== this.sectionName) {
-        this.domQuery(this.sections[i].name, 'none');
+      console.log("enableRelevantPage", i , this.sections[i].code, this.sectionCode )
+      console.log("this.sections[i].code !== this.sectionCode", this.sections[i].code !== this.sectionCode)
+
+      if (this.sections[i].code !== this.sectionCode) {
+        this.domQuery(this.sections[i].code, 'none');
       }
     }
-    this.domQuery(this.sectionName, 'block');
+    this.domQuery(this.sectionCode, 'block');
     if (document.getElementById('observation-ion-toolbar')) {
       document.getElementById('observation-ion-toolbar').style.display = 'block'
     }
@@ -2744,11 +2800,11 @@ async updateDataInIndexDb(updatedAnswers) {
         };
         const response = await this.openAlert(confirmationParams);
         if (response) {
-          if (this.sections?.length > 1) {
-            this.backToSectionListing();
-          } else {
+          // if (this.sections?.length > 1) {
+          //   this.backToSectionListing();
+          // } else {
             this.location.back();
-          }
+          // }
         }
       }
     }
@@ -2778,47 +2834,48 @@ async updateDataInIndexDb(updatedAnswers) {
     }).toPromise();
   }
 
-  setSection(name: string) {
-    this.sectionName = name;
+  setSection(code: any) {
+    console.log("inside setSection",code)
+    this.sectionCode = code;
     this.enableRelevantPage();
-    if (document.getElementById('observation-ion-toolbar')) {
-      document.getElementById('observation-ion-toolbar').style.display = 'none'
-    }
-    this.mainComponent?.enableRelevantPage();
-    let sectionElements = document.getElementsByClassName('section-listing');
-    if (sectionElements.length > 0) {
-      for (let i = 0; i < sectionElements.length; i++) {
-        (sectionElements[i] as HTMLElement).style.display = 'none';
-      }
-    }
-    this.listing = true;
+    // if (document.getElementById('observation-ion-toolbar')) {
+    //   document.getElementById('observation-ion-toolbar').style.display = 'none'
+    // }
+    // this.mainComponent?.enableRelevantPage();
+    // let sectionElements = document.getElementsByClassName('section-listing');
+    // if (sectionElements.length > 0) {
+    //   for (let i = 0; i < sectionElements.length; i++) {
+    //     (sectionElements[i] as HTMLElement).style.display = 'none';
+    //   }
+    // }
+    // this.listing = true;
   }
 
-  backToSectionListing() {
-    this.listing = false;
-    this.domQuery(this.sectionName, 'none');
-    if (document.getElementById('observation-ion-toolbar')) {
-      document.getElementById('observation-ion-toolbar').style.display = 'block'
-    }
-    let sectionElements = document.getElementsByClassName('section-listing');
-    this.mainComponent.pageIndex = 0;
-    this.mainComponent.handlePageEvent({ pageIndex: 0 })
-    if (sectionElements.length > 0) {
-      for (let i = 0; i < sectionElements.length; i++) {
-        (sectionElements[i] as HTMLElement).style.display = 'block';
-      }
-    }
-    if (this.sections.length == 1) {
-      this.location.back();
-    }
-  }
+  // backToSectionListing() {
+  //   // this.listing = false;
+  //   this.domQuery(this.sectionCode, 'none');
+  //   if (document.getElementById('observation-ion-toolbar')) {
+  //     document.getElementById('observation-ion-toolbar').style.display = 'block'
+  //   }
+  //   let sectionElements = document.getElementsByClassName('section-listing');
+  //   this.mainComponent.pageIndex = 0;
+  //   this.mainComponent.handlePageEvent({ pageIndex: 0 })
+  //   if (sectionElements.length > 0) {
+  //     for (let i = 0; i < sectionElements.length; i++) {
+  //       (sectionElements[i] as HTMLElement).style.display = 'block';
+  //     }
+  //   }
+  //   if (this.sections.length == 1) {
+  //     this.location.back();
+  //   }
+  // }
 
   closeModal() {
     this.dialog.closeAll();
   }
 
-  goToQuestion(id, pageIndex, sectionName) {
-    this.setSection(sectionName)
+  goToQuestion(id, pageIndex, sectionCode) {
+    this.setSection(sectionCode)
     this.mainComponent.pageIndex = pageIndex;
     this.mainComponent.handlePageEvent({ pageIndex: pageIndex })
     this.closeModal();
@@ -2895,7 +2952,13 @@ async updateDataInIndexDb(updatedAnswers) {
       60000
     );
     this.isExpired = this.assessment?.assessment?.status == 'expired';
-    this.sections = this.evidence?.sections;
+    if (this.evidence?.sections?.length > 1 && this.sectionCode) {
+      this.sections = this.evidence.sections.filter(
+        (section) => section.code === this.sectionCode
+      );
+    }
+    console.log("fetchSections2", this.sections)
+    // this.sections = this.evidence?.sections;
     this.loaded = true;
     }
 

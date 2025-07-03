@@ -1,25 +1,25 @@
 {
     "survey":{
-        "details":"/ml/surveys/mlsurvey/v1/details?solutionId=",
-        "update":"/ml/surveySubmissions/mlsurvey/v1/update/",
-        "reportUrl":"/ml/reports/mlreports/v1/fetch/",
-        "surveyVerifyLink":"/ml/surveys/mlsurvey/v1/details/"
+        "details":"/surveys/mlsurvey/v1/details?solutionId=",
+        "update":"/surveySubmissions/mlsurvey/v1/update/",
+        "reportUrl":"/reports/mlreports/v1/fetch",
+        "surveyVerifyLink":"/surveys/mlsurvey/v1/details/"
     },
     "observation":{
-        "listing":"/kendra/solutions/mlcore/v1/targetedSolutions",
-        "reportListing":"/assessment/observationSubmissions/mlsurvey/v1/solutionList",
-        "details":"/assessment/observations/mlsurvey/v1/assessment/",
-        "getSelectedEntities":"/assessment/observations/mlsurvey/v1/entities?",
+        "listing":"/solutions/mlcore/v1/targetedSolutions",
+        "reportListing":"/observationSubmissions/mlsurvey/v1/solutionList",
+        "details":"/observations/mlsurvey/v1/assessment/",
+        "getSelectedEntities":"/observations/mlsurvey/v1/entities?",
         "targetedEntity": "/survey/v1/observations/targetedEntity/",
-        "searchEntities":"/assessment/observations/mlsurvey/v1/searchEntities",
-        "updateEntities":"/assessment/observations/mlsurvey/v1/updateEntities/",
-        "observationSubmissions":"/assessment/observationSubmissions/mlsurvey/v1/list/",
-        "update":"/assessment/observationSubmissions/mlsurvey/v1/update/",
-        "create":"/assessment/observationSubmissions/mlsurvey/v1/create/",
+        "searchEntities":"/observations/mlsurvey/v1/searchEntities",
+        "updateEntities":"/observations/mlsurvey/v1/updateEntities/",
+        "observationSubmissions":"/observationSubmissions/mlsurvey/v1/list/",
+        "update":"/observationSubmissions/mlsurvey/v1/update/",
+        "create":"/observationSubmissions/mlsurvey/v1/create/",
         "refreshTokenUrl":"/user/v1/account/generateToken",
         "project": "/ml/project/mlprojects/v1/templates/details/",
-        "observationVerifyLink":"/ml/solutions/mlcore/v1/verifyLink/",
-        "templateDetails":"/ml/solutions/mlcore/v1/details/"
+        "observationVerifyLink":"/solutions/mlcore/v1/verifyLink/",
+        "templateDetails":"/solutions/mlcore/v1/details/"
     },
-    "presignedUrl":"/kendra/cloud-services/mlcore/v1/files/preSignedUrls"
+    "presignedUrl":"/cloud-services/mlcore/v1/files/preSignedUrls"
 }

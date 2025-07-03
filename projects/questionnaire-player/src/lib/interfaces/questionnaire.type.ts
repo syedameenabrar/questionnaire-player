@@ -213,7 +213,7 @@ export interface ApiConfiguration{
   submissionNumber:string;
   evidenceCode:string;
   index:any;
-  stateData:any
+  stateData:any;
 }
 
 

@@ -1,20 +1,20 @@
 <div *ngIf="loaded" class="wrapper">
   <form [formGroup]="questionnaireForm" class="main custom-font" *ngIf="!uploading;else uplodingModal">
-    <div *ngIf="!listing && sections?.length != 1" style="color: var(--primary-color);">
+    <!-- <div *ngIf="!listing && sections?.length != 1" style="color: var(--primary-color);">
       <h1  class="sesion-title">List of Sections</h1>
       <hr style="height: 1px;background:var(--primary-color);"/>
-    </div>
+    </div> -->
     <!-- <div *ngIf="listing && sections?.length" (click)="backToSectionListing()" class="d-flex flex-gap-10 header-shadow">
       <mat-icon class="m-10 ml-16" style="font-size: x-large;">arrow_back</mat-icon>
     </div> -->
     <div *ngFor="let section of sections; let secId = index">
-      <div class="section-listing" [ngStyle]="{display:sections.length == 1 ? 'none':'block'}">
+      <!-- <div class="section-listing" [ngStyle]="{display:sections.length == 1 ? 'none':'block'}">
         <mat-card (click)="setSection(section.name)" class="px-16 py-16 m-20" style="color: var(--primary-color);">
           <mat-card-title>{{secId+1}}. {{section.name}}</mat-card-title>
         </mat-card>
-      </div>
-      <span [id]="section.name" [ngStyle]="{
-        display: sections.length == 1 ? 'block' : 'none',
+      </div> -->
+      {{section.code}}
+      <span [id]="section.code" [ngStyle]="{
         'pointer-events': stateData && stateData?.isSurvey === false ? 'none' : 'auto',
         opacity: stateData && stateData?.isSurvey === false ? 0.6 : 1
       }">
@@ -24,7 +24,7 @@
         </span>
     </div>
   </form>
-  <ng-container *ngIf="!uploading">
+  <!-- <ng-container *ngIf="!uploading">
   <ng-container *ngIf="sections?.length > 1;else showAllButtons">
   <div class="sticky-footer" [ngClass]="{'bg-white': !listing}">
     <hr class="partition" />
@@ -53,9 +53,9 @@
   </div>
 </div>
 </ng-container>
-</ng-container>
+</ng-container> -->
 
-<ng-template #showAllButtons>
+<ng-container *ngIf="!uploading">
   <div class="sticky-footer">
     <hr class="partition" />
     <div class="footer-buttons">
@@ -79,7 +79,7 @@
     </div>
     </div>
   </div>
-</ng-template>
+</ng-container>
 
 </div>
 <div class="spinner-overlay" *ngIf="!loaded">
@@ -109,7 +109,7 @@
               <ng-template #pageWithMsg> {{page + ' (' + pageMsg.get(page) + ')'}} </ng-template>
                 <div class="d-flex flex-dr flex-gap-8 flex-w-wrap" style="margin: 12px 0;">
                 <ng-container *ngFor="let question of questionMap[page]">
-                  <button (click)="goToQuestion(question._id,question.pageIndex,question.sectionName)" mat-mini-fab [ngStyle]="{
+                  <button (click)="goToQuestion(question._id,question.pageIndex,question.sectionCode)" mat-mini-fab [ngStyle]="{
                   'background-color':question.validity
                 }">
                     {{ question.questionNumber }}
