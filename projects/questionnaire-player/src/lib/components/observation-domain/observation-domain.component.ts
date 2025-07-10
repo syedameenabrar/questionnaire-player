@@ -8,6 +8,7 @@ import { BackNavigationHandlerComponent } from '../../shared/components/pie-char
 import { QueryParamsService } from '../../services/queryParams.service';
 import { catchError, finalize } from 'rxjs';
 import { Location } from '@angular/common';
+import { DbService } from '../../services/db/db.service';
 
 @Component({
   selector: 'lib-observation-domain',
@@ -24,62 +25,87 @@ export class ObservationDomainComponent extends BackNavigationHandlerComponent i
   remark: any = "";
   observationId: any = "";
   id: any = "";
-  entities:any=[]
+  entities: any = []
   @ViewChild('notApplicableModel') notApplicableModel: TemplateRef<any>;
   loaded = false;
-  submissionNumber:any;
+  submissionNumber: any;
+  submissionId: any;
+  completeObservationData: any;
 
   constructor(private apiService: ApiService, private toaster: ToastService, private router: Router,
-    private dialog: MatDialog, private queryParamsService: QueryParamsService, 
-    location: Location
+    private dialog: MatDialog, private queryParamsService: QueryParamsService,
+    location: Location, private db: DbService
   ) {
     super(router, location);
-   }
+  }
 
-  ngOnInit(): void {
+  async ngOnInit() {
     document.getElementById('observation-ion-toolbar').style.display = 'block';
     this.queryParamsService.parseQueryParams();
     this.observationId = this.queryParamsService?.observationId;
     this.entityId = this.queryParamsService?.entityId;
     this.id = this.queryParamsService?.id;
-    let typeFromPreviousUrl = this.queryParamsService.typeFromPreviousUrl;
-    if(typeFromPreviousUrl == "questionnairePlayer"){
-      setTimeout(() => {
-        this.getObservationByEntityId();
-      }, 1000);
-    }else{
-      this.getObservationByEntityId()
+    this.submissionId = this.queryParamsService?.id;
+    this.submissionNumber = this.queryParamsService?.submissionNumber;
+
+    let isDataInIndexDb = await this.checkAndMapIndexDbDataToVariables();
+
+    if (!isDataInIndexDb) {
+      this.getFullObservationData();
     }
+  }
+
+  getFullObservationData() {
+    this.apiService.post(urlConfig.observation.details + this.observationId + `?entityId=${this.entityId}`, this.apiService.profileData)
+      .pipe(
+        finalize(() => this.loaded = true),
+        catchError((err: any) => {
+          this.toaster.showToast(err?.error?.message, 'Close');
+          throw Error(err);
+        })
+      )
+      .subscribe((res: any) => {
+
+        if (res.result) {
+          this.completeObservationData = res?.result;
+          this.mapDataToVariables();
+          this.setDataInIndexDb();
+        } else {
+          this.toaster.showToast(res.message, 'danger');
+        }
+      })
   }
 
   getObservationByEntityId() {
     this.evidences = [];
     this.apiService.post(urlConfig.observation.observationSubmissions + this.observationId + `?entityId=${this.entityId}`, this.apiService.profileData)
-    .pipe(
-      finalize(() =>this.loaded = true),
-      catchError((err: any) => {
-        this.toaster.showToast(err?.error?.message, 'Close');
-        throw Error(err);
-      })
-    )
+      .pipe(
+        finalize(() => this.loaded = true),
+        catchError((err: any) => {
+          this.toaster.showToast(err?.error?.message, 'Close');
+          throw Error(err);
+        })
+      )
       .subscribe((res: any) => {
-        
+
         if (res.result) {
           this.entities = res?.result;
 
-        let evidencesStatus = this.entities
-          .filter((obj: any) => obj?._id == this.id)
-          .map((obj: any) => obj.evidencesStatus);
+          let evidencesStatus = this.entities
+            .filter((obj: any) => obj?._id == this.id)
+            .map((obj: any) => obj.evidencesStatus);
 
           this.entities
-          .map((obj: any) => {
-            if(obj?._id == this.id){
-              this.submissionNumber = obj?.submissionNumber;
+            .map((obj: any) => {
+              if (obj?._id == this.id) {
+                this.submissionNumber = obj?.submissionNumber;
+                this.submissionId = obj?._id;
+
+              }
             }
-          }
-        )
-        this.evidences = evidencesStatus.flat();
-          console.log("this.entities",this.entities)
+            )
+
+          this.evidences = evidencesStatus.flat();
 
         } else {
           this.toaster.showToast(res.message, 'danger');
@@ -100,9 +126,9 @@ export class ObservationDomainComponent extends BackNavigationHandlerComponent i
     this.expandedIndex = this.expandedIndex === index ? null : index;
   }
 
-  navigateToDetails(data,index) {
+  navigateToDetails(data, index) {
     this.router.navigate(['observation'], {
-      queryParams: { type: 'questionnairePlayer', observationId:this.observationId, entityId:this.entityId, submissionNumber:this.submissionNumber,evidenceCode:data?.code, index:index }
+      queryParams: { type: 'questionnairePlayer', observationId: this.observationId, entityId: this.entityId, submissionNumber: this.submissionNumber, submissionId: this.submissionId, evidenceCode: data?.code, index: index }
     });
   }
 
@@ -137,5 +163,35 @@ export class ObservationDomainComponent extends BackNavigationHandlerComponent i
         this.toaster.showToast(err.error.message, 'Close');
       })
 
+  }
+
+  async setDataInIndexDb() {
+
+    const data = {
+      key: `${this.submissionId}_${this.submissionNumber}`,
+      data: this.completeObservationData
+    }
+    try {
+      await this.db.addData(data);
+    } catch (error) {
+      console.error("Failed to store data in IndexedDB", error);
+    }
+  }
+
+  async checkAndMapIndexDbDataToVariables() {
+    let indexdbData = await this.db.getData(`${this.submissionId}_${this.submissionNumber}`);
+    let currentObservation = indexdbData?.data;
+
+    if (currentObservation) {
+      this.loaded = true;
+      this.completeObservationData = currentObservation;
+      this.mapDataToVariables();
+    }
+    return currentObservation ? true : false;
+  }
+
+  mapDataToVariables() {
+    this.entities = this.completeObservationData?.assessment?.evidences;
+    this.evidences = this.entities;
   }
 }

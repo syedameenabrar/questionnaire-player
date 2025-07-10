@@ -95,7 +95,7 @@ getObservationsByStatus(statuses: ('draft' | 'inprogress' | 'completed' | 'start
 
     if (data?.isRubricDriven) {
       this.router.navigate(['observation'], {
-        queryParams: { type: 'domain', observationId: data?.observationId, entityId: data.entityId, id: data?._id }
+        queryParams: { type: 'domain', observationId: data?.observationId, entityId: data.entityId,submissionNumber: data?.submissionNumber, id: data?._id }
       });
     } else {
       this.router.navigate(['observation'], {

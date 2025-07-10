@@ -2,7 +2,9 @@
     "survey":{
         "details":"/survey/v1/surveys/details?solutionId=",
         "update":"/survey/v1/surveySubmissions/update/",
-        "reportUrl":"/survey/v1/reports/fetch"
+        "reportUrl":"/survey/v1/reports/fetch",
+        "surveyVerifyLink":"/survey/v1/surveys/details/",
+        "reports":"/survey/v1/reports/submissionReport?submissionId="
     },
     "observation":{
         "listing":"/survey/v1/solutions/targetedSolutions",
@@ -15,7 +17,10 @@
         "observationSubmissions":"/survey/v1/observationSubmissions/list/",
         "update":"/survey/v1/observationSubmissions/update/",
         "create":"/survey/v1/observationSubmissions/create/",
-        "refreshTokenUrl":"/user/v1/account/generateToken"
+        "project": "/project/v1/project/templates/details/",
+        "templateDetails":"/project/v1/solutions/details/",
+        "refreshTokenUrl":"/user/v1/account/generateToken",
+        "observationVerifyLink":"/survey/v1/solutions/verifyLink/"
     },
     "presignedUrl":"/survey/v1/files/preSignedUrls"
 }

@@ -35,4 +35,11 @@ export class ToastService {
     }
     this.snackBar.open(message,'',snackBarConfig)
   }
+
+  clearToaster(){
+    if (this.snackBar) {
+      this.snackBar.dismiss();
+
+    }
+  }
 }

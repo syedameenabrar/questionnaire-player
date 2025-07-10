@@ -338,10 +338,10 @@ export class ReportComponent extends BackNavigationHandlerComponent implements O
         })
       )
       .subscribe((res: any) => {
-        this.apiService.downloadFile(res?.result?.pdfUrl);
+        this.openUrl(res?.result?.pdfUrl);
       });
   }
-  
+
   onSelectionChange(submissionId: string): void {
     this.submissionId = submissionId;
     this.observationType == 'questions' ? this.loadObservationReport(submissionId, false, false) : this.loadObservationReport(submissionId, true, false);

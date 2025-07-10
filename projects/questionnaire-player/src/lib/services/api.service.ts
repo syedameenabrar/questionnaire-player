@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http'
 import { Observable } from 'rxjs';
 import * as urlConfig from './../constants/url-config.json';
-import { saveAs } from 'file-saver';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -62,14 +62,5 @@ export class ApiService {
         console.error('Error retrieving access token:', error);
         return null;
     }
-    }
-
-    downloadFile(url: string) {
-      this.http.get(url, { responseType: 'blob' })
-        .subscribe(blob => {
-          saveAs(blob, `observation_report${Date.now()}.pdf`);
-        }, error => {
-          console.error('Error downloading file:', error);
-      });
     }
 }

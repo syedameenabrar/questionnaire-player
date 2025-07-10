@@ -112,7 +112,8 @@ export class MatrixQuestionsComponent implements OnInit {
       this.matrixForm.patchValue(this.formAsArray.controls[i].value);
     }
     this.dialog.open(this.modalTemplate, {
-      width: '100%',
+      width: '90vw',
+      maxWidth: '100vw',  
       enterAnimationDuration: 300,
       exitAnimationDuration: 150,
       disableClose: true,

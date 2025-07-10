@@ -31,7 +31,7 @@ export class MainComponent implements OnInit, AfterViewInit {
   hintModalNote:string
   @Input() isExpired:boolean;
 
-  pageSize = 1; //Each Question object from Question representing each page irrespective of number of questions it includes
+  pageSize = 1; 
   pageIndex = 0;
   hidePageSize = true;
   showFirstLastButtons = true;
@@ -49,10 +49,13 @@ export class MainComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-   this.enableRelevantPage();
+    setTimeout(() => {
+      this.enableRelevantPage();
+    });
   }
   
   enableRelevantPage(questionId?){
+    window.scrollTo(0, 0);
     if(!this.questionnaireInstance){
       for(let i = 0; i < this.questions.length; i++){
         if(i !== this.pageIndex){
@@ -75,6 +78,7 @@ export class MainComponent implements OnInit, AfterViewInit {
   }
 
   handlePageEvent(e) {
+    this.pageIndex = e.pageIndex;
     if (this.questions[e.pageIndex] && !this.findNextVisibleQuestion(e.pageIndex, this.pageIndex)) {
       this.paginatorLength = this.pageIndex +1;
     }

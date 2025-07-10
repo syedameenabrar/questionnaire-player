@@ -1,4 +1,5 @@
 import {
+  CSP_NONCE,
   Component,
   ElementRef,
   Input,
@@ -27,10 +28,9 @@ import * as urlConfig from '../../constants/url-config.json';
 import { ToastService } from '../../services/toast.service';
 import { ThemePalette } from '@angular/material/core';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
-import { firstValueFrom, Observable, Subscription } from 'rxjs';
+import { firstValueFrom, Observable, Subscribable, Subscription } from 'rxjs';
 import { AlertComponent } from '../alert/alert.component';
 import { Location } from '@angular/common';
-import { BackNavigationHandlerComponent } from '../../shared/components/pie-chart/back-navigation-handler/back-navigation-handler.component';
 import { Router } from '@angular/router';
 import { SharedService } from '../../services/shared.service';
 import { QueryParamsService } from '../../services/queryParams.service';
@@ -42,7 +42,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
   templateUrl: './main-wrapper.component.html',
   styleUrls: ['./main-wrapper.component.scss'],
 })
-export class MainWrapperComponent extends BackNavigationHandlerComponent implements OnInit, OnChanges, OnDestroy {
+export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
   questions: Array<Question>;
   @Input({ transform: booleanAttribute }) angular = false;
   evidence: Evidence;
@@ -69,7 +69,12 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
   isOnline: boolean = true;
   stateData: any;
   submissionId:any;
-  evidenceCode:any
+  evidenceCode:any;
+  solutionType :any;
+  uploading:boolean= false;
+  totalFileToUpload:any = 0;
+  currentFileUploaded = 0;
+  sectionIndex:any = 0;
 
   constructor(
     public fb: FormBuilder,
@@ -86,9 +91,7 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
     private attachmentService: AttachmentService,
     private http: HttpClient,
 
-  ) {
-    super(router, location);
-  }
+  ) {}
 
   checkFormValidity() {
     window.parent.postMessage({
@@ -111,13 +114,10 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
         this.apiService.stateData ? this.getQuestions(this.apiService.stateData) : this.fetchDetails();
       }
 
-      if (this.sections?.length == 1) {
-        this.setSection(this.sections[0].name);
-        if (document.getElementById('observation-ion-toolbar')) {
-          document.getElementById('observation-ion-toolbar').style.display = 'none'
-        }
-        this.listing = false;
-      }
+     
+      setTimeout(() => {
+        this.setSection(this.sectionIndex);
+      });
     }
 
     if (changes['saveQuestioner']) {
@@ -125,6 +125,7 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
         this.submission('draft');
       }
     }
+
   }
 
   async ngOnInit() {
@@ -143,13 +144,10 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
       }
     }
 
-    if (this.sections?.length == 1) {
-      this.setSection(this.sections[0].name);
-      if (document.getElementById('observation-ion-toolbar')) {
-        document.getElementById('observation-ion-toolbar').style.display = 'none'
-      }
-      this.listing = false;
-    }
+      setTimeout(() => {
+        this.setSection(this.sectionIndex);
+      });
+
     this.questionnaireForm = this.fb.group({});
 
     this.questionnaireForm.valueChanges.subscribe((data: any) => {
@@ -169,25 +167,26 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
       };
       this.updateDataInIndexDb(submissionData);
     });
+
   }
 
   async getQueryParms() {
-    this.queryParamsService.parseQueryParams(); // make sure this is async
-    const submissionId = this.queryParamsService?.submissionId || this.submissionId || "";
-    const evidenceCode = this.queryParamsService?.evidenceCode || this.evidenceCode || "";
+    this.queryParamsService.parseQueryParams();
+    this.submissionId = this.queryParamsService?.submissionId || this.submissionId || "";
+    this.evidenceCode = this.queryParamsService?.evidenceCode || this.evidenceCode;
+    this.sectionIndex =  this.queryParamsService?.sectionIndex || 0;
+    
     // if (!submissionId || !evidenceCode) {
     //   return null;
     // }
   
     return {
-      indexDbKey: `${submissionId}`,
-      evidenceCode
+      indexDbKey: `${this.submissionId}`,
+      evidenceCode: `${this.evidenceCode}`
     };
   }
   
-
-
-  async setDataInIndexDb(submissionId?:any) {
+  async setDataInIndexDb(submissionId:any) {
     const queryParamsData = await this.getQueryParms(); 
     const indexDbKey = queryParamsData?.indexDbKey;
 
@@ -202,35 +201,74 @@ export class MainWrapperComponent extends BackNavigationHandlerComponent impleme
     }
   }
 
-  getProgressStatus(evidenceCode: string): number {
-    let submission: any = evidenceCode;
+  getProgressStatus(submission: any): number {
     if (!submission || !submission.answers) return 0;
   
-    const answers = Object.values(submission.answers);
-    const totalQuestions = answers.length;
+    const answersObj = submission.answers;
+    
+    let totalQuestions = 0;
+    let answeredCount = 0;
+  
+    for (const qid of Object.keys(answersObj)) {
+      const answer = answersObj[qid];
+      const visibleIf = answer.visibleIf;
+     
+      if (Array.isArray(visibleIf) && visibleIf.length > 0) {
+        let isVisible = false;
+  
+        for (const condition of visibleIf) {
+          const targetQid = condition._id;
+          const targetValue = condition.value?.[0];
+          const operator = condition.operator;
+  
+          const targetAnswer = answersObj[targetQid];
+  
+          if (!targetAnswer || targetAnswer.value === undefined || targetAnswer.value === null) {
+            isVisible = false;
+            break; 
+          }
+  
+          const actualValue = targetAnswer.value;
+
+          if (operator === '===' && actualValue === targetValue) {
+            isVisible = true;
+          } else {
+            isVisible = false;
+          }
+        }
+  
+        if (!isVisible) continue; 
+      }
+  
+      totalQuestions++;
+  
+      const value = answer.value;
+  
+      const isAnswered =
+        value !== undefined &&
+        value !== null &&
+        (
+          Array.isArray(value)
+            ? value.some((v: any) =>
+                typeof v === 'string' ? v.trim() !== '' : v !== null && v !== undefined
+              )
+            : value.toString().trim() !== ''
+        );
+  
+      if (isAnswered) {
+        answeredCount++;
+      }
+    }
+  
     if (totalQuestions === 0) return 0;
   
-    const answeredCount = answers.filter((ans: any) =>
-      ans.value !== undefined &&
-      ans.value !== null &&
-      (
-        Array.isArray(ans.value)
-          ? ans.value.some((v: any) =>
-              typeof v === 'string' ? v.trim() !== '' : v !== null && v !== undefined
-            )
-          : ans.value.toString().trim() !== ''
-      )
-    ).length;
-  
-    const percentage = Math.round((answeredCount / totalQuestions) * 100);
-    return percentage;
+    return Math.round((answeredCount / totalQuestions) * 100);
   }
-
+  
 async updateDataInIndexDb(updatedAnswers) {
   const queryParamsData = await this.getQueryParms(); 
   const indexDbKey = queryParamsData?.indexDbKey;
   const evidenceCode = queryParamsData?.evidenceCode;
-
   if (!indexDbKey || indexDbKey === 'undefined') {
     return false;
   }
@@ -285,8 +323,6 @@ async updateDataInIndexDb(updatedAnswers) {
 
   try {
     await this.db.updateData(data);
-
-    
     this.assessment = assessmentClone;
 
     return true;
@@ -312,11 +348,17 @@ async updateDataInIndexDb(updatedAnswers) {
     const indexDbKey = queryParamsData?.indexDbKey;
     let indexdbData = await this.db.getData(indexDbKey);
     let currentObservation = indexdbData?.data;
+    if (this.solutionType === "survey") {
+      const submissions = currentObservation?.assessment?.submissions;
+      if (submissions && typeof submissions === 'object') {
+        this.evidenceCode = Object.keys(submissions)[0];
+      }
+    }
     if (currentObservation) {
       this.assessment = this.questionnaireService.mapSubmissionToAssessment(
         currentObservation
       );
-      this.evidence = this.apiConfig?.solutionType == 'observation' ? currentObservation?.assessment?.evidences[+[this.apiConfig.index]] : currentObservation?.assessment?.evidences[0];
+      this.evidence = this.solutionType == 'observation' ? currentObservation?.assessment?.evidences[+[this.apiConfig.index]] : currentObservation?.assessment?.evidences[0];
       this.evidence.startTime = Date.now();
       this.endDate = new Date(
         new Date(currentObservation?.assessment?.endDate).getTime() +
@@ -325,13 +367,8 @@ async updateDataInIndexDb(updatedAnswers) {
       );
       this.isExpired = currentObservation?.assessment?.status == 'expired' || false;
       this.sections = this.evidence?.sections;
-      if (this.sections?.length == 1) {
-        this.setSection(this.sections[0].name);
-        if (document.getElementById('observation-ion-toolbar')) {
-          document.getElementById('observation-ion-toolbar').style.display = 'none'
-        }
-        this.listing = false
-      }
+        this.setSection(this.sectionIndex);
+
       this.questionnaireForm = this.fb.group({});
 
       this.questionnaireForm.valueChanges.subscribe((data: any) => {
@@ -346,7 +383,7 @@ async updateDataInIndexDb(updatedAnswers) {
   setApiService() {
     this.apiService.baseUrl = this.apiConfig.baseURL;
     this.apiService.token = this.apiConfig.userAuthToken;
-    this.apiService.solutionType = this.apiConfig.solutionType;
+    this.apiService.solutionType = this.apiConfig.solutionType || 'observation';
     this.apiService.observationId = this.apiConfig.observationId;
     this.apiService.entityId = this.apiConfig.entityId;
     this.apiService.submissionNumber = this.apiConfig.submissionNumber;
@@ -356,27 +393,41 @@ async updateDataInIndexDb(updatedAnswers) {
     this.apiService.profileData = this.apiConfig.profileData;
     this.apiService.stateData = this.apiConfig.stateData;
 
-    this.stateData = this.apiConfig.stateData
+    this.stateData = this.apiConfig.stateData;
+    this.solutionType = this.apiConfig.solutionType || 'observation';
+    this.getQueryParms();
+
   }
 
-  fetchDetails() {
-    const path = this.apiConfig.solutionType == 'observation' ? this.apiConfig.observationId + `?entityId=${this.apiConfig.entityId}&submissionNumber=${this.apiConfig.submissionNumber}&evidenceCode=${this.apiConfig.evidenceCode}` : this.apiConfig.solutionId
-    this.subscription = this.apiService.post(`${urlConfig[this.apiConfig.solutionType].details}` + path, this.apiConfig.profileData)
+  async fetchDetails() {
+    const path = this.solutionType == 'observation' ? this.apiConfig.observationId + `?entityId=${this.apiConfig.entityId}&submissionNumber=${this.apiConfig.submissionNumber}&evidenceCode=${this.apiConfig.evidenceCode}` : this.apiConfig.solutionId
+    this.subscription = this.apiService.post(`${urlConfig[this.solutionType].details}` + path, this.apiConfig.profileData)
       .pipe(
         catchError((err) => {
           throw new Error('Could not fetch the details');
         })
       )
       .subscribe(async (res: any) => {
-        if(!res.result && res.message === "Link is expired"){
+        if(!res.result){
           this.surveyExpired(res)
           return ;
         }
+
         if (res.result) {
           this.assessment = this.questionnaireService.mapSubmissionToAssessment(
             res.result
           );
-          this.evidence = this.apiConfig?.solutionType == 'observation' ? this.assessment?.assessment?.evidences[+[this.apiConfig.index]] : this.assessment?.assessment?.evidences[0];
+          this.submissionId = this.assessment.assessment.submissionId;
+            this.evidenceCode = this.assessment.assessment.evidences[0].code;
+
+
+          let isDataInlocalSotrage = await this.checkAndMapIndexDbDataToVariables();
+
+          if(!isDataInlocalSotrage){
+
+          this.setDataInIndexDb(this.submissionId);
+              
+          this.evidence = this.solutionType == 'observation' ? this.assessment?.assessment?.evidences[+[this.apiConfig.index]] : this.assessment?.assessment?.evidences[0];
           this.evidence.startTime = Date.now();
           this.endDate = new Date(
             new Date(this.assessment?.assessment?.endDate).getTime() +
@@ -386,13 +437,6 @@ async updateDataInIndexDb(updatedAnswers) {
           this.isExpired = this.assessment?.assessment?.status == 'expired';
           this.sections = this.evidence?.sections;
           this.loaded = true;
-
-
-    let isDataInlocalSotrage = await this.checkAndMapIndexDbDataToVariables();
-          if(!isDataInlocalSotrage){
-            this.submissionId = this.assessment?.assessment?.submissionId || "";
-            this.evidenceCode = this.assessment?.assessment?.evidences[0]?.code || "";
-            this.setDataInIndexDb(this.submissionId)
           }
 
         } else {
@@ -551,6 +595,7 @@ async updateDataInIndexDb(updatedAnswers) {
         this.domQuery(this.sections[i].name, 'none');
       }
     }
+
     this.domQuery(this.sectionName, 'block');
     if (document.getElementById('observation-ion-toolbar')) {
       document.getElementById('observation-ion-toolbar').style.display = 'block'
@@ -578,118 +623,170 @@ async updateDataInIndexDb(updatedAnswers) {
     this.submitSurvey(submissionData);
   }
 
-  async submitImageToCloud(data): Promise<any> {
-    const payload: any = {
-      ref: 'survey',
-      request: {
-        [data.submissionId]: {
-          files: [data.name],
-        }
-      }
-    };
-
+  async submitImageToCloud(payload: any, uploadQueue: any[]): Promise<any[]> {
     try {
       const response: any = await firstValueFrom(
         this.apiService.post(urlConfig.presignedUrl, payload)
       );
-
-      const presignedUrlData = response.result[data.submissionId].files[0];
-      const headers = new HttpHeaders({
-        'Content-Type': 'multipart/form-data',
-        "x-ms-blob-type": "BlockBlob",
-      });
-
-      await firstValueFrom(
-        this.http.put(presignedUrlData.url, data.file, { headers })
+  
+      // Get the actual submissionId key (ignoring cloudStorage key)
+      const submissionId = Object.keys(response.result).find(
+        (key) => key !== 'cloudStorage'
       );
+  
+      const fileList = response.result[submissionId]?.files || [];
+      const uploadResults: any[] = [];
+  
+      for (let file of uploadQueue) {
+        const presignedUrlData = fileList.find((f: any) => f.file === file.name);
+  
+        if (!presignedUrlData) {
+          console.error(`Presigned URL not found for file: ${file.name}`);
+          continue;
+        }
+  
+        const headers = new HttpHeaders({
+          'Content-Type': 'multipart/form-data',
+          'x-ms-blob-type': 'BlockBlob',
+        });
+  
+        const storedFile: any = await this.db.getData(file.name);
+        if (storedFile?.data) {
+          const convertedFile = this.attachmentService.base64ToFile(storedFile.data);
+          file.file = convertedFile;
+        }
 
-      const obj: any = {
-        name: data.name,
-        url: presignedUrlData.url.split('?')[0],
-        previewUrl: presignedUrlData.url.split('?')[0],
-        question_id: data.question_id,
-      };
-
-      for (const key of Object.keys(presignedUrlData.payload)) {
-        obj[key] = presignedUrlData.payload[key];
+  
+        await firstValueFrom(
+          this.http.put(presignedUrlData.url, file.file, { headers })
+        );
+  
+        file.isUploaded = true;
+        file.url = presignedUrlData.url;
+        file.previewUrl = presignedUrlData.getDownloadableUrl[0];
+        file.sourcePath = presignedUrlData.payload?.sourcePath || '';
+        this.currentFileUploaded++;
+  
+        uploadResults.push(file);
       }
-
-      return obj;
-
+  
+      return uploadResults;
+  
     } catch (err) {
-      console.error('Upload failed', err);
+      console.error('Batch upload failed', err);
       throw err;
     }
   }
-
-
+  
+  
+  
+  
   async submitSurvey(submissionData) {
     if (submissionData.status !== 'draft') {
       if (!this.saveQuestioner) {
         const confirmationParams = {
           title: 'Confirmation',
-          message: `Are you sure you want to submit the ${this.apiConfig.solutionType}?`,
+          message: `Are you sure you want to submit the ${this.solutionType}?`,
           actionBtns: true,
           cancelLabel: 'Cancel',
           acceptLabel: 'Confirm',
         };
+  
         const response = await this.openAlert(confirmationParams);
-        if (response) {
-          const answers = submissionData?.answers;
-
-          for (let [qid, answerObj] of Object.entries(answers)) {
-            const answer = answerObj as { fileName?: any[] };
-            const files = answer.fileName || [];
-            for (let file of files) {
-              if (!file?.isUploaded) {
-                const storedFile: any = await this.db.getData(file?.name);
-                if (!storedFile || !storedFile.data) continue;
-
-                const convertedFile = this.attachmentService.base64ToFile(storedFile.data);
-                file.file = convertedFile;
-
-                const presignedUrlData: any = await this.submitImageToCloud(file);
-
-                file.isUploaded = true;
-                file.previewUrl = presignedUrlData.url.split('?')[0];
-                file.url = presignedUrlData.url.split('?')[0];
-                file.file = "";
-
-                await this.updateDataInIndexDb(submissionData);
+        if (!response) return;
+  
+        this.totalFileToUpload = 0;
+        this.currentFileUploaded = 0;
+  
+        const answers = submissionData?.answers;
+        const uploadQueue: any[] = [];
+  
+        // Collect all files that need uploading
+        for (let [submissionId, answerObj] of Object.entries(answers)) {
+          const files = (answerObj as any).fileName || [];
+          for (let file of files) {
+            if (!file?.isUploaded) {
+              this.totalFileToUpload++;
+              const storedFile: any = await this.db.getData(file.name);
+              if (!storedFile || !storedFile.data) {
+                this.toaster.showToast(`No stored data found for file: ${file.name}`, 'danger', 5000);
+                continue;
               }
+              // const convertedFile = this.attachmentService.base64ToFile(storedFile.data);
+              // file.file = convertedFile;
+              file.submissionId = submissionId;
+              uploadQueue.push(file);
             }
           }
-
         }
-        if (!response) return;
+  
+        this.uploading = true;
+  
+        try {
+          if (uploadQueue.length > 0) {
+            // Prepare payload for bulk upload
+            const payload = {
+              ref: 'survey',
+              request: {
+                [this.submissionId]: {
+                  files: uploadQueue.map(file => file.name)
+                }
+              }
+            };
+  
+            const uploadedFiles = await this.submitImageToCloud(payload, uploadQueue);
+  
+            for (let i = 0; i < uploadQueue.length; i++) {
+              const file = uploadQueue[i];
+              const presignedUrlData = uploadedFiles[i];
+  
+              file.isUploaded = true;
+              file.previewUrl = presignedUrlData.previewUrl;
+              file.url = presignedUrlData.url;
+              file.sourcePath = presignedUrlData.sourcePath;
+              // file.file = '';
+  
+              this.currentFileUploaded++;
+            }
+  
+            await this.updateDataInIndexDb(submissionData);
+          }
+        } catch (uploadErr) {
+          console.error('Batch upload failed:', uploadErr);
+          this.toaster.showToast(`Failed to upload files`, 'danger', 5000);
+          this.uploading = false;
+          return;
+        } finally {
+          this.uploading = false;
+        }
       }
+  
       const responseFromUpdateDataFunction = await this.updateDataInIndexDb(submissionData);
       if (responseFromUpdateDataFunction) {
-
-      this.apiService
-        .post(
-          `${urlConfig[this.apiConfig.solutionType].update}${this.assessment.assessment.submissionId}`,
-          { evidence: submissionData }
-        )
-        .pipe(
-          catchError((err) => {
-            this.toaster.showToast(err?.error?.message, 'danger', 5000);
-            throw new Error(`Update API has failed`);
-          })
-        )
-        .subscribe((res: any) => {
-          if (res.status === 200 && !this.saveQuestioner) {
-            this.formIsNotDirty();
-            const footer = this.el.nativeElement.querySelector('.footer-buttons');
-            this.renderer.setStyle(footer, 'display', 'none');
-            this.toaster.showToast(
-              `Your ${this.apiConfig.solutionType} has been submitted successfully.`,
-              'success',
-              5000
-            );
-            this.evidence.isSubmitted = true;
-          }
-        });
+        this.apiService
+          .post(
+            `${urlConfig[this.solutionType].update}${this.assessment.assessment.submissionId}`,
+            { evidence: submissionData }
+          )
+          .pipe(
+            catchError((err) => {
+              this.toaster.showToast(err?.error?.message, 'danger', 5000);
+              throw new Error('Update API has failed');
+            })
+          )
+          .subscribe((res: any) => {
+            if (res.status === 200 && !this.saveQuestioner) {
+              this.formIsNotDirty();
+              const footer = this.el.nativeElement.querySelector('.footer-buttons');
+              this.renderer.setStyle(footer, 'display', 'none');
+              this.toaster.showToast(
+                `Your ${this.solutionType} has been submitted successfully.`,
+                'success',
+                5000
+              );
+              this.evidence.isSubmitted = true;
+            }
+          });
       }
     } else {
       const responseFromUpdateDataFunction = await this.updateDataInIndexDb(submissionData);
@@ -697,24 +794,21 @@ async updateDataInIndexDb(updatedAnswers) {
         this.formIsNotDirty();
         const confirmationParams = {
           title: 'Success',
-          message: `Successfully your ${this.apiConfig.solutionType} has been saved. Do you want to continue?`,
+          message: `Successfully your ${this.solutionType} has been saved. Do you want to continue?`,
           acceptLabel: 'Later',
           cancelLabel: 'Continue',
           type: 'success',
         };
         const response = await this.openAlert(confirmationParams);
         if (response) {
-          if (this.sections?.length > 1) {
-            this.backToSectionListing();
-          } else {
             this.location.back();
-          }
         }
-
       }
-}
+    }
   }
-
+  
+  
+  
   async openAlert(alertDialogConfig) {
     const dialogRef = await this.dialog.open(AlertComponent, {
       data: alertDialogConfig,
@@ -737,47 +831,19 @@ async updateDataInIndexDb(updatedAnswers) {
     }).toPromise();
   }
 
-  setSection(name: string) {
-    this.sectionName = name;
-    this.enableRelevantPage();
-    if (document.getElementById('observation-ion-toolbar')) {
-      document.getElementById('observation-ion-toolbar').style.display = 'none'
-    }
-    this.mainComponent?.enableRelevantPage();
-    let sectionElements = document.getElementsByClassName('section-listing');
-    if (sectionElements.length > 0) {
-      for (let i = 0; i < sectionElements.length; i++) {
-        (sectionElements[i] as HTMLElement).style.display = 'none';
-      }
-    }
-    this.listing = true;
-  }
+  setSection(index: any) {
 
-  backToSectionListing() {
-    this.listing = false;
-    this.domQuery(this.sectionName, 'none');
-    if (document.getElementById('observation-ion-toolbar')) {
-      document.getElementById('observation-ion-toolbar').style.display = 'block'
-    }
-    let sectionElements = document.getElementsByClassName('section-listing');
-    this.mainComponent.pageIndex = 0;
-    this.mainComponent.handlePageEvent({ pageIndex: 0 })
-    if (sectionElements.length > 0) {
-      for (let i = 0; i < sectionElements.length; i++) {
-        (sectionElements[i] as HTMLElement).style.display = 'block';
-      }
-    }
-    if (this.sections.length == 1) {
-      this.location.back();
-    }
+    this.sectionName = this.sections[index].name;
+    this.enableRelevantPage();
+    this.mainComponent?.enableRelevantPage();
   }
 
   closeModal() {
     this.dialog.closeAll();
   }
 
-  goToQuestion(id, pageIndex, sectionName) {
-    this.setSection(sectionName)
+  goToQuestion(id, pageIndex, sectionIndex) {
+    this.setSection(sectionIndex)
     this.mainComponent.pageIndex = pageIndex;
     this.mainComponent.handlePageEvent({ pageIndex: pageIndex })
     this.closeModal();
@@ -791,9 +857,12 @@ async updateDataInIndexDb(updatedAnswers) {
   }
 
   ngOnDestroy(): void {
-    if (this.apiConfig.solutionType == 'observation' && this.questionnaireForm.dirty) {
+    this.toaster.clearToaster()
+    if (this.solutionType == 'observation' && this.questionnaireForm.dirty) {
       this.saveQuestioner = true;
-      this.submission('draft');
+      if(!this.assessment.assessment.evidences[0].isSubmitted){
+        this.submission('draft');
+      }
       this.subscription?.unsubscribe();
       this.sharedService.updateValue(false);
       this.questionnaireForm.reset();
@@ -818,7 +887,7 @@ async updateDataInIndexDb(updatedAnswers) {
     }
   }
 
-  getQuestions(data) {
+  async getQuestions(data) {
 
     if (data?.isATargetedSolution === false) {
 
@@ -832,25 +901,28 @@ async updateDataInIndexDb(updatedAnswers) {
 
     );
 
-    this.evidence = this.apiConfig?.solutionType == 'observation' ? this.assessment?.assessment?.evidences[+[this.apiConfig.index]] : this.assessment?.assessment?.evidences[0];
+    this.submissionId = this.assessment.assessment.submissionId;
+    this.evidenceCode = this.assessment.assessment.evidences[0].code;
+    this.apiConfig.index = 0;
 
+    let isDataInlocalSotrage = await this.checkAndMapIndexDbDataToVariables();
+
+    if(!isDataInlocalSotrage){
+
+    this.setDataInIndexDb(this.submissionId);
+        
+    this.evidence = this.solutionType == 'observation' ? this.assessment?.assessment?.evidences[+[this.apiConfig.index]] : this.assessment?.assessment?.evidences[0];
+    
     this.evidence.startTime = Date.now();
-
     this.endDate = new Date(
-
       new Date(this.assessment?.assessment?.endDate).getTime() +
-
       new Date(this.assessment?.assessment?.endDate).getTimezoneOffset() *
-
       60000
-
     );
-
     this.isExpired = this.assessment?.assessment?.status == 'expired';
-
     this.sections = this.evidence?.sections;
-
     this.loaded = true;
+    }
 
   }
 

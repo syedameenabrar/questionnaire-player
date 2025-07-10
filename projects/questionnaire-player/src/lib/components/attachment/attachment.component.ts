@@ -9,12 +9,12 @@ import { MatDialog } from '@angular/material/dialog';
 import { AlertComponent } from '../alert/alert.component';
 import { Observable } from 'rxjs/internal/Observable';
 import { types, limit } from '../../constants/file-formats.json';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { ApiService } from '../../services/api.service';
-import * as urlConfig from '../../constants/url-config.json';
-import { catchError } from 'rxjs/operators';
 import { PrivacyPopupComponent } from '../privacy-popup/privacy-popup.component';
 import { ToastService } from '../../services/toast.service';
+import { DbService } from '../../services/db/db.service';
+import { AttachmentService } from '../../services/attachment/attachment.service';
 @Component({
   selector: 'lib-attachment',
   templateUrl: './attachment.component.html',
@@ -37,9 +37,9 @@ export class AttachmentComponent {
   public isConsentGiven = false;
   constructor(
     private dialog: MatDialog,
-    private http: HttpClient,
-    private apiService: ApiService,
-    public toastService: ToastService
+    public toastService: ToastService,
+    private db: DbService,
+    private attachmentService: AttachmentService
   ) {}
 
   onKeydown(event: KeyboardEvent): void {
@@ -81,89 +81,73 @@ export class AttachmentComponent {
           submissionId: this.data.submissionId,
           file: files[index],
         };
-        const alertDialogConfig = {
-          title: null,
-          message: `File Uploading Please Wait...`,
-          acceptLabel: null,
-          cancelLabel: null,
-        };
-        this.openAlert(alertDialogConfig);
         this.fileUpload(fileDetails);
       }
     });
     event.target.value = '';
   }
 
-  fileUpload(data) {
+  async fileUpload(data) {
     let payload: any = {};
     payload['ref'] = 'survey';
     payload['request'] = {};
+  
     const submissionId = data.submissionId;
+  
+    // Create timestamped name with extension
+    const originalName = data.file.name; // e.g., "document.pdf"
+    const extension = originalName.split('.').pop()?.toLowerCase() || 'file';
+    const timestamp = Date.now(); // current timestamp in ms
+    const fileName = `${timestamp}.${extension}`; // e.g., "1718734382040.pdf"
+  
+    // Attach filename to payload
     payload['request'][submissionId] = {
-      files: [data.name],
+      files: [fileName],
     };
-    this.apiService
-      .post(urlConfig.presignedUrl, payload)
-      .pipe(
-        catchError((err: any) => {
-          console.error('Unable to upload the file. Please try again', err);
-          this.fileUploadResponse = {
-            status: 400,
-            data: null,
-            question_id: data.question_id,
-          };
-          throw Error(err);
-        })
-      )
-      .subscribe((response: any) => {
-        const presignedUrlData = response['result'][submissionId].files[0];
-        const headers = new HttpHeaders({
-          'Content-Type': 'multipart/form-data',
-          "Access-Control-Allow-Origin":"*",
-          ...(response['result'].cloudStorage === "azure" ? { "x-ms-blob-type": "BlockBlob" } : {})
-        });
-        this.http
-          .put(`${presignedUrlData.url}`, data.file, { headers })
-          .pipe(
-            catchError((err) => {
-              console.error('Unable to upload the file. Please try again');
-              this.fileUploadResponse = {
-                status: 400,
-                data: null,
-                question_id: data.question_id,
-              };
-              throw Error(err);
-            })
-          )
-          .subscribe((cloudResponse: any) => {
-            const obj: any = {
-              name: data.name,
-              url: `${presignedUrlData.url}`.split('?')[0],
-              previewUrl: presignedUrlData.getDownloadableUrl[0],
-            };
-            for (const key of Object.keys(presignedUrlData.payload)) {
-              obj[key] = presignedUrlData['payload'][key];
-            }
-            this.fileUploadResponse = {
-              status: 200,
-              data: obj,
-              question_id: data.question_id,
-            };
-            this.closeDialog();
-            const alertDialogConfig = {
-              message: 'File uploaded successfully!',
-              acceptLabel: 'Ok',
-              cancelLabel: null,
-            };
-            this.data.files.push(this.fileUploadResponse.data);
-            this.openAlert(alertDialogConfig);
-          });
-      });
+  
+    // Convert to base64
+    const convertedFile = await this.attachmentService.convertTobase64(data.file);
+  
+    // Save to IndexedDB with timestamped filename as key
+    const dataToAdd = {
+      key: fileName,
+      data: convertedFile,
+    };
+    this.db.addData(dataToAdd);
+  
+    this.closeDialog();
+  
+    // Store the full file info with the new name
+    const abc = {
+      // ...data,
+      name: fileName,
+      isUploaded: false,
+    };
+  
+    // Mocking upload response and alert
+    this.fileUploadResponse = {
+      status: 200,
+      data: abc,
+      question_id: data.question_id,
+    };
+  
+    const alertDialogConfig = {
+      message: 'File uploaded successfully!',
+      acceptLabel: 'Ok',
+      cancelLabel: null,
+    };
+  
+    // Update UI
+    this.data.files.push(abc);
+    this.openAlert(alertDialogConfig);
+    this.attachmentService.triggerMainWrapperComponent();
   }
+  
 
   filesTrackBy(index, file) {
     return file.url;
   }
+  
   getFileType(fileName) {
     const type = fileName.split('.').pop();
     for (const key of Object.keys(this.formats)) {
@@ -174,32 +158,148 @@ export class AttachmentComponent {
   }
 
   closeDialog() {
-    this.dialogRef.close();
-  }
-
-  async showFilePreview(url: any, type: string) {
-    this.objectURL = url;
-    this.objectType = type;
-    this.dialogRef = this.dialog.open(this.previewModal, {
-      width: 'auto',
-      height: 'auto',
-      enterAnimationDuration: 300,
-      exitAnimationDuration: 150,
-    });
-    if (this.objectType == 'doc') {
-      const alertDialogConfig = {
-        title: null,
-        message: `Please wait it may take up to a minute to load`,
-        acceptLabel: 'Close Preview',
-        cancelLabel: null,
-      };
-      this.openAlert(alertDialogConfig, true);
+    if (this.dialogRef) {
+      this.dialogRef?.close();
     }
   }
 
-  openUrl(url: string) {
-    window.open(url, '_blank');
+
+  async showFilePreview(file: any, type: string) {
+    const fileName = file.name || '';
+    const extension = fileName.split('.').pop()?.toLowerCase() || 'unknown';
+  
+    // Supported formats
+    const allSupportedTypes = [
+      ...this.formats.image,
+      ...this.formats.video,
+      ...this.formats.audio,
+      ...this.formats.pdf
+    ].map(t => t.toLowerCase());
+  
+    const isSupported = allSupportedTypes.includes(type.toLowerCase()) || allSupportedTypes.includes(extension);
+  
+    let url: string = '';
+    let result = await this.db.getData(file.name);
+    let base64Data = result?.data;
+
+    if (file.previewUrl) {
+      url = file.previewUrl;
+    } else {
+     
+      if (!base64Data || typeof base64Data !== 'string') {
+        this.openAlert({
+          title: 'File Error',
+          message: `Could not load file: ${file.name}. File might be missing or corrupted.`,
+          acceptLabel: 'OK',
+          cancelLabel: null
+        });
+        return;
+      }
+  
+      const blob = this.attachmentService.base64ToFile(base64Data);  // Make sure this handles correct MIME
+      url = URL.createObjectURL(blob);
+    }
+  
+    // 🔸 Handle image or video preview in modal
+    if (type === 'image' || type === 'video') {
+      this.objectURL = url;
+      this.objectType = type;
+      this.dialogRef = this.dialog.open(this.previewModal, {
+        width: 'auto',
+        height: 'auto',
+        enterAnimationDuration: 300,
+        exitAnimationDuration: 150,
+      });
+      return;
+    }
+  
+    // 🔸 Unsupported preview – fallback to download
+    if (!isSupported) {
+
+  
+      const shareOptions = {
+        type: "preview",
+        title: file.name,
+        fileType: extension,
+        isBase64: !file.previewUrl,
+        url: file.previewUrl ? file.previewUrl : base64Data
+      };
+  
+      const response =await this.postMessageListener(shareOptions);
+      if (!response) {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = file.name || `download.${extension}`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    
+        this.openAlert({
+          title: 'Preview Not Supported',
+          message: `${extension.toUpperCase()} files cannot be previewed. The file will be downloaded instead.`,
+          acceptLabel: 'OK',
+          cancelLabel: null
+        });
+      }
+    }
+  
+    // 🔸 Optional alert for specific types
+    // if (extension === 'doc') {
+    //   this.openAlert({
+    //     title: null,
+    //     message: `Please wait, it may take up to a minute to load.`,
+    //     acceptLabel: 'Close Preview',
+    //     cancelLabel: null,
+    //   }, true);
+    // }
   }
+  
+  
+  
+  
+  async openUrl(file: any) {
+    let url: string = "";
+      let result = await this.db.getData(file.name);
+      let base64Data = result?.data;
+ 
+  
+    // Step 4: Prepare Share Options
+    const shareOptions = {
+      type: "preview",
+      title: file.name,
+      fileType: "pdf",
+      isBase64: !file.previewUrl,
+      url: file.previewUrl ? file.previewUrl : base64Data
+    };
+  
+    // Step 5: Post to WebView (if applicable), else fallback to new tab
+    const response = await this.postMessageListener(shareOptions);
+    if (!response) {
+         // Step 1: Try using previewUrl if available
+    if (file.previewUrl) {
+      url = file.previewUrl;
+    } else {
+      // Step 2: Fetch base64 data from IndexedDB
+      
+      if (!base64Data || typeof base64Data !== 'string' || base64Data.trim() === "") {
+        this.openAlert({
+          title: 'File Error',
+          message: `The file could not be previewed. Data is missing or corrupt.`,
+          acceptLabel: 'OK',
+          cancelLabel: null
+        });
+        return;
+      }
+  
+      // Step 3: Convert base64 to Blob and create Object URL
+      const blob = this.attachmentService.base64ToFile(base64Data);
+      url = URL.createObjectURL(blob);
+    }
+      window.open(url, '_blank');
+    }
+  }
+  
+  
 
   fileLimitCross() {
     const alertDialogConfig = {
@@ -257,6 +357,7 @@ export class AttachmentComponent {
       return;
     }
     this.data.files.splice(fileIndex, 1);
+    this.attachmentService.triggerMainWrapperComponent();
   }
   async handleFileUpload(questionId: string) {
     try {
@@ -312,5 +413,21 @@ export class AttachmentComponent {
 
   docLoader() {
     this.docPreviewAlertRef.close();
+  }
+
+  postMessageListener(data:any):Promise<boolean>{
+    return new Promise((resolve) => {
+      try {
+        if ((window as any).FlutterChannel) {
+          (window as any).FlutterChannel.postMessage(data);
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      } catch (err: any) {
+        console.error('FlutterChannel Error:', err);
+        resolve(false);
+      }
+    });
   }
 }
