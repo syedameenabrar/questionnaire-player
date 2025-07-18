@@ -1,0 +1,4 @@
+button {
+    min-height: 3rem !important;
+    height: inherit;
+}
