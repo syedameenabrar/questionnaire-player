@@ -109,20 +109,33 @@ export class ObservationEntityComponent extends BackNavigationHandlerComponent {
   }
 
   getSearchEntities() {
-    this.apiService.post(urlConfig.observation.searchEntities + this.observationId + `&parentEntityId=${this.apiService.profileData?.state}&page=${this.page}&limit=${this.pageCount}&search=${this.searchValue}`, this.apiService.profileData)
+    let parentEntityId = this.selectedEntities?.parentEntityKey
+      ? this.apiService.profileData[this.selectedEntities?.parentEntityKey]
+      : '';
 
-      .subscribe((res: any) => {
+    let url = urlConfig.observation.searchEntities + this.observationId;
+
+    if (parentEntityId) {
+      url += `&parentEntityId=${parentEntityId}`;
+    }
+
+    this.apiService.post(url, this.apiService.profileData).subscribe(
+      (res: any) => {
         if (res.result) {
           const searchEntities = res?.result[0];
           this.searchEntities = searchEntities?.data;
-          this.filteredEntities = [...this.filteredEntities,...searchEntities?.data]
-
+          this.filteredEntities = [
+            ...this.filteredEntities,
+            ...searchEntities?.data,
+          ];
         } else {
           this.toaster.showToast(res.message, 'Close');
         }
-      }, (err: any) => {
+      },
+      (err: any) => {
         this.toaster.showToast(err.error.message, 'Close');
-      })
+      }
+    );
   }
 
   closeDialog() {
