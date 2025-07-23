@@ -785,6 +785,7 @@ async updateDataInIndexDb(updatedAnswers) {
                 5000
               );
               this.evidence.isSubmitted = true;
+              this.location.back();
             }
           });
       }

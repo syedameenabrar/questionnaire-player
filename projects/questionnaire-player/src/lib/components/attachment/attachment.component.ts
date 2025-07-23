@@ -15,6 +15,7 @@ import { PrivacyPopupComponent } from '../privacy-popup/privacy-popup.component'
 import { ToastService } from '../../services/toast.service';
 import { DbService } from '../../services/db/db.service';
 import { AttachmentService } from '../../services/attachment/attachment.service';
+import { DialogComponent } from '../dialog/dialog.component';
 @Component({
   selector: 'lib-attachment',
   templateUrl: './attachment.component.html',
@@ -28,6 +29,7 @@ export class AttachmentComponent {
   objectURL: string;
   formats = types;
   @ViewChild('previewModal') previewModal: TemplateRef<any>;
+  @ViewChild(DialogComponent) childDialogComponent: DialogComponent;
   @ViewChild('fileInput') fileInput: ElementRef;
   fileUploadResponse = null;
   objectType: string;
@@ -35,6 +37,9 @@ export class AttachmentComponent {
   dialogRef: any;
   @Input() questionFile;
   public isConsentGiven = false;
+  isDimmed: any;
+  hint: string;
+  hintModalNote: string;
   constructor(
     private dialog: MatDialog,
     public toastService: ToastService,
@@ -410,6 +415,18 @@ export class AttachmentComponent {
 
     return dialogRef.afterClosed();
   }
+
+  openDialog() {
+    this.isDimmed = !this.isDimmed;
+    this.hint = "Accepted formats are png,jpg,jpeg,pdf,mp4 and Maximum file size upload limit is 50MB.";
+    this.hintModalNote = "Note: This is the hint for the following attachment";
+    this.childDialogComponent.openDialog('300ms', '150ms');
+  }
+
+  closeHint(){
+    this.isDimmed = false;
+  }
+
 
   docLoader() {
     this.docPreviewAlertRef.close();

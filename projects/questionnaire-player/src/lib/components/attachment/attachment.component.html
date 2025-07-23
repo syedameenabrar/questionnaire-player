@@ -4,6 +4,14 @@
       <mat-icon class="w-auto h-auto">upload</mat-icon> Add file 
     </button>
   </span>
+  <button
+  mat-icon-button
+  style="color: var(--primary-color);"
+  aria-label="Icon-button with a lightbulb icon"
+  (click)="openDialog()"
+  matTooltip="Hint for the attachments">
+  <mat-icon>emoji_objects_outline</mat-icon>
+  </button>
   <input type="file" id="{{ questionId }}" hidden (change)="onFileSelected($event)" />
 </div>
 
@@ -56,3 +64,10 @@
     <audio *ngIf="objectType == 'audio'" [src]="objectURL" controls class="mw-100 mh-100"></audio>
   </div>
 </ng-template>
+
+<lib-dialog
+  [isDimmed]="isDimmed"
+  [hint]="hint"
+  [hintModalNote] = "hintModalNote"
+  (closeHintEmitter)="closeHint()"
+></lib-dialog>
