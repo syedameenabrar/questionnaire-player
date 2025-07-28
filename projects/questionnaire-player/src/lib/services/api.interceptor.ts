@@ -102,6 +102,22 @@ export class ApiInterceptor implements HttpInterceptor {
     if (!this.onlineStatus) {
       return throwError(() => new Error('User is offline'));
     }
+    if(error.status === 401 || error.status === 403){
+      const data = {
+        type:"redirect",
+        pathType:"login"
+      };
+      try {
+        if ((window as any).FlutterChannel) {
+          (window as any).FlutterChannel.postMessage(data);
+        } else {
+          location.href = "/"
+        }
+      } catch (err: any) {
+        console.error('FlutterChannel Error:', err);
+        location.href = "/"
+      }
+    }
     return throwError(() => error);
   }
 }
