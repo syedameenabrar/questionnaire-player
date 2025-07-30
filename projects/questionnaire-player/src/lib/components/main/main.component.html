@@ -38,8 +38,8 @@
       }" />
   </ng-container>
   <div [ngStyle]="{
-      padding: question.responseType != 'pageQuestions' ? '1.5rem' : 0,
-      margin: question.responseType != 'pageQuestions' ? '1.5rem' : 0
+      padding: question.responseType != 'pageQuestions' ? '1rem' : 0,
+      margin: question.responseType != 'pageQuestions' ? '0.5rem' : 0
     }" [ngClass]="{
       'mat-elevation-z8': question.responseType != 'pageQuestions',
       activeCard: question.responseType != 'pageQuestions' , 'submitted' : (isSubmitted || isExpired)

@@ -19,21 +19,21 @@
       <hr class="partition" />
       <div class="footer-buttons">
         <div *ngIf="!evidence?.isSubmitted && !isExpired"
-          class="m-16 d-flex flex-ai-center flex-jc-space-between flex-dr flex-gap-30">
+          class="m-4 d-flex flex-ai-center flex-jc-space-between flex-dr flex-gap-30">
           <div>
             <mat-icon tabindex="0" (keydown)="($event.key == 'Enter' || $event.key == ' ') && getQuestionMap()"
               (click)="getQuestionMap()" matTooltip="Question Map"
-              style="height: auto;width: auto;color: var(--primary-color);font-size: 40px; margin-left: 15px;">map</mat-icon>
-            <p class="question-map">Question Map</p>
+              style="height: auto;width: auto;color: var(--primary-color);font-size: 40px; margin-left: 15px;">rule</mat-icon>
+            <!-- <p class="question-map">Question Map</p> -->
           </div>
           <div>
             <button class="btn btn-primary mr-2" (click)="start()" *ngIf="stateData && stateData?.isSurvey === false">
               Start
             </button>
-            <button class="btn btn-outline-secondary" (click)="submission('draft')"
+            <!-- <button class="btn btn-outline-secondary" (click)="submission('draft')"
               *ngIf="(stateData && stateData?.isSurvey === true) || !stateData">
               Save
-            </button>
+            </button> -->
             <button class="btn btn-primary mr-2"
               (click)="!questionnaireForm?.valid ? getQuestionMap() : submission('submit')"
               *ngIf="(stateData && stateData?.isSurvey === true) || !stateData">
