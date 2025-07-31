@@ -95,11 +95,18 @@
         [disabled]="isEntityInFilteredEntitiesOne(entity)">
         {{ entity?.name }}
       </mat-list-option>
-      <mat-list-option>
-        <div  *ngIf="filteredEntities?.length >= this.pageCount" class="fixed-bottom-button">
-          <button mat-raised-button color="accent" class="fixed-bottom-button" (click)="loadMore()">LOAD MORE</button>
+      <ng-container *ngIf="filteredEntities?.length >= pageCount">
+        <div class="fixed-bottom-button">
+          <button
+            mat-raised-button
+            color="accent"
+            class="fixed-bottom-button"
+            (click)="loadMore()"
+          >
+            LOAD MORE
+          </button>
         </div>
-      </mat-list-option>
+      </ng-container>
 
     </mat-selection-list>
 

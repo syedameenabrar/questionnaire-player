@@ -33,6 +33,7 @@ export class ListingComponent implements OnInit {
   selectedObservation:any;
   isAnyEntitySelected: boolean = false;
   private searchTerms = new Subject<string>();
+  selectedEntityName: string = '';
 
   constructor(
     public router: Router,
@@ -126,6 +127,15 @@ export class ListingComponent implements OnInit {
   }
 
   openFilter() {
+    if (this.allEntities?.length > 0) {
+      this.allEntities = this.allEntities.map((entity, index) => ({
+        ...entity,
+        selected: index === 0
+      }));
+      this.selectedEntityName = this.allEntities[0].name;
+      this.isAnyEntitySelected = true;
+    }
+  
     this.isEntityFilterModalOpen = true;
   }
 
@@ -141,14 +151,10 @@ export class ListingComponent implements OnInit {
   onInputChange(event: any): void {
     this.searchTerms.next(event.target.value);
   }
-
-
   onEntityChange(selectedIndex: number): void {
     this.allEntities.forEach((entity, index) => {
-      if (index !== selectedIndex) {
-        entity.selected = false;
-      }
+      entity.selected = index === selectedIndex;
     });
-    this.isAnyEntitySelected = this.allEntities.some(entity => entity.selected);
+    this.isAnyEntitySelected = true;
   }
 }
