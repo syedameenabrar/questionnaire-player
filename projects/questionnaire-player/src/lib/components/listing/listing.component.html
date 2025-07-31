@@ -70,7 +70,14 @@
       <div>
         <ul>
           <li *ngFor="let question of allEntities; let i = index">
-            <input type="checkbox" [(ngModel)]="question.selected" class="modal-input" [id]="'question-' + i" (change)="onEntityChange(i)" >
+            <input 
+            type="radio" 
+            [(ngModel)]="selectedEntityName" 
+            class="modal-input" 
+            [id]="'question-' + i" 
+            [value]="question.name"
+            (change)="onEntityChange(i)"  
+            />
             <label [for]="'question-' + i">
               {{ question.name }}
             </label>
