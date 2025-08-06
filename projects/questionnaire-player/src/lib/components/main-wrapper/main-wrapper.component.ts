@@ -142,7 +142,7 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
         if (!evidenceData?.answers) return;
     
         const submissionData = {
-          status: 'save',
+          status: evidenceData['isSubmitted'] ? "submit" : "draft",
           ...evidenceData,
         };
     
@@ -151,6 +151,7 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   async ngOnInit() {
+    this.toaster.clearToaster();
     let isDataInlocalSotrage = await this.checkAndMapIndexDbDataToVariables();
     if (typeof this.apiConfig === 'string') {
       try {
@@ -183,9 +184,9 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
         this.questionnaireForm.value
       );
 
-      evidenceData['status'] = 'draft';
+      // evidenceData['status'] = 'draft';
       const submissionData = {
-        status: "draft",
+        status: evidenceData['isSubmitted'] ? "submit" : "draft",
         ...evidenceData,
       };
       this.updateDataInIndexDb(submissionData);
@@ -320,8 +321,11 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
     }
 
 
+
     submissions[evidenceCode].answers = { ...updatedAnswers?.answers }; // ensure fresh reference
-    submissions[evidenceCode].status = updatedAnswers?.status === 'save'
+    submissions[evidenceCode].status = evidences[evidenceIndex].isSubmitted 
+    // submissions[evidenceCode].status = updatedAnswers?.status === 'save'
+
       ? 'save'
       : updatedAnswers?.status === 'draft'
         ? 'draft'
@@ -705,6 +709,7 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
 
 
   async submitSurvey(submissionData) {
+
     if (submissionData.status !== 'draft') {
 
       if (!this.saveQuestioner) {
@@ -829,11 +834,13 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
         // };
         // const response = await this.openAlert(confirmationParams);
         // if (response) {
+          if (this.questionnaireForm.dirty) {
         this.toaster.showToast(
           `Your changes has been saved.`,
           'success',
           5000
         );
+      }
         // }
       }
     }

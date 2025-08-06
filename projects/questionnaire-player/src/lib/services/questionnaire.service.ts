@@ -73,14 +73,14 @@ export class QuestionnaireService {
     const assessment = data.assessment;
 
     for (const evidence of assessment.evidences) {
-      const validSubmission = assessment.submissions[evidence.externalId];
+      const validSubmission = assessment.submissions[evidence?.externalId];
       if (validSubmission) {
         evidence.notApplicable = validSubmission.notApplicable;
-        if (evidence.notApplicable) {
+        if (evidence?.notApplicable) {
           continue;
         }
 
-        for (const section of evidence.sections) {
+        for (const section of evidence?.sections) {
           for (const question of section.questions) {
             if (question.responseType === 'pageQuestions') {
               for (const questions of question.pageQuestions) {
@@ -90,7 +90,7 @@ export class QuestionnaireService {
                     : this.constructMatrixValue(
                         validSubmission,
                         questions,
-                        evidence.externalId
+                        evidence?.externalId
                       );
                 questions.remarks = validSubmission.answers[questions._id]
                   ? validSubmission.answers[questions._id].remarks
@@ -112,7 +112,7 @@ export class QuestionnaireService {
                   : this.constructMatrixValue(
                       validSubmission,
                       question,
-                      evidence.externalId
+                      evidence?.externalId
                     );
               question.remarks = validSubmission.answers[question._id]
                 ? validSubmission.answers[question._id].remarks
@@ -179,13 +179,15 @@ export class QuestionnaireService {
   }
 
   getEvidenceData(evidence: Evidence, formValues: object) {
-    let sections = evidence.sections;
+    let sections = evidence?.sections;
+    
     let answers = this.getSectionData(sections, formValues);
     let payloadData = {
-      externalId: evidence.externalId,
+      externalId: evidence?.externalId,
       answers: answers,
-      startTime: evidence.startTime,
+      startTime: evidence?.startTime,
       endTime: Date.now(),
+      isSubmitted: evidence?.isSubmitted
     };
     return payloadData;
   }

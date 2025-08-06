@@ -30,10 +30,7 @@
             <button class="btn btn-primary mr-2" (click)="start()" *ngIf="stateData && stateData?.isSurvey === false">
               Start
             </button>
-            <!-- <button class="btn btn-outline-secondary" (click)="submission('draft')"
-              *ngIf="(stateData && stateData?.isSurvey === true) || !stateData">
-              Save
-            </button> -->
+            
             <button class="btn btn-primary mr-2"
               (click)="!questionnaireForm?.valid ? getQuestionMap() : submission('submit')"
               *ngIf="(stateData && stateData?.isSurvey === true) || !stateData">
