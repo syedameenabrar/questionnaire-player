@@ -881,10 +881,10 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
     this.dialog.closeAll();
   }
 
-  goToQuestion(id, pageIndex, sectionIndex) {
+  goToQuestion(questonId, pageIndex, sectionIndex) {
     this.setSection(sectionIndex)
     this.mainComponent.pageIndex = pageIndex;
-    this.mainComponent.handlePageEvent({ pageIndex: pageIndex })
+    this.mainComponent.handlePageEvent({ pageIndex: pageIndex, questonId:questonId })
     this.closeModal();
   }
 

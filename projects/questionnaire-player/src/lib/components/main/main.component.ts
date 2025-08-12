@@ -56,6 +56,7 @@ export class MainComponent implements OnInit, AfterViewInit {
   
   enableRelevantPage(questionId?){
     window.scrollTo(0, 0);
+
     if(!this.questionnaireInstance){
       for(let i = 0; i < this.questions.length; i++){
         if(i !== this.pageIndex){
@@ -82,7 +83,7 @@ export class MainComponent implements OnInit, AfterViewInit {
     if (this.questions[e.pageIndex] && !this.findNextVisibleQuestion(e.pageIndex, this.pageIndex)) {
       this.paginatorLength = this.pageIndex +1;
     }
-      this.enableRelevantPage();
+      this.enableRelevantPage(e?.questonId);
   }
 
   private findNextVisibleQuestion(eventPageIndex: number, currentPageIndex: number): boolean {
