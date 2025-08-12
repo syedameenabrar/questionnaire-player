@@ -102,98 +102,90 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
     }, '*');
   }
 
-  async ngOnChanges(changes: SimpleChanges) {
-    let initialResponse:any; 
-
-    if (
-      this.angular &&
-      changes['apiConfig'] &&
-      changes['apiConfig'].previousValue == undefined &&
-      changes['apiConfig'].currentValue
-    ) {
-      this.setApiService();
-      let isDataInlocalSotrage = await this.checkAndMapIndexDbDataToVariables();
-      if (!isDataInlocalSotrage) {
-        this.setApiService();
-        initialResponse = this.apiService.stateData ? await this.getQuestions(this.apiService.stateData) : await this.fetchDetails();
-      }
-
-
-      setTimeout(() => {
-        this.setSection(this.sectionIndex);
-      });
-    }
-
-    if (changes['saveQuestioner']) {
-      if (this.saveQuestioner == true) {
-        this.submission('draft');
-      }
-    }
-
-      this.questionnaireForm?.valueChanges
-      .pipe(debounceTime(500), distinctUntilChanged())
-      .subscribe((data: any) => {
-        if (!data) return;
-  
-        if (!this.evidence) return;
-  
-        const evidenceData = this.questionnaireService.getEvidenceData(this.evidence, data);
-        
-        if (!evidenceData?.answers) return;
-    
-        const submissionData = {
-          status: evidenceData['isSubmitted'] ? "submit" : "draft",
-          ...evidenceData,
-        };
-    
-        this.updateDataInIndexDb(submissionData).then(() => {});
-      })
-  }
-
   async ngOnInit() {
     this.toaster.clearToaster();
-    let isDataInlocalSotrage = await this.checkAndMapIndexDbDataToVariables();
+    this.questionnaireForm = this.fb.group({});
+  
+ 
+    const isDataInLocalStorage = await this.checkAndMapIndexDbDataToVariables();
+  
+  
     if (typeof this.apiConfig === 'string') {
       try {
         this.apiConfig = JSON.parse(this.apiConfig);
-
-        if (!isDataInlocalSotrage) {
-          this.setApiService();
-          this.apiService.stateData ? this.getQuestions(this.apiService.stateData) : this.fetchDetails();
-        }
-
       } catch (error) {
         throw new Error('Invalid Assessment Structure', error);
       }
     }
-
+  
+   
+    if (!isDataInLocalStorage) {
+      this.setApiService();
+      this.apiService.stateData
+        ? await this.getQuestions(this.apiService.stateData)
+        : await this.fetchDetails();
+    }
+  
+ 
     setTimeout(() => {
       this.setSection(this.sectionIndex);
     });
-
-    this.questionnaireForm = this.fb.group({});
-
+  
+ 
     this.questionnaireForm.valueChanges
-    .subscribe((data: any) => {
-      this.checkFormValidity();
-    })
-
+      .pipe(debounceTime(500), distinctUntilChanged())
+      .subscribe(data => {
+        this.checkFormValidity();
+        this.saveEvidence(data);
+      });
+  
     this.attachmentService.trigger$.subscribe(() => {
-      const evidenceData = this.questionnaireService.getEvidenceData(
-        this.evidence,
-        this.questionnaireForm.value
-      );
-
-      // evidenceData['status'] = 'draft';
-      const submissionData = {
-        status: evidenceData['isSubmitted'] ? "submit" : "draft",
-        ...evidenceData,
-      };
-      this.updateDataInIndexDb(submissionData);
+      this.saveEvidence(this.questionnaireForm.value);
     });
-
   }
-
+  
+  async ngOnChanges(changes: SimpleChanges) {
+    if (
+      this.angular &&
+      changes['apiConfig'] &&
+      changes['apiConfig'].previousValue === undefined &&
+      changes['apiConfig'].currentValue
+    ) {
+      this.setApiService();
+      const isDataInLocalStorage = await this.checkAndMapIndexDbDataToVariables();
+  
+      if (!isDataInLocalStorage) {
+        this.setApiService();
+        const initialResponse = this.apiService.stateData
+          ? await this.getQuestions(this.apiService.stateData)
+          : await this.fetchDetails();
+      }
+  
+      setTimeout(() => {
+        this.setSection(this.sectionIndex);
+      });
+    }
+  
+    if (changes['saveQuestioner'] && this.saveQuestioner === true) {
+      this.submission('draft');
+    }
+  }
+  
+  // 🔹 Common save logic
+  private saveEvidence(data: any) {
+    if (!data || !this.evidence) return;
+  
+    const evidenceData = this.questionnaireService.getEvidenceData(this.evidence, data);
+    if (!evidenceData?.answers) return;
+  
+    const submissionData = {
+      status: evidenceData['isSubmitted'] ? 'submit' : 'draft',
+      ...evidenceData,
+    };
+  
+    this.updateDataInIndexDb(submissionData);
+  }
+  
   async getQueryParms() {
     this.queryParamsService.parseQueryParams();
     this.submissionId = this.queryParamsService?.submissionId || this.submissionId || "";
@@ -341,7 +333,6 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
     evidences[evidenceIndex].completePercentage = progress;
     evidences[evidenceIndex].progressStatus = progressStatus;
     evidences[evidenceIndex].isSubmitted = ['save', 'submit'].includes(submissions[evidenceCode].status);
-
 
     const data = {
       key: indexDbKey,

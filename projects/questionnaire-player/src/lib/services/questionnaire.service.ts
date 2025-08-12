@@ -232,28 +232,37 @@ export class QuestionnaireService {
 
   formatToPayload(currentQuestion, formValues) {
     let value, labels;
-    if (currentQuestion.responseType == 'matrix') {
-      value = !currentQuestion.value.length ? [] : formValues[currentQuestion._id];
-      labels = currentQuestion.value;
+  
+    if (currentQuestion.responseType === 'matrix') {
+      value = !currentQuestion.value?.length
+        ? []
+        : formValues[currentQuestion._id];
+      labels = currentQuestion.value || [];
     } else {
       value = formValues[currentQuestion._id];
       labels = formValues[currentQuestion._id];
-      if (currentQuestion.responseType == 'radio' && currentQuestion.value) {
-        labels = currentQuestion.options.find(
-          (_) => _.value == currentQuestion.value
-        ).label;
+  
+      if (currentQuestion.responseType === 'radio' && currentQuestion.value) {
+        const selectedOption = currentQuestion.options.find(
+          (_) => _.value === currentQuestion.value
+        );
+        labels = selectedOption ? selectedOption.label : '';
       }
-      if (
-        currentQuestion.responseType == 'multiselect' &&
-        currentQuestion.value
-      ) {
+  
+      if (currentQuestion.responseType === 'multiselect') {
+        const selectedValues = Array.isArray(currentQuestion.value)
+          ? currentQuestion.value
+          : currentQuestion.value
+          ? [currentQuestion.value]
+          : [];
+  
         labels = currentQuestion.options
-          .filter((_) => currentQuestion.value.includes(_.value))
-          .map((_) => _.label);
+          .filter((opt) => selectedValues.includes(opt.value))
+          .map((opt) => opt.label);
       }
     }
-
-    return {
+  
+    let payloadItem = {
       qid: currentQuestion._id,
       value: value,
       remarks: currentQuestion.remarks,
@@ -261,7 +270,7 @@ export class QuestionnaireService {
       gpsLocation: '',
       payload: {
         question: currentQuestion.question,
-        labels: this.convertToArray(labels),
+        labels: this.convertToArray(labels), // always returns array
         responseType: currentQuestion.responseType,
         filesNotUploaded: [], //todo
       },
@@ -273,7 +282,21 @@ export class QuestionnaireService {
       visibleIf: currentQuestion.visibleIf,
       rubricLevel: '',
     };
+  
+    // 🔹 Flatten extra nested "value" if it’s an object with a "value" key
+    while (
+      payloadItem?.value &&
+      typeof payloadItem.value === 'object' &&
+      !Array.isArray(payloadItem.value) &&
+      'value' in payloadItem.value
+    ) {
+      payloadItem.value = payloadItem.value.value;
+    }
+  
+    return payloadItem;
   }
+  
+  
 
   convertToArray(arr) {
     if (!arr) {
