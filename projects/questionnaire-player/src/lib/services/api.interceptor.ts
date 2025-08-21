@@ -42,11 +42,11 @@ export class ApiInterceptor implements HttpInterceptor {
   }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    if (!this.onlineStatus) {
-      this.offline = true;
-      this.toaster.showToast('You are offline. Please connect to a network.', 'danger');
-      return of();
-    }
+    // if (!this.onlineStatus) {
+    //   this.offline = true;
+    //   this.toaster.showToast('You are offline. Please connect to a network.', 'danger');
+    //   return of();
+    // }
 
     this.offline = false;
 

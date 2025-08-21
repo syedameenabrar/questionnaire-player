@@ -372,9 +372,11 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
 
   async checkAndMapIndexDbDataToVariables() {
     const queryParamsData = await this.getQueryParms();
+
     const indexDbKey = queryParamsData?.indexDbKey;
     let indexdbData = await this.db.getData(indexDbKey);
     let currentObservation = indexdbData?.data;
+
     if (this.solutionType === "survey") {
       const submissions = currentObservation?.assessment?.submissions;
       if (submissions && typeof submissions === 'object') {
@@ -386,6 +388,8 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
         currentObservation
       );
       this.evidence = this.solutionType == 'observation' ? currentObservation?.assessment?.evidences[+[this.apiConfig.index]] : currentObservation?.assessment?.evidences[0];
+      this.evidenceCode=this.evidence.code;
+
       this.evidence.startTime = Date.now();
       this.endDate = new Date(
         new Date(currentObservation?.assessment?.endDate).getTime() +
