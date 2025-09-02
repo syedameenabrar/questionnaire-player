@@ -61,19 +61,24 @@ export class CheckboxInputComponent implements OnInit {
     const formArray: FormArray = this.questionnaireForm.get(
       this.question._id
     ) as FormArray;
+  
     if (isChecked) {
       formArray.controls[oIndex].patchValue(oId);
+    } else {
+      formArray.controls[oIndex].patchValue('');
     }
-    this.question.value =
-      this.questionnaireForm.controls[this.question._id].value;
-    this.question.value = (this.question.value as Array<string>).filter(
-      Boolean
+  
+    this.question.value = (this.questionnaireForm.controls[this.question._id].value as Array<string>).filter(
+      (val) => val !== '' && val !== null && val !== undefined
     );
+  
     this.question.endTime = Date.now();
+  
     if (this.question.children.length) {
       this.dependentParent.emit(this.question);
     }
   }
+  
 
   get isValid(): boolean {
     return this.questionnaireForm.controls[this.question._id].valid;

@@ -26,10 +26,23 @@
               style="height: auto;width: auto;color: var(--primary-color);font-size: 40px; margin-left: 15px;">rule</mat-icon>
             <!-- <p class="question-map">Question Map</p> -->
           </div>
+          <div class="progress-wrapper">
+            <div class="progress my-progress">
+              <div class="progress-bar"
+                   role="progressbar"
+                   [style.width.%]="pageProgressValue"
+                   [attr.aria-valuenow]="pageProgressValue"
+                   aria-valuemin="0" aria-valuemax="100">
+              </div>
+            </div>
+            <p class="progress-text">{{ completedPages }} / {{ totalPages }}</p>
+          </div>
+          
           <div>
             <button class="btn btn-primary mr-2" (click)="start()" *ngIf="stateData && stateData?.isSurvey === false">
               Start
             </button>
+
             
             <button class="btn btn-primary mr-2"
               (click)="!questionnaireForm?.valid ? getQuestionMap() : submission('submit')"

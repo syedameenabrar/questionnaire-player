@@ -77,6 +77,9 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
   totalFileToUpload: any = 0;
   currentFileUploaded = 0;
   sectionIndex: any = 0;
+  completedPages: number = 0;
+  totalPages: number = 0;
+  pageProgressValue: number = 0;
 
   constructor(
     public fb: FormBuilder,
@@ -338,6 +341,7 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
     if (progress === 100) progressStatus = 'completed';
     else if (progress > 0) progressStatus = 'inProgress';
 
+    this.calculatePageCompletion(submissions[evidenceCode]);
 
     evidences[evidenceIndex].completePercentage = progress;
     evidences[evidenceIndex].progressStatus = progressStatus;
@@ -980,5 +984,56 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
     const message = { type: 'EXPIRED', data: data };
     window.postMessage(message, '*');
   }
+
+  calculatePageCompletion(submission: any) {
+    if (!submission || !submission.answers || !this.sections) return;
+  
+    let totalPages = 0;
+    let completedPages = 0;
+  
+    this.sections.forEach((section) => {
+      section.questions.forEach((q:any) => {
+        if (q.responseType === 'pageQuestions') {
+          totalPages++;
+          const allAnswered = q.pageQuestions.every((pq:any) => {
+            const ans = submission.answers[pq._id]?.value;
+            const required = pq.validation?.required;
+  
+            if (required) {
+              return Array.isArray(ans)
+                ? ans.some(v => v !== '' && v != null)
+                : ans !== undefined && ans !== null && ans.toString().trim() !== '';
+            } else {
+              // optional, doesn't block completion
+              return true;
+            }
+          });
+  
+          if (allAnswered) completedPages++;
+        } else {
+          // normal question = treat as its own page
+          totalPages++;
+          const ans = submission.answers[q._id]?.value;
+          const required = q.validation?.required;
+  
+          const isAnswered = required
+            ? (Array.isArray(ans)
+                ? ans.some(v => v !== '' && v != null)
+                : ans !== undefined && ans !== null && ans.toString().trim() !== '')
+            : true;
+  
+          if (isAnswered) completedPages++;
+        }
+      });
+    });
+  
+    this.totalPages = totalPages;
+    this.completedPages = completedPages;
+    this.pageProgressValue = this.totalPages > 0
+  ? Math.round((this.completedPages / this.totalPages) * 100)
+  : 0;
+
+  }
+  
 
 }
