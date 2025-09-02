@@ -32,6 +32,8 @@ export class ObservationEntityComponent extends BackNavigationHandlerComponent {
   loaded = false;
   searchValue: string = "";
   searchAddEntityValue: string = "";
+  page:number = 1;
+  pageCount:number|string = 50;
 
   constructor(private apiService: ApiService, private toaster: ToastService, private router: Router, private dialog: MatDialog
     , private queryParamsService: QueryParamsService, location: Location
@@ -45,6 +47,11 @@ export class ObservationEntityComponent extends BackNavigationHandlerComponent {
     this.solutionName = decodeURIComponent(decodeURIComponent(this.queryParamsService?.name || ''));
     this.entityToAdd = this.queryParamsService?.entityType;
     this.getEntities();
+  }
+
+  loadMore() {
+    this.page++;
+    this.getSearchEntities()
   }
 
   getEntities() {
@@ -102,20 +109,33 @@ export class ObservationEntityComponent extends BackNavigationHandlerComponent {
   }
 
   getSearchEntities() {
-    this.apiService.post(urlConfig.observation.searchEntities + this.observationId + `&parentEntityId=${this.apiService.profileData?.state}`, this.apiService.profileData)
+    let parentEntityId = this.selectedEntities?.parentEntityKey
+      ? this.apiService.profileData[this.selectedEntities?.parentEntityKey]
+      : '';
 
-      .subscribe((res: any) => {
+    let url = urlConfig.observation.searchEntities + this.observationId;
+
+    if (parentEntityId) {
+      url += `&parentEntityId=${parentEntityId}`;
+    }
+
+    this.apiService.post(url, this.apiService.profileData).subscribe(
+      (res: any) => {
         if (res.result) {
           const searchEntities = res?.result[0];
           this.searchEntities = searchEntities?.data;
-          this.filteredEntities = [...searchEntities?.data]
-
+          this.filteredEntities = [
+            ...this.filteredEntities,
+            ...searchEntities?.data,
+          ];
         } else {
           this.toaster.showToast(res.message, 'Close');
         }
-      }, (err: any) => {
+      },
+      (err: any) => {
         this.toaster.showToast(err.error.message, 'Close');
-      })
+      }
+    );
   }
 
   closeDialog() {
@@ -165,7 +185,7 @@ export class ObservationEntityComponent extends BackNavigationHandlerComponent {
       (filteredEntity: any) => filteredEntity._id === entity._id
     ) ?? false;
   }
-  
+
   isEntitySelected(entity: any): boolean {
     return (
       this.selectedEntities?.entities?.some(
@@ -174,7 +194,7 @@ export class ObservationEntityComponent extends BackNavigationHandlerComponent {
       this.addedEntities.includes(entity._id)
     );
   }
-  
+
   onSelectionChange(event: MatSelectionListChange): void {
     event?.options.forEach(option => {
       const entityId = option.value;
@@ -187,7 +207,7 @@ export class ObservationEntityComponent extends BackNavigationHandlerComponent {
       }
     });
   }
-  
+
   handleSearchInput(event?: any): void {
     const searchValue = event?.target?.value?.toLowerCase() || "";
     this.searchAddEntityValue = searchValue;
