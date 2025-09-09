@@ -124,6 +124,7 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
 
       setTimeout(() => {
         this.setSection(this.sectionIndex);
+        console.log("this.sectionIndex1",this.sectionIndex)
       });
     }
 
@@ -172,6 +173,8 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
 
     setTimeout(() => {
       this.setSection(this.sectionIndex);
+      console.log("this.sectionIndex2",this.sectionIndex)
+
     });
 
     this.questionnaireForm = this.fb.group({});
@@ -402,6 +405,8 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
       );
       this.isExpired = currentObservation?.assessment?.status == 'expired' || false;
       this.sections = this.evidence?.sections;
+      console.log("this.sections",this.sections)
+
       this.setSection(this.sectionIndex);
 
       this.questionnaireForm = this.fb.group({});
@@ -471,6 +476,7 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
             );
             this.isExpired = this.assessment?.assessment?.status == 'expired';
             this.sections = this.evidence?.sections;
+            console.log("this.sections",this.sections)
             this.loaded = true;
           }
 
@@ -881,6 +887,7 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
   setSection(index: any) {
 
     this.sectionName = this.sections[index].name;
+    console.log("this.sectionName",this.sectionName)
     this.enableRelevantPage();
     this.mainComponent?.enableRelevantPage();
   }
@@ -990,12 +997,22 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
   
     let totalPages = 0;
     let completedPages = 0;
-  
+    const answersObj = submission.answers;
+
     this.sections.forEach((section) => {
       section.questions.forEach((q:any) => {
+
+        if (Array.isArray(q.visibleIf) && !q.canDisplay) {
+          return;
+        }
+
         if (q.responseType === 'pageQuestions') {
           totalPages++;
           const allAnswered = q.pageQuestions.every((pq:any) => {
+            if (Array.isArray(pq.visibleIf) && !pq.canDisplay) {
+              return true;
+            }
+
             const ans = submission.answers[pq._id]?.value;
             const required = pq.validation?.required;
   
@@ -1004,7 +1021,6 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
                 ? ans.some(v => v !== '' && v != null)
                 : ans !== undefined && ans !== null && ans.toString().trim() !== '';
             } else {
-              // optional, doesn't block completion
               return true;
             }
           });

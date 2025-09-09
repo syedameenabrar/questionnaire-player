@@ -105,3 +105,5 @@ To apply custom theming in your application, you can define CSS variables in you
 }
 ```
 This allows you to control the visual appearance of the web component and ensure it aligns with your application's design.
+
+npm run build-web-comp
