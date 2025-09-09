@@ -2,3 +2,49 @@ button {
     min-height: 3rem !important;
     height: inherit;
 }
+
+.font-bold{
+    margin-top: 0px;
+}
+
+.paragraph{
+    line-height: 25px;
+}
+
+.primary-button {
+    background-color: var(--primary-color) !important;
+    color: var(--general-btn-text-color) !important;
+}
+
+.disabled-button {
+    background-color: var(--disabled-btn-bg) !important;
+    color: var(--disabled-btn-text) !important;
+    border-color: var(--disabled-btn-text) !important;
+  }
+
+.buttons{
+    padding: 10px 35px;
+    font-size: medium;
+    border-radius: 30px;
+}
+
+.d-flex {
+    display: flex;
+  }
+  .d-flex-r {
+    flex-direction: row;
+  }
+  .d-flex-jc {
+    justify-content: center;
+  }
+  
+  .mt-10 { margin-top: 10px; }
+  
+  .flex-1 {
+    flex: 1;
+  }
+  
+  .gap-3 {
+    gap: 0.75rem;
+  }
+  
