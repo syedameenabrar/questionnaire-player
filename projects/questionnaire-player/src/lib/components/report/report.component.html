@@ -124,6 +124,10 @@
                       <mat-icon class="customizeIcon" matTooltip="View the uploaded video" matTooltipClass="tooltip"
                         (click)="openDialog(evidence.previewUrl,'video')">video_file</mat-icon>
                     </div>
+                    <div *ngSwitchCase="'mp3'" class="iconList">
+                      <mat-icon class="customizeIcon" matTooltip="View the uploaded audio" matTooltipClass="tooltip"
+                        (click)="openDialog(evidence.previewUrl,'audio')">audio_file</mat-icon>
+                    </div>
                   </ng-container>
                 </div>
               </div>
@@ -256,6 +260,10 @@
                       <div *ngSwitchCase="'mp4'" class="iconList">
                         <mat-icon class="customizeIcon" matTooltip="View the uploaded video" matTooltipClass="tooltip"
                           (click)="openDialog(evidence.previewUrl,'video')">video_file</mat-icon>
+                      </div>
+                      <div *ngSwitchCase="'mp3'" class="iconList">
+                        <mat-icon class="customizeIcon" matTooltip="View the uploaded audio" matTooltipClass="tooltip"
+                          (click)="openDialog(evidence.previewUrl,'audio')">audio_file</mat-icon>
                       </div>
                     </ng-container>
                   </div>

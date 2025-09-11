@@ -206,7 +206,7 @@ export class AttachmentComponent {
     }
   
     // 🔸 Handle image or video preview in modal
-    if (type === 'image' || type === 'video') {
+    if (type === 'image' || type === 'video' || type === 'audio') {
       this.objectURL = url;
       this.objectType = type;
       this.dialogRef = this.dialog.open(this.previewModal, {
