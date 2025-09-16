@@ -418,7 +418,7 @@ export class AttachmentComponent {
 
   openDialog() {
     this.isDimmed = !this.isDimmed;
-    this.hint = "Accepted formats are png,jpg,jpeg,pdf,mp4 and Maximum file size upload limit is 50MB.";
+    this.hint = "Accepted formats are png,jpg,jpeg,pdf,mp4,mp3, wav and Maximum file size upload limit is 50MB.";
     this.hintModalNote = "Note: This is the hint for the following attachment";
     this.childDialogComponent.openDialog('300ms', '150ms');
   }

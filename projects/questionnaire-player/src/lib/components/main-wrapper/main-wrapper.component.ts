@@ -156,6 +156,8 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
 
   async ngOnInit() {
     this.toaster.clearToaster();
+    console.log("159")
+
     let isDataInlocalSotrage = await this.checkAndMapIndexDbDataToVariables();
     if (typeof this.apiConfig === 'string') {
       try {
@@ -163,6 +165,7 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
 
         if (!isDataInlocalSotrage) {
           this.setApiService();
+          console.log("166",this.apiService.stateData)
           this.apiService.stateData ? this.getQuestions(this.apiService.stateData) : this.fetchDetails();
         }
 
@@ -440,7 +443,10 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   async fetchDetails() {
+    console.log("433")
     const path = this.solutionType == 'observation' ? this.apiConfig.observationId + `?entityId=${this.apiConfig.entityId}&submissionNumber=${this.apiConfig.submissionNumber}&evidenceCode=${this.apiConfig.evidenceCode}` : this.apiConfig.solutionId
+    console.log("path",path)
+
     this.subscription = this.apiService.post(`${urlConfig[this.solutionType].details}` + path, this.apiConfig.profileData)
       .pipe(
         catchError((err) => {
