@@ -101,6 +101,7 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   async ngOnChanges(changes: SimpleChanges) {
+    let initialResponse:any
     if (
       this.angular &&
       changes['apiConfig'] &&
@@ -111,7 +112,7 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
       let isDataInlocalSotrage = await this.checkAndMapIndexDbDataToVariables();
       if (!isDataInlocalSotrage) {
         this.setApiService();
-        this.apiService.stateData ? this.getQuestions(this.apiService.stateData) : this.fetchDetails();
+        initialResponse = this.apiService.stateData ? await this.getQuestions(this.apiService.stateData) : await this.fetchDetails();
       }
 
      
@@ -160,9 +161,9 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
         this.questionnaireForm.value
       );
 
-      evidenceData['status'] = 'draft';
+      // evidenceData['status'] = 'draft';
       const submissionData = {
-        status: "draft",
+        status: evidenceData['isSubmitted'] ? "submit" : "draft",
         ...evidenceData,
       };
       this.updateDataInIndexDb(submissionData);
@@ -359,6 +360,7 @@ async updateDataInIndexDb(updatedAnswers) {
         currentObservation
       );
       this.evidence = this.solutionType == 'observation' ? currentObservation?.assessment?.evidences[+[this.apiConfig.index]] : currentObservation?.assessment?.evidences[0];
+      this.evidenceCode=this.evidence.code;
       this.evidence.startTime = Date.now();
       this.endDate = new Date(
         new Date(currentObservation?.assessment?.endDate).getTime() +
@@ -901,9 +903,12 @@ async updateDataInIndexDb(updatedAnswers) {
 
     let isDataInlocalSotrage = await this.checkAndMapIndexDbDataToVariables();
 
+    if(this.submissionId){
+      this.setDataInIndexDb(this.submissionId);
+    }
     if(!isDataInlocalSotrage){
 
-    this.setDataInIndexDb(this.submissionId);
+    
         
     this.evidence = this.solutionType == 'observation' ? this.assessment?.assessment?.evidences[+[this.apiConfig.index]] : this.assessment?.assessment?.evidences[0];
     
