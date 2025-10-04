@@ -80,6 +80,7 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
   completedPages: number = 0;
   totalPages: number = 0;
   pageProgressValue: number = 0;
+  questionNotStarted:boolean = true;
 
   constructor(
     public fb: FormBuilder,
@@ -353,6 +354,10 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
     evidences[evidenceIndex].progressStatus = progressStatus;
     evidences[evidenceIndex].isSubmitted = ['save', 'submit'].includes(submissions[evidenceCode].status);
 
+    console.log("this.evidenceTop",evidences[evidenceIndex]?.isSubmitted)
+    console.log("this.progressStatusTop",evidences[evidenceIndex]?.progressStatus);
+    this.enableDisableStartBtn(evidences[evidenceIndex]);
+
     const data = {
       key: indexDbKey,
       data: assessmentClone
@@ -418,7 +423,6 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
         this.checkFormValidity();
       })
       this.loaded = true;
-
     }
     return currentObservation ? true : false;
   }
@@ -484,6 +488,7 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
             this.sections = this.evidence?.sections;
             console.log("this.sections",this.sections)
             this.loaded = true;
+
           }
 
         } else {
@@ -941,11 +946,15 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
 
   async start() {
     const { observationAsTask, isATargetedSolution } = this.stateData || {};
-
+    console.log("this.stateData", this.stateData)
     if (observationAsTask || isATargetedSolution) {
       const message = { type: 'START', data: this.stateData };
       window.postMessage(message, '*');
-    } else {
+    } else if(this.questionNotStarted){
+      console.log("questionNotStarted");
+      this.questionNotStarted = false;
+    } 
+    else {
       this.toaster.showToast(
         'Dear User, this Observation is not relevant for your subrole and location',
         'danger',
@@ -1057,5 +1066,15 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
 
   }
   
+  enableDisableStartBtn(evidence){
+    console.log("evidence",evidence)
+    if(evidence?.isSubmitted){
+      this.questionNotStarted = false;
+    }else if(!evidence?.isSubmitted && evidence?.progressStatus == 'notStarted'){
+      this.questionNotStarted = true;
+    }else{
+      this.questionNotStarted = false;
+    }
+  }
 
 }

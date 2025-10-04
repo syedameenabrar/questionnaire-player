@@ -69,6 +69,7 @@ export interface Evidence {
   endTime: string;
   isSubmitted: boolean;
   submissions: any[];
+  progressStatus:any;
 }
 
 export interface Section {
