@@ -123,10 +123,9 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
       }
 
 
-      setTimeout(() => {
-        this.setSection(this.sectionIndex);
-        console.log("this.sectionIndex1",this.sectionIndex)
-      });
+      setTimeout(async() => {
+        await this.setSection(this.sectionIndex);
+      }, 1000);
     }
 
     if (changes['saveQuestioner']) {
@@ -134,30 +133,10 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
         this.submission('draft');
       }
     }
-
-      this.questionnaireForm?.valueChanges
-      .pipe(debounceTime(500), distinctUntilChanged())
-      .subscribe((data: any) => {
-        if (!data) return;
-  
-        if (!this.evidence) return;
-  
-        const evidenceData = this.questionnaireService.getEvidenceData(this.evidence, data);
-        
-        if (!evidenceData?.answers) return;
-    
-        const submissionData = {
-          status: evidenceData['isSubmitted'] ? "submit" : "draft",
-          ...evidenceData,
-        };
-    
-        this.updateDataInIndexDb(submissionData).then(() => {});
-      })
   }
 
   async ngOnInit() {
     this.toaster.clearToaster();
-    console.log("159")
 
     let isDataInlocalSotrage = await this.checkAndMapIndexDbDataToVariables();
     if (typeof this.apiConfig === 'string') {
@@ -166,7 +145,6 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
 
         if (!isDataInlocalSotrage) {
           this.setApiService();
-          console.log("166",this.apiService.stateData)
           this.apiService.stateData ? this.getQuestions(this.apiService.stateData) : this.fetchDetails();
         }
 
@@ -175,11 +153,9 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
       }
     }
 
-    setTimeout(() => {
-      this.setSection(this.sectionIndex);
-      console.log("this.sectionIndex2",this.sectionIndex)
-
-    });
+    setTimeout(async() => {
+      await this.setSection(this.sectionIndex);
+    }, 1000);
 
     this.questionnaireForm = this.fb.group({});
 
@@ -199,6 +175,7 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
         status: evidenceData['isSubmitted'] ? "submit" : "draft",
         ...evidenceData,
       };
+
       this.updateDataInIndexDb(submissionData);
     });
 
@@ -354,8 +331,6 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
     evidences[evidenceIndex].progressStatus = progressStatus;
     evidences[evidenceIndex].isSubmitted = ['save', 'submit'].includes(submissions[evidenceCode].status);
 
-    console.log("this.evidenceTop",evidences[evidenceIndex]?.isSubmitted)
-    console.log("this.progressStatusTop",evidences[evidenceIndex]?.progressStatus);
     this.enableDisableStartBtn(evidences[evidenceIndex]);
 
     const data = {
@@ -413,7 +388,6 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
       );
       this.isExpired = currentObservation?.assessment?.status == 'expired' || false;
       this.sections = this.evidence?.sections;
-      console.log("this.sections",this.sections)
 
       this.setSection(this.sectionIndex);
 
@@ -447,9 +421,8 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   async fetchDetails() {
-    console.log("433")
     const path = this.solutionType == 'observation' ? this.apiConfig.observationId + `?entityId=${this.apiConfig.entityId}&submissionNumber=${this.apiConfig.submissionNumber}&evidenceCode=${this.apiConfig.evidenceCode}` : this.apiConfig.solutionId
-    console.log("path",path)
+
 
     this.subscription = this.apiService.post(`${urlConfig[this.solutionType].details}` + path, this.apiConfig.profileData)
       .pipe(
@@ -463,16 +436,18 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
           return;
         }
 
+
         if (res.result) {
           this.assessment = this.questionnaireService.mapSubmissionToAssessment(
             res.result
           );
+
           this.submissionId = this.assessment.assessment.submissionId;
           this.evidenceCode = this.assessment.assessment.evidences[0].code;
 
 
           let isDataInlocalSotrage = await this.checkAndMapIndexDbDataToVariables();
-
+          this.enableDisableStartBtn(this.assessment.assessment.evidences[0]);
           if (!isDataInlocalSotrage) {
 
             this.setDataInIndexDb(this.submissionId);
@@ -486,7 +461,6 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
             );
             this.isExpired = this.assessment?.assessment?.status == 'expired';
             this.sections = this.evidence?.sections;
-            console.log("this.sections",this.sections)
             this.loaded = true;
 
           }
@@ -895,12 +869,29 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
     }).toPromise();
   }
 
-  setSection(index: any) {
-
+  async setSection(index: any) {
     this.sectionName = this.sections[index].name;
-    console.log("this.sectionName",this.sectionName)
     this.enableRelevantPage();
     this.mainComponent?.enableRelevantPage();
+
+    this.questionnaireForm?.valueChanges
+    .pipe(debounceTime(500), distinctUntilChanged())
+    .subscribe((data: any) => {
+      if (!data) return;
+
+      if (!this.evidence) return;
+
+      const evidenceData = this.questionnaireService.getEvidenceData(this.evidence, data);
+      
+      if (!evidenceData?.answers) return;
+  
+      const submissionData = {
+        status: evidenceData['isSubmitted'] ? "submit" : "draft",
+        ...evidenceData,
+      };
+  
+      this.updateDataInIndexDb(submissionData).then(() => {});
+    })
   }
 
   closeModal() {
@@ -946,12 +937,10 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
 
   async start() {
     const { observationAsTask, isATargetedSolution } = this.stateData || {};
-    console.log("this.stateData", this.stateData)
     if (observationAsTask || isATargetedSolution) {
       const message = { type: 'START', data: this.stateData };
       window.postMessage(message, '*');
     } else if(this.questionNotStarted){
-      console.log("questionNotStarted");
       this.questionNotStarted = false;
     } 
     else {
@@ -1067,7 +1056,6 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
   }
   
   enableDisableStartBtn(evidence){
-    console.log("evidence",evidence)
     if(evidence?.isSubmitted){
       this.questionNotStarted = false;
     }else if(!evidence?.isSubmitted && evidence?.progressStatus == 'notStarted'){
