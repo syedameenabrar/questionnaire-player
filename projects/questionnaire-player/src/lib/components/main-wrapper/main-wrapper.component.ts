@@ -833,7 +833,10 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
         // };
         // const response = await this.openAlert(confirmationParams);
         // if (response) {
+        console.log("hello world",this.questionnaireForm.dirty)
           if (this.questionnaireForm.dirty) {
+            const message = { type: 'PROGRAMS', data: 'Your changes has been saved.'};
+            window.postMessage(message, '*');
         this.toaster.showToast(
           `Your changes has been saved.`,
           'success',
@@ -971,10 +974,12 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
     this.apiConfig.index = 0;
 
     let isDataInlocalSotrage = await this.checkAndMapIndexDbDataToVariables();
+    
+    if(this.submissionId){
+      this.setDataInIndexDb(this.submissionId);
+    }
 
     if (!isDataInlocalSotrage) {
-
-      this.setDataInIndexDb(this.submissionId);
 
       this.evidence = this.solutionType == 'observation' ? this.assessment?.assessment?.evidences[+[this.apiConfig.index]] : this.assessment?.assessment?.evidences[0];
 
