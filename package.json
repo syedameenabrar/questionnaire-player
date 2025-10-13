@@ -1,6 +1,6 @@
 {
   "name": "questionnaire-webcomponent",
-  "version": "4.1.36",
+  "version": "4.1.38",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
