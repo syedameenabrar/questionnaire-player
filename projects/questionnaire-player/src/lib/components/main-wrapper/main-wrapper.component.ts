@@ -970,8 +970,8 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
     );
 
     this.submissionId = this.assessment.assessment.submissionId;
-    this.evidenceCode = this.assessment.assessment.evidences[0].code;
-    this.apiConfig.index = 0;
+    this.evidenceCode = this.assessment.assessment.evidences[this.sectionIndex].code;
+    this.apiConfig.index = this.sectionIndex;
 
     let isDataInlocalSotrage = await this.checkAndMapIndexDbDataToVariables();
     
