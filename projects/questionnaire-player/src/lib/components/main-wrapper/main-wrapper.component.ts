@@ -708,9 +708,8 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
 
 
   async submitSurvey(submissionData) {
-
     if (submissionData.status !== 'draft') {
-
+  
       if (!this.saveQuestioner) {
         const confirmationParams = {
           title: 'Confirmation',
@@ -719,16 +718,16 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
           cancelLabel: 'Cancel',
           acceptLabel: 'Confirm',
         };
-
+  
         const response = await this.openAlert(confirmationParams);
         if (!response) return;
-
+  
         this.totalFileToUpload = 0;
         this.currentFileUploaded = 0;
-
+  
         const answers = submissionData?.answers;
         const uploadQueue: any[] = [];
-
+  
         // Collect all files that need uploading
         for (let [submissionId, answerObj] of Object.entries(answers)) {
           const files = (answerObj as any).fileName || [];
@@ -740,19 +739,16 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
                 this.toaster.showToast(`No stored data found for file: ${file.name}`, 'danger', 5000);
                 continue;
               }
-              // const convertedFile = this.attachmentService.base64ToFile(storedFile.data);
-              // file.file = convertedFile;
               file.submissionId = submissionId;
               uploadQueue.push(file);
             }
           }
         }
-
+  
         this.uploading = true;
-
+  
         try {
           if (uploadQueue.length > 0) {
-            // Prepare payload for bulk upload
             const payload = {
               ref: 'survey',
               request: {
@@ -761,22 +757,20 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
                 }
               }
             };
-
+  
             const uploadedFiles = await this.submitImageToCloud(payload, uploadQueue);
-
+  
             for (let i = 0; i < uploadQueue.length; i++) {
               const file = uploadQueue[i];
               const presignedUrlData = uploadedFiles[i];
-
+  
               file.isUploaded = true;
               file.previewUrl = presignedUrlData.previewUrl;
               file.url = presignedUrlData.url;
               file.sourcePath = presignedUrlData.sourcePath;
-              // file.file = '';
-
               this.currentFileUploaded++;
             }
-
+  
             await this.updateDataInIndexDb(submissionData);
           }
         } catch (uploadErr) {
@@ -788,13 +782,24 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
           this.uploading = false;
         }
       }
-
+  
+      // ----------------------------
+      // Filter only uploaded files before sending to backend
+      // ----------------------------
+      const filteredSubmissionData = JSON.parse(JSON.stringify(submissionData));
+      if (filteredSubmissionData.answers) {
+        for (let [submissionId, answerObj] of Object.entries(filteredSubmissionData.answers)) {
+          const files = (answerObj as any).fileName || [];
+          (answerObj as any).fileName = files.filter(f => f.isUploaded);
+        }
+      }
+  
       const responseFromUpdateDataFunction = await this.updateDataInIndexDb(submissionData);
       if (responseFromUpdateDataFunction) {
         this.apiService
           .post(
             `${urlConfig[this.solutionType].update}${this.assessment.assessment.submissionId}`,
-            { evidence: submissionData }
+            { evidence: filteredSubmissionData }
           )
           .pipe(
             catchError((err) => {
@@ -819,34 +824,25 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
             }
           });
       }
-    }
-    else {
+  
+    } else {
+      // Draft save
       const responseFromUpdateDataFunction = await this.updateDataInIndexDb(submissionData);
       if (responseFromUpdateDataFunction && !this.saveQuestioner) {
         this.formIsNotDirty();
-        // const confirmationParams = {
-        //   title: 'Success',
-        //   message: `Successfully your ${this.solutionType} has been saved. Do you want to continue?`,
-        //   acceptLabel: 'Later',
-        //   cancelLabel: 'Continue',
-        //   type: 'success',
-        // };
-        // const response = await this.openAlert(confirmationParams);
-        // if (response) {
-        console.log("hello world",this.questionnaireForm.dirty)
-          if (this.questionnaireForm.dirty) {
-            const message = { type: 'PROGRAMS', data: 'Your changes has been saved.'};
-            window.postMessage(message, '*');
-        this.toaster.showToast(
-          `Your changes has been saved.`,
-          'success',
-          5000
-        );
-      }
-        // }
+        if (this.questionnaireForm.dirty) {
+          const message = { type: 'PROGRAMS', data: 'Your changes has been saved.' };
+          window.postMessage(message, '*');
+          this.toaster.showToast(
+            `Your changes has been saved.`,
+            'success',
+            5000
+          );
+        }
       }
     }
   }
+  
 
 
 
