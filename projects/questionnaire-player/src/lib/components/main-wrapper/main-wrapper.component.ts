@@ -81,6 +81,7 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
   totalPages: number = 0;
   pageProgressValue: number = 0;
   questionNotStarted:boolean = true;
+  isDateAutoSave:boolean = false;
 
   constructor(
     public fb: FormBuilder,
@@ -709,6 +710,7 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
 
   async submitSurvey(submissionData) {
     if (submissionData.status !== 'draft') {
+      this.isDateAutoSave = true;
   
       if (!this.saveQuestioner) {
         const confirmationParams = {
@@ -830,15 +832,16 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
       const responseFromUpdateDataFunction = await this.updateDataInIndexDb(submissionData);
       if (responseFromUpdateDataFunction && !this.saveQuestioner) {
         this.formIsNotDirty();
-        if (this.questionnaireForm.dirty) {
+        if (this.questionnaireForm.dirty && !this.isDateAutoSave) {
           const message = { type: 'PROGRAMS', data: 'Your changes has been saved.' };
           window.postMessage(message, '*');
-          this.toaster.showToast(
-            `Your changes has been saved.`,
-            'success',
-            5000
-          );
+            this.toaster.showToast(
+              `Your changes has been saved.`,
+              'success',
+              5000
+            );
         }
+        this.isDateAutoSave = false;
       }
     }
   }
