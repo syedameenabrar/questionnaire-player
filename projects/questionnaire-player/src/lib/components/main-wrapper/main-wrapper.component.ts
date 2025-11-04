@@ -332,7 +332,7 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
     evidences[evidenceIndex].progressStatus = progressStatus;
     evidences[evidenceIndex].isSubmitted = ['save', 'submit'].includes(submissions[evidenceCode].status);
 
-    this.enableDisableStartBtn(evidences[evidenceIndex]);
+    // this.enableDisableStartBtn(evidences[evidenceIndex]);
 
     const data = {
       key: indexDbKey,
@@ -894,6 +894,12 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
   
       this.updateDataInIndexDb(submissionData).then(() => {});
     })
+
+    setTimeout(() => {
+      if (this.evidence) {
+        this.enableDisableStartBtn(this.evidence);
+      }
+    }, 300);
   }
 
   closeModal() {
@@ -1062,7 +1068,7 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
   enableDisableStartBtn(evidence){
     if(evidence?.isSubmitted){
       this.questionNotStarted = false;
-    }else if(!evidence?.isSubmitted && evidence?.progressStatus == 'notStarted'){
+    }else if(!evidence?.isSubmitted && (!evidence?.progressStatus || evidence?.progressStatus == 'notStarted')){
       this.questionNotStarted = true;
     }else{
       this.questionNotStarted = false;
