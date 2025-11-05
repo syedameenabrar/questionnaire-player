@@ -706,9 +706,6 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-
-
-
   async submitSurvey(submissionData) {
     if (submissionData.status !== 'draft') {
       this.isDateAutoSave = true;
@@ -766,7 +763,6 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
             for (let i = 0; i < uploadQueue.length; i++) {
               const file = uploadQueue[i];
               const presignedUrlData = uploadedFiles[i];
-  
               file.isUploaded = true;
               file.previewUrl = presignedUrlData.previewUrl;
               file.url = presignedUrlData.url;
@@ -797,58 +793,60 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
         }
       }
   
-      const responseFromUpdateDataFunction = await this.updateDataInIndexDb(submissionData);
-      if (responseFromUpdateDataFunction) {
-        this.apiService
-          .post(
-            `${urlConfig[this.solutionType].update}${this.assessment.assessment.submissionId}`,
-            { evidence: filteredSubmissionData }
-          )
-          .pipe(
-            catchError((err) => {
-              this.toaster.showToast(err?.error?.message, 'danger', 5000);
-              throw new Error('Update API has failed');
-            })
-          )
-          .subscribe((res: any) => {
-            if (res.status === 200 && !this.saveQuestioner) {
-              this.formIsNotDirty();
-              const footer = this.el.nativeElement.querySelector('.footer-buttons');
-              this.renderer.setStyle(footer, 'display', 'none');
-              this.toaster.showToast(
-                `Your ${this.solutionType} has been submitted successfully.`,
-                'success',
-                5000
-              );
-              this.evidence.isSubmitted = true;
-              setTimeout(() => {
-                this.location.back();
-              }, 1000);
-            }
-          });
-      }
+      // Send submission to backend
+      this.apiService
+        .post(
+          `${urlConfig[this.solutionType].update}${this.assessment.assessment.submissionId}`,
+          { evidence: filteredSubmissionData }
+        )
+        .pipe(
+          catchError((err) => {
+            const errorMsg = err?.error?.message || 'Submission failed';
+            this.toaster.showToast(errorMsg, 'danger', 5000);
+            throw err;
+          })
+        )
+        .subscribe(async (res: any) => {
+          if (res.status === 200 && !this.saveQuestioner) {
+            // ✅ Update only after success
+            await this.updateDataInIndexDb(submissionData);
+  
+            this.formIsNotDirty();
+            const footer = this.el.nativeElement.querySelector('.footer-buttons');
+            this.renderer.setStyle(footer, 'display', 'none');
+            this.toaster.showToast(
+              `Your ${this.solutionType} has been submitted successfully.`,
+              'success',
+              5000
+            );
+            this.evidence.isSubmitted = true;
+  
+            setTimeout(() => {
+              this.location.back();
+            }, 1000);
+          } else {
+            // ❌ Prevent local update if backend failed
+            this.toaster.showToast(res?.message || 'Submission failed', 'danger', 5000);
+            this.evidence.isSubmitted = false;
+            await this.updateDataInIndexDb({ ...submissionData, status: 'draft' });
+          }
+        });
   
     } else {
-      // Draft save
+      // -------- Draft save --------
       const responseFromUpdateDataFunction = await this.updateDataInIndexDb(submissionData);
       if (responseFromUpdateDataFunction && !this.saveQuestioner) {
         this.formIsNotDirty();
         if (this.questionnaireForm.dirty && !this.isDateAutoSave) {
-          const message = { type: 'PROGRAMS', data: 'Your changes has been saved.' };
+          const message = { type: 'PROGRAMS', data: 'Your changes have been saved.' };
           window.postMessage(message, '*');
-            this.toaster.showToast(
-              `Your changes has been saved.`,
-              'success',
-              5000
-            );
+          this.toaster.showToast(`Your changes have been saved.`, 'success', 5000);
         }
         this.isDateAutoSave = false;
       }
     }
   }
   
-
-
 
   async openAlert(alertDialogConfig) {
     const dialogRef = await this.dialog.open(AlertComponent, {
