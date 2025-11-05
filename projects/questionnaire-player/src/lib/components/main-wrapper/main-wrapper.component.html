@@ -1,4 +1,4 @@
-<div *ngIf="loaded" class="wrapper">
+<div *ngIf="loaded && initialized" class="wrapper">
   <form [formGroup]="questionnaireForm" class="main custom-font" *ngIf="!uploading;else uplodingModal">
     <div *ngFor="let section of sections; let secId = index">
 

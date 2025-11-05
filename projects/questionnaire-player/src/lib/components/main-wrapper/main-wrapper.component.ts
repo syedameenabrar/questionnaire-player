@@ -80,7 +80,8 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
   completedPages: number = 0;
   totalPages: number = 0;
   pageProgressValue: number = 0;
-  questionNotStarted:boolean = true;
+  questionNotStarted: boolean | null = null;
+  initialized = false;
   isDateAutoSave:boolean = false;
 
   constructor(
@@ -899,7 +900,7 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
       if (this.evidence) {
         this.enableDisableStartBtn(this.evidence);
       }
-    }, 300);
+    }, 50);
   }
 
   closeModal() {
@@ -1066,13 +1067,19 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
   }
   
   enableDisableStartBtn(evidence){
+    if (!evidence) return;
+
     if(evidence?.isSubmitted){
+      this.questionNotStarted = false;
+    }else if(this.solutionType === "survey"){
       this.questionNotStarted = false;
     }else if(!evidence?.isSubmitted && (!evidence?.progressStatus || evidence?.progressStatus == 'notStarted')){
       this.questionNotStarted = true;
     }else{
       this.questionNotStarted = false;
     }
+
+    this.initialized = true;
   }
 
 }
