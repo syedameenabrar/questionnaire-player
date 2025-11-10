@@ -70,6 +70,9 @@ export interface Evidence {
   isSubmitted: boolean;
   submissions: any[];
   progressStatus:any;
+  pageProgressValue:any;
+  completedPages:any;
+  totalPages:any;
 }
 
 export interface Section {

@@ -306,6 +306,7 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
         isValid: true,
         status: 'draft',
         progressStatus: 'notStarted',
+        pageProgressValue: this.pageProgressValue,
         completePercentage: 0
       };
     }
@@ -331,6 +332,9 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
 
     evidences[evidenceIndex].completePercentage = progress;
     evidences[evidenceIndex].progressStatus = progressStatus;
+    evidences[evidenceIndex].pageProgressValue = this.pageProgressValue;
+    evidences[evidenceIndex].completedPages = this.completedPages;
+    evidences[evidenceIndex].totalPages = this.totalPages;
     evidences[evidenceIndex].isSubmitted = ['save', 'submit'].includes(submissions[evidenceCode].status);
 
     // this.enableDisableStartBtn(evidences[evidenceIndex]);
@@ -381,6 +385,11 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
       );
       this.evidence = this.solutionType == 'observation' ? currentObservation?.assessment?.evidences[+[this.apiConfig.index]] : currentObservation?.assessment?.evidences[0];
       this.evidenceCode=this.evidence.code;
+      this.pageProgressValue = this.evidence?.pageProgressValue || 0;
+      this.completedPages = this.evidence?.completedPages || 0;
+      this.totalPages = this.evidence?.totalPages || 0;
+
+
 
       this.evidence.startTime = Date.now();
       this.endDate = new Date(
@@ -977,6 +986,7 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
     this.evidenceCode = this.assessment.assessment.evidences[this.sectionIndex].code;
     this.apiConfig.index = this.sectionIndex;
 
+
     let isDataInlocalSotrage = await this.checkAndMapIndexDbDataToVariables();
     
     if(this.submissionId){
@@ -986,7 +996,6 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
     if (!isDataInlocalSotrage) {
 
       this.evidence = this.solutionType == 'observation' ? this.assessment?.assessment?.evidences[+[this.apiConfig.index]] : this.assessment?.assessment?.evidences[0];
-
       this.evidence.startTime = Date.now();
       this.endDate = new Date(
         new Date(this.assessment?.assessment?.endDate).getTime() +
@@ -1058,10 +1067,13 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
   
     this.totalPages = totalPages;
     this.completedPages = completedPages;
-    this.pageProgressValue = this.totalPages > 0
-  ? Math.round((this.completedPages / this.totalPages) * 100)
-  : 0;
+    this.calculatePageProgressValue();
+  }
 
+  calculatePageProgressValue(){
+    this.pageProgressValue = this.totalPages > 0
+    ? Math.round((this.completedPages / this.totalPages) * 100)
+    : 0;
   }
   
   enableDisableStartBtn(evidence){
@@ -1076,7 +1088,6 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
     }else{
       this.questionNotStarted = false;
     }
-
     this.initialized = true;
   }
 
