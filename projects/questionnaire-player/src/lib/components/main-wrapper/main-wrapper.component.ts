@@ -217,67 +217,65 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
 
   getProgressStatus(submission: any): number {
     if (!submission || !submission.answers) return 0;
-
+  
     const answersObj = submission.answers;
-
+  
     let totalQuestions = 0;
     let answeredCount = 0;
-
+  
     for (const qid of Object.keys(answersObj)) {
       const answer = answersObj[qid];
+      const value = answer.value;
+      const responseType = answer.responseType;
+  
+      // Skip invisible questions
       const visibleIf = answer.visibleIf;
-
       if (Array.isArray(visibleIf) && visibleIf.length > 0) {
         let isVisible = false;
-
+  
         for (const condition of visibleIf) {
           const targetQid = condition._id;
           const targetValue = condition.value?.[0];
           const operator = condition.operator;
-
           const targetAnswer = answersObj[targetQid];
-
+  
           if (!targetAnswer || targetAnswer.value === undefined || targetAnswer.value === null) {
             isVisible = false;
             break;
           }
-
+  
           const actualValue = targetAnswer.value;
-
           if (operator === '===' && actualValue === targetValue) {
             isVisible = true;
-          } else {
-            isVisible = false;
           }
         }
-
+  
         if (!isVisible) continue;
       }
-
+  
       totalQuestions++;
-
-      const value = answer.value;
-
-      const isAnswered =
-        value !== undefined &&
-        value !== null &&
-        (
-          Array.isArray(value)
-            ? value.some((v: any) =>
-              typeof v === 'string' ? v.trim() !== '' : v !== null && v !== undefined
-            )
-            : value.toString().trim() !== ''
-        );
-
-      if (isAnswered) {
-        answeredCount++;
+  
+      // ✅ Fix: treat slider value "1" (default) as unanswered
+      let isAnswered = false;
+      if (Array.isArray(value)) {
+        isAnswered = value.some((v: any) => v && v.toString().trim() !== '');
+      } else if (value !== undefined && value !== null) {
+        const strVal = value.toString().trim();
+        if (responseType === 'slider') {
+          isAnswered = strVal !== '' && strVal !== '0' && strVal !== '1'; // ignore default 1
+        } else {
+          isAnswered = strVal !== '';
+        }
       }
+  
+      if (isAnswered) answeredCount++;
     }
-
+  
     if (totalQuestions === 0) return 0;
-
+  
     return Math.round((answeredCount / totalQuestions) * 100);
   }
+  
 
   async updateDataInIndexDb(updatedAnswers) {
     const queryParamsData = await this.getQueryParms();
