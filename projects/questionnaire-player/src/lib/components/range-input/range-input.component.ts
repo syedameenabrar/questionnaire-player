@@ -24,27 +24,24 @@ export class RangeInputComponent implements OnInit {
     setTimeout(() => {
       this.questionnaireForm.addControl(
         this.question._id,
-        new FormControl(this.question.value || +this.min, [
+        new FormControl(this.question.value ?? null, [
           this.qService.validate(this.question),
         ])
       );
-      this.question.startTime = this.question.startTime
-        ? this.question.startTime
-        : Date.now();
-      this.question.value = this.question.value ? this.question.value : this.min;
+      this.question.startTime = this.question.startTime || Date.now();
+      this.question.value = this.question.value ? this.question.value : '0';
     });
     this.max && (this.options['max'] = +this.max)
     this.min && (this.options['min'] = +this.min)
 
-    setTimeout(()=>{
-      if(this.question.value){
-        this.questionnaireForm.controls[this.question._id].reset(this.question.value);
-      }else{
-        if(((this.question.validation) as Validation).required){
-            this.questionnaireForm.controls[this.question._id].reset(null);
-        }
+    setTimeout(() => {
+      const control = this.questionnaireForm.controls[this.question._id];
+      if (this.question.value !== undefined && this.question.value !== null) {
+        control.setValue(this.question.value);
+      } else {
+        control.reset(null);
       }
-    },100);
+    }, 100);
   }
 
   onChange(value) {
