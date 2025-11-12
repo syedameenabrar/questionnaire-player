@@ -303,7 +303,7 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
         submissionDate: new Date().toISOString(),
         isValid: true,
         status: 'draft',
-        progressStatus: 'notStarted',
+        progressStatus: this.questionNotStarted ? 'notStarted' : 'inProgress',
         pageProgressValue: this.pageProgressValue,
         completePercentage: 0
       };
@@ -325,6 +325,7 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
     let progressStatus = 'notStarted';
     if (progress === 100) progressStatus = 'completed';
     else if (progress > 0) progressStatus = 'inProgress';
+    else if (!this.questionNotStarted) progressStatus = 'inProgress';
 
     this.calculatePageCompletion(submissions[evidenceCode]);
 

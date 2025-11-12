@@ -44,11 +44,12 @@
             </button>
 
             
-            <button class="btn btn-primary mr-2"
-              (click)="!questionnaireForm?.valid ? getQuestionMap() : submission('submit')"
-              *ngIf="(stateData && stateData?.isSurvey === true) || !stateData">
-              Submit
-            </button>
+            <button
+            class="btn btn-primary mr-2"
+            (click)="!questionnaireForm?.valid ? getQuestionMap() : submission('submit')"
+            *ngIf="((stateData && stateData?.isSurvey === true) || !stateData) && !questionNotStarted">
+            Submit
+          </button>
           </div>
         </div>
       </div>
