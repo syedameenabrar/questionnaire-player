@@ -83,6 +83,8 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
   questionNotStarted: boolean | null = null;
   initialized = false;
   isDateAutoSave:boolean = false;
+  private _formValueChangesSub: Subscription | null = null;
+
 
   constructor(
     public fb: FormBuilder,
@@ -125,9 +127,14 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
       }
 
 
-      setTimeout(async() => {
-        await this.setSection(this.sectionIndex);
+      setTimeout(async () => {
+        if (Array.isArray(this.sections) && this.sections.length > 0) {
+          await this.setSection(this.sectionIndex);
+        } else {
+          console.warn('Skipping setSection; sections not ready yet (ngOnInit/ngOnChanges).');
+        }
       }, 1000);
+  
     }
 
     if (changes['saveQuestioner']) {
@@ -155,9 +162,14 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
       }
     }
 
-    setTimeout(async() => {
-      await this.setSection(this.sectionIndex);
+    setTimeout(async () => {
+      if (Array.isArray(this.sections) && this.sections.length > 0) {
+        await this.setSection(this.sectionIndex);
+      } else {
+        console.warn('Skipping setSection; sections not ready yet (ngOnInit/ngOnChanges).');
+      }
     }, 1000);
+
 
     this.questionnaireForm = this.fb.group({});
 
@@ -879,29 +891,61 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   async setSection(index: any) {
-    this.sectionName = this.sections[index].name;
+    // Guard: sections must exist and be an array with at least one element
+    if (!Array.isArray(this.sections) || this.sections.length === 0) {
+      console.warn('setSection called before sections are available. sectionIndex:', index, 'sections:', this.sections);
+      return;
+    }
+
+    // Normalize index to integer and clamp within valid range
+    let idx = Number(index);
+    if (Number.isNaN(idx) || !Number.isFinite(idx)) {
+      idx = 0;
+    }
+    idx = Math.max(0, Math.min(idx, this.sections.length - 1));
+    this.sectionIndex = idx;
+
+    // Ensure the section exists now
+    const section = this.sections[idx];
+    if (!section) {
+      console.warn('No section found at index', idx, 'sections length', this.sections.length);
+      return;
+    }
+
+    this.sectionName = section.name;
     this.enableRelevantPage();
     this.mainComponent?.enableRelevantPage();
 
-    this.questionnaireForm?.valueChanges
-    .pipe(debounceTime(500), distinctUntilChanged())
-    .subscribe((data: any) => {
-      if (!data) return;
+    // Unsubscribe previous subscription if any to avoid duplicate subscriptions
+    // (optional but helpful: avoid leaking multiple valueChanges subscribers)
+    // If you have a subscription stored elsewhere for the form changes, clear it here.
+    // e.g. this._formValueChangesSub?.unsubscribe();
 
-      if (!this.evidence) return;
+    // Debounced auto-save flow
+    // Unsubscribe then recreate to avoid stacking observers
+    if (this._formValueChangesSub) {
+      this._formValueChangesSub.unsubscribe();
+    }
 
-      const evidenceData = this.questionnaireService.getEvidenceData(this.evidence, data);
-      
-      if (!evidenceData?.answers) return;
-  
-      const submissionData = {
-        status: evidenceData['isSubmitted'] ? "submit" : "draft",
-        ...evidenceData,
-      };
-  
-      this.updateDataInIndexDb(submissionData).then(() => {});
-    })
+    // create a single debounced subscription for value changes
+    this._formValueChangesSub = this.questionnaireForm?.valueChanges
+      ?.pipe(debounceTime(500), distinctUntilChanged())
+      .subscribe((data: any) => {
+        if (!data || !this.evidence) return;
 
+        const evidenceData = this.questionnaireService.getEvidenceData(this.evidence, data);
+        if (!evidenceData?.answers) return;
+
+        const submissionData = {
+          status: evidenceData['isSubmitted'] ? "submit" : "draft",
+          ...evidenceData,
+        };
+
+        // fire-and-forget; updateDataInIndexDb already handles errors
+        this.updateDataInIndexDb(submissionData).then(() => {});
+      });
+
+    // Re-run enable/disable start button check after small delay (keeps original behavior)
     setTimeout(() => {
       if (this.evidence) {
         this.enableDisableStartBtn(this.evidence);
