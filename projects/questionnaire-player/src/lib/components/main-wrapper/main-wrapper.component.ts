@@ -84,7 +84,7 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
   initialized = false;
   isDateAutoSave:boolean = false;
   private _formValueChangesSub: Subscription | null = null;
-
+  
 
   constructor(
     public fb: FormBuilder,
@@ -890,7 +890,7 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
     }).toPromise();
   }
 
-  async setSection(index: any) {
+  async setSection(index: any, skipEnableDisableStartBtn:any = false) {
     // Guard: sections must exist and be an array with at least one element
     if (!Array.isArray(this.sections) || this.sections.length === 0) {
       console.warn('setSection called before sections are available. sectionIndex:', index, 'sections:', this.sections);
@@ -946,11 +946,13 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
       });
 
     // Re-run enable/disable start button check after small delay (keeps original behavior)
-    setTimeout(() => {
-      if (this.evidence) {
-        this.enableDisableStartBtn(this.evidence);
-      }
-    }, 50);
+    if(!skipEnableDisableStartBtn){
+      setTimeout(() => {
+        if (this.evidence) {
+          this.enableDisableStartBtn(this.evidence);
+        }
+      }, 50);
+    }
   }
 
   closeModal() {
@@ -958,9 +960,9 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   goToQuestion(questonId, pageIndex, sectionIndex) {
-    this.setSection(sectionIndex)
+    this.setSection(sectionIndex, true)
     this.mainComponent.pageIndex = pageIndex;
-    this.mainComponent.handlePageEvent({ pageIndex: pageIndex, questonId:questonId })
+    this.mainComponent.handlePageEvent({ pageIndex: pageIndex, questonId:questonId });
     this.closeModal();
   }
 
@@ -1001,6 +1003,8 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
       window.postMessage(message, '*');
     } else if(this.questionNotStarted){
       this.questionNotStarted = false;
+      this.evidence.progressStatus = "inProgress";
+      await this.submission('save');
     } 
     else {
       this.toaster.showToast(
