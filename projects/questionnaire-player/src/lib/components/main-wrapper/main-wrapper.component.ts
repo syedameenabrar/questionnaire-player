@@ -240,7 +240,6 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
       const value = answer.value;
       const responseType = answer.responseType;
   
-      // Skip invisible questions
       const visibleIf = answer.visibleIf;
       if (Array.isArray(visibleIf) && visibleIf.length > 0) {
         let isVisible = false;
@@ -266,8 +265,6 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
       }
   
       totalQuestions++;
-  
-      // ✅ Fix: treat slider value "1" (default) as unanswered
       let isAnswered = false;
       if (Array.isArray(value)) {
         isAnswered = value.some((v: any) => v && v.toString().trim() !== '');
@@ -288,7 +285,6 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
     return Math.round((answeredCount / totalQuestions) * 100);
   }
   
-
   async updateDataInIndexDb(updatedAnswers) {
     const queryParamsData = await this.getQueryParms();
     const indexDbKey = queryParamsData?.indexDbKey;
@@ -321,12 +317,8 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
       };
     }
 
-
-
-    submissions[evidenceCode].answers = { ...updatedAnswers?.answers }; // ensure fresh reference
+    submissions[evidenceCode].answers = { ...updatedAnswers?.answers };
     submissions[evidenceCode].status = evidences[evidenceIndex].isSubmitted 
-    // submissions[evidenceCode].status = updatedAnswers?.status === 'save'
-
       ? 'save'
       : updatedAnswers?.status === 'draft'
         ? 'draft'
@@ -348,8 +340,6 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
     evidences[evidenceIndex].totalPages = this.totalPages;
     evidences[evidenceIndex].isSubmitted = ['save', 'submit'].includes(submissions[evidenceCode].status);
 
-    // this.enableDisableStartBtn(evidences[evidenceIndex]);
-
     const data = {
       key: indexDbKey,
       data: assessmentClone
@@ -366,16 +356,11 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-
-
-
-
   async deleteFromIndexDb() {
     const queryParamsData = await this.getQueryParms();
     const indexDbKey = queryParamsData?.indexDbKey;
     this.db.deleteData(indexDbKey);
   }
-
 
   async checkAndMapIndexDbDataToVariables() {
     const queryParamsData = await this.getQueryParms();
@@ -399,9 +384,6 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
       this.pageProgressValue = this.evidence?.pageProgressValue || 0;
       this.completedPages = this.evidence?.completedPages || 0;
       this.totalPages = this.evidence?.totalPages || 0;
-
-
-
       this.evidence.startTime = Date.now();
       this.endDate = new Date(
         new Date(currentObservation?.assessment?.endDate).getTime() +
@@ -676,8 +658,6 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
       const response: any = await firstValueFrom(
         this.apiService.post(urlConfig.presignedUrl, payload)
       );
-
-      // Get the actual submissionId key (ignoring cloudStorage key)
       const submissionId = Object.keys(response.result).find(
         (key) => key !== 'cloudStorage'
       );
@@ -748,7 +728,6 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
         const answers = submissionData?.answers;
         const uploadQueue: any[] = [];
   
-        // Collect all files that need uploading
         for (let [submissionId, answerObj] of Object.entries(answers)) {
           const files = (answerObj as any).fileName || [];
           for (let file of files) {
@@ -801,10 +780,6 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
           this.uploading = false;
         }
       }
-  
-      // ----------------------------
-      // Filter only uploaded files before sending to backend
-      // ----------------------------
       const filteredSubmissionData = JSON.parse(JSON.stringify(submissionData));
       if (filteredSubmissionData.answers) {
         for (let [submissionId, answerObj] of Object.entries(filteredSubmissionData.answers)) {
@@ -812,8 +787,7 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
           (answerObj as any).fileName = files.filter(f => f.isUploaded);
         }
       }
-  
-      // Send submission to backend
+
       this.apiService
         .post(
           `${urlConfig[this.solutionType].update}${this.assessment.assessment.submissionId}`,
@@ -828,7 +802,6 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
         )
         .subscribe(async (res: any) => {
           if (res.status === 200 && !this.saveQuestioner) {
-            // ✅ Update only after success
             await this.updateDataInIndexDb(submissionData);
   
             this.formIsNotDirty();
@@ -845,7 +818,6 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
               this.location.back();
             }, 1000);
           } else {
-            // ❌ Prevent local update if backend failed
             this.toaster.showToast(res?.message || 'Submission failed', 'danger', 5000);
             this.evidence.isSubmitted = false;
             await this.updateDataInIndexDb({ ...submissionData, status: 'draft' });
@@ -853,7 +825,6 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
         });
   
     } else {
-      // -------- Draft save --------
       const responseFromUpdateDataFunction = await this.updateDataInIndexDb(submissionData);
       if (responseFromUpdateDataFunction && !this.saveQuestioner) {
         this.formIsNotDirty();
@@ -891,43 +862,28 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   async setSection(index: any, skipEnableDisableStartBtn:any = false) {
-    // Guard: sections must exist and be an array with at least one element
     if (!Array.isArray(this.sections) || this.sections.length === 0) {
       console.warn('setSection called before sections are available. sectionIndex:', index, 'sections:', this.sections);
       return;
     }
-
-    // Normalize index to integer and clamp within valid range
     let idx = Number(index);
     if (Number.isNaN(idx) || !Number.isFinite(idx)) {
       idx = 0;
     }
     idx = Math.max(0, Math.min(idx, this.sections.length - 1));
     this.sectionIndex = idx;
-
-    // Ensure the section exists now
     const section = this.sections[idx];
     if (!section) {
       console.warn('No section found at index', idx, 'sections length', this.sections.length);
       return;
     }
-
     this.sectionName = section.name;
     this.enableRelevantPage();
     this.mainComponent?.enableRelevantPage();
-
-    // Unsubscribe previous subscription if any to avoid duplicate subscriptions
-    // (optional but helpful: avoid leaking multiple valueChanges subscribers)
-    // If you have a subscription stored elsewhere for the form changes, clear it here.
-    // e.g. this._formValueChangesSub?.unsubscribe();
-
-    // Debounced auto-save flow
-    // Unsubscribe then recreate to avoid stacking observers
     if (this._formValueChangesSub) {
       this._formValueChangesSub.unsubscribe();
     }
 
-    // create a single debounced subscription for value changes
     this._formValueChangesSub = this.questionnaireForm?.valueChanges
       ?.pipe(debounceTime(500), distinctUntilChanged())
       .subscribe((data: any) => {
@@ -940,12 +896,9 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
           status: evidenceData['isSubmitted'] ? "submit" : "draft",
           ...evidenceData,
         };
-
-        // fire-and-forget; updateDataInIndexDb already handles errors
         this.updateDataInIndexDb(submissionData).then(() => {});
       });
 
-    // Re-run enable/disable start button check after small delay (keeps original behavior)
     if(!skipEnableDisableStartBtn){
       setTimeout(() => {
         if (this.evidence) {
@@ -996,52 +949,22 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
     // }
   }
 
-  async start() {
-    const { observationAsTask, isATargetedSolution } = this.stateData || {};
-    if (observationAsTask || isATargetedSolution) {
-      const message = { type: 'START', data: this.stateData };
-      window.postMessage(message, '*');
-    } else if(this.questionNotStarted){
-      this.questionNotStarted = false;
-      this.evidence.progressStatus = "inProgress";
-      await this.submission('save');
-    } 
-    else {
-      this.toaster.showToast(
-        'Dear User, this Observation is not relevant for your subrole and location',
-        'danger',
-        5000
-      );
-    }
-  }
-
   async getQuestions(data) {
-
     if (data?.isATargetedSolution === false) {
-
       this.toaster.showToast('Dear User, this Observation is not relevant for your subrole and location', 'danger', 5000)
-
     }
 
     this.assessment = this.questionnaireService.mapSubmissionToAssessment(
-
       data
-
     );
-
     this.submissionId = this.assessment.assessment.submissionId;
     this.evidenceCode = this.assessment.assessment.evidences[this.sectionIndex].code;
     this.apiConfig.index = this.sectionIndex;
-
-
     let isDataInlocalSotrage = await this.checkAndMapIndexDbDataToVariables();
-    
     if(this.submissionId){
       this.setDataInIndexDb(this.submissionId);
     }
-
     if (!isDataInlocalSotrage) {
-
       this.evidence = this.solutionType == 'observation' ? this.assessment?.assessment?.evidences[+[this.apiConfig.index]] : this.assessment?.assessment?.evidences[0];
       this.evidence.startTime = Date.now();
       this.endDate = new Date(
@@ -1053,7 +976,6 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
       this.sections = this.evidence?.sections;
       this.loaded = true;
     }
-
   }
 
   surveyExpired(data) {
@@ -1096,7 +1018,6 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
   
           if (allAnswered) completedPages++;
         } else {
-          // normal question = treat as its own page
           totalPages++;
           const ans = submission.answers[q._id]?.value;
           const required = q.validation?.required;
@@ -1121,6 +1042,25 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
     this.pageProgressValue = this.totalPages > 0
     ? Math.round((this.completedPages / this.totalPages) * 100)
     : 0;
+  }
+
+  async startQuestioner() {
+    const { observationAsTask, isATargetedSolution } = this.stateData || {};
+    if (observationAsTask || isATargetedSolution) {
+      const message = { type: 'START', data: this.stateData };
+      window.postMessage(message, '*');
+    } else if(this.questionNotStarted){
+      this.questionNotStarted = false;
+      this.evidence.progressStatus = "inProgress";
+      await this.submission('save');
+    } 
+    else {
+      this.toaster.showToast(
+        'Dear User, this Observation is not relevant for your subrole and location',
+        'danger',
+        5000
+      );
+    }
   }
   
   enableDisableStartBtn(evidence){
