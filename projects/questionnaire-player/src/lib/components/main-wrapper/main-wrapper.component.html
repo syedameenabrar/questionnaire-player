@@ -39,7 +39,7 @@
           </div>
           
           <div>
-            <button class="btn btn-primary mr-2" (click)="startQuestioner()" *ngIf="(stateData && stateData?.isSurvey === false ) || questionNotStarted">
+            <button class="btn btn-primary mr-2" (click)="startQuestioner()" *ngIf="(stateData && stateData?.isSurvey === false ) || questionNotStarted" [class.disabled-btn]="((stateData && stateData?.isATargetedSolution == false))">
               Start
             </button>
 

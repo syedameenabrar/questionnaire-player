@@ -270,6 +270,19 @@
   padding: 0.5rem 1rem;
 }
 
+.disabled-btn {
+  background-color: var(--disabled-btn-bg);
+  color: var(--disabled-btn-text);
+  border: solid transparent 0.063rem;
+}
+
+
+.disabled-btn:hover {
+  background-color: var(--disabled-btn-bg);
+  color: var(--disabled-btn-text);
+  border: solid transparent 0.063rem;
+}
+
 
 @media (max-width: 600px) {
   .upload-text,
