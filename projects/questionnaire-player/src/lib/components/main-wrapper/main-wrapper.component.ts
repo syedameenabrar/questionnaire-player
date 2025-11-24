@@ -1047,13 +1047,16 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
 
   async startQuestioner() {
     const { observationAsTask, isATargetedSolution } = this.stateData || {};
-    if (observationAsTask || isATargetedSolution) {
-      const message = { type: 'START', data: this.stateData };
-      window.postMessage(message, '*');
-    } else if(this.questionNotStarted){
+    if(this.questionNotStarted && this.stateData?.isSurvey){
       this.questionNotStarted = false;
       this.evidence.progressStatus = "inProgress";
       await this.submission('save');
+      return
+    } 
+
+    if (observationAsTask || isATargetedSolution) {
+      const message = { type: 'START', data: this.stateData };
+      window.postMessage(message, '*');
     } 
     else {
       this.toaster.showToast(
