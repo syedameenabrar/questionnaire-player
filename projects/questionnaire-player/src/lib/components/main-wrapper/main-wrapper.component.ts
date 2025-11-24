@@ -145,6 +145,7 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   async ngOnInit() {
+    this.loadInitialData();
     this.toaster.clearToaster();
 
     let isDataInlocalSotrage = await this.checkAndMapIndexDbDataToVariables();
@@ -1078,4 +1079,13 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
     this.initialized = true;
   }
 
+  async loadInitialData() {
+    try {
+      await this.checkAndMapIndexDbDataToVariables();
+    } finally {
+      this.loaded = false; // Only hide after state mapping done
+    }
+
 }
+}
+

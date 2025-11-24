@@ -1,4 +1,5 @@
-<div *ngIf="loaded && initialized" class="wrapper">
+<div *ngIf="loaded" class="wrapper">
+  <div class="initialized">
   <form [formGroup]="questionnaireForm" class="main custom-font" *ngIf="!uploading;else uplodingModal">
     <div *ngFor="let section of sections; let secId = index">
 
@@ -56,6 +57,7 @@
     </div>
   </ng-container>
 
+</div>
 </div>
 <div class="spinner-overlay" *ngIf="!loaded">
   <mat-progress-spinner class="spinner" [color]="color" [mode]="mode" [strokeWidth]="strokeWidth">
