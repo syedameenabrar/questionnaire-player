@@ -62,12 +62,13 @@ import { ReportComponent } from './components/report/report.component';
 import { ObservationDomainComponent } from './components/observation-domain/observation-domain.component';
 import { PlayerBridgeComponent } from './components/player-bridge/player-bridge.component';
 import { SectionTabsComponent } from './components/section-tabs/section-tabs.component';
-import { QuestionnaireService } from './services/questionnaire.service';
 import { MatMenuModule } from '@angular/material/menu';
 import { SpinnerComponent } from './shared/components/spinner/spinner.component';
 import { MatSelectModule } from '@angular/material/select';
 import { MatExpansionModule } from '@angular/material/expansion';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
+import { PageQuestionsGridComponent } from './components/page-questions-grid/page-questions-grid.component';
+import { CardsQuestionsComponent } from './components/cards-questions/cards-questions.component';
 
 const routes: Routes = [
   { path: 'observation', component: ObservationWrapperComponent }
@@ -114,7 +115,9 @@ const MAT_CUSTOM_DATE_FORMATS = {
     ObservationDomainComponent,
     PlayerBridgeComponent,
     SpinnerComponent,
-    SectionTabsComponent
+    SectionTabsComponent,
+    PageQuestionsGridComponent,
+    CardsQuestionsComponent
     ],
   imports: [
     CommonModule,

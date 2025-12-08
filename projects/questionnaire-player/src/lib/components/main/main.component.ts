@@ -6,7 +6,7 @@ import {
   TemplateRef,
   ViewChild,
 } from '@angular/core';
-import { Question, ResponseType } from '../../interfaces/questionnaire.type';
+import { Question, ResponseType, ApiConfiguration } from '../../interfaces/questionnaire.type';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { DialogComponent } from '../dialog/dialog.component';
 import { QuestionnaireService } from '../../services/questionnaire.service';
@@ -24,6 +24,7 @@ export class MainComponent implements OnInit, AfterViewInit {
   @Input() questionnaireInstance = false;
   @Input() fileUploadResponse;
   @Input() fileSizeLimit;
+  @Input() apiConfig: ApiConfiguration;
   @ViewChild('questionnaire') questionnaire:TemplateRef<any>;
   selectedIndex: number;
   dimmerIndex;
@@ -37,6 +38,7 @@ export class MainComponent implements OnInit, AfterViewInit {
   showFirstLastButtons = true;
   disabled = false;
   paginatorLength: number;
+  enablePagination: boolean = true; // Default to true for backward compatibility
 
   constructor(public fb: FormBuilder, public qService: QuestionnaireService) {}
 
@@ -45,19 +47,24 @@ export class MainComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    // Check if pagination is enabled (default to true for backward compatibility)
+    this.enablePagination = this.apiConfig?.enablePagination !== false;
     this.paginatorLength = this.questions.length;
   }
 
   ngAfterViewInit(): void {
-    setTimeout(() => {
-      this.enableRelevantPage();
-    });
+    // Only enable pagination logic if pagination is enabled
+    if (this.enablePagination) {
+      setTimeout(() => {
+        this.enableRelevantPage();
+      });
+    }
   }
   
   enableRelevantPage(questionId?){
     window.scrollTo(0, 0);
 
-    if(!this.questionnaireInstance){
+    if(!this.questionnaireInstance && this.enablePagination){
       for(let i = 0; i < this.questions.length; i++){
         if(i !== this.pageIndex){
           this.domQuery(i,'none');
@@ -126,7 +133,7 @@ export class MainComponent implements OnInit, AfterViewInit {
         }
       }
     });
-    if(!this.questionnaireInstance){
+    if(!this.questionnaireInstance && this.enablePagination){
       if(!this.findNextVisibleQuestion(this.pageIndex,this.questions.length)){
         this.paginatorLength = this.pageIndex + 1;
       }else{

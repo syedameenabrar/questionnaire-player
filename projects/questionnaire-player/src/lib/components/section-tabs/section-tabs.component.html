@@ -9,14 +9,15 @@
       [label]="section.name"
     >
       <span [id]="section.name" *ngIf="section.name">
-        <lib-main
+        <lib-cards-questions
           #mainComponent
           [questions]="section.questions"
           [questionnaireForm]="questionnaireForm"
           [isSubmitted]="isSubmitted"
           [isExpired]="isExpired"
           [fileSizeLimit]="fileSizeLimit"
-        ></lib-main>
+          [apiConfig]="apiConfig"
+        ></lib-cards-questions>
       </span>
     </mat-tab>
   </mat-tab-group>
@@ -31,6 +32,7 @@
       [isSubmitted]="isSubmitted"
       [isExpired]="isExpired"
       [fileSizeLimit]="fileSizeLimit"
+      [apiConfig]="apiConfig"
     ></lib-main>
   </span>
 </ng-template>

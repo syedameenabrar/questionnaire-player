@@ -217,7 +217,9 @@ export interface ApiConfiguration{
   submissionNumber:string;
   evidenceCode:string;
   index:any;
-  stateData:any
+  stateData:any;
+  usePageQuestionsGrid?: boolean; // If true, use lib-page-questions-grid for pageQuestions, otherwise use lib-main
+  enablePagination?: boolean; // If false, display all page groups as cards instead of paginating
 }
 
 

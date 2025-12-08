@@ -12,6 +12,7 @@
         [isSubmitted]="evidence?.isSubmitted"
         [isExpired]="isExpired"
         [fileSizeLimit]="apiConfig.fileSizeLimit"
+        [apiConfig]="apiConfig"
         [(sectionIndex)]="sectionIndex"
         (tabChange)="onTabChange($event)"
       ></lib-section-tabs>

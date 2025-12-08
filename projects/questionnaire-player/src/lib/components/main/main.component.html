@@ -1,4 +1,4 @@
-<div class="custom-font">
+<div [ngClass]="{'custom-font': apiConfig?.usePageQuestionsGrid === true, 'custom-font-grid': apiConfig?.usePageQuestionsGrid === false}">
   <ng-container *ngIf="!questionnaireInstance else paginationNonApplicableInstance">
     <ng-container *ngFor="
         let question of questions;
@@ -31,20 +31,20 @@
     <h4 class="section-header-style headerMargin">{{ question?.sectionHeader }}</h4>
     <hr [ngStyle]="{
         'background-color':
-          question.responseType != 'pageQuestions'
+          question.responseType != 'pageQuestions' && apiConfig?.usePageQuestionsGrid === true
             ? 'var(--primary-color)'
             : null,
-        height: question.responseType != 'pageQuestions' ? '3px' : 0
+        height: question.responseType != 'pageQuestions' && apiConfig?.usePageQuestionsGrid === true ? '3px' : 0
       }" />
   </ng-container>
   <div [ngStyle]="{
-      padding: question.responseType != 'pageQuestions' ? '1rem' : 0,
-      margin: question.responseType != 'pageQuestions' ? '0.5rem' : 0
+      padding: question.responseType != 'pageQuestions' && apiConfig?.usePageQuestionsGrid === true ? '1rem' : 0,
+      margin: question.responseType != 'pageQuestions' && apiConfig?.usePageQuestionsGrid === true ? '0.5rem' : 0
     }" [ngClass]="{
-      'mat-elevation-z8': question.responseType != 'pageQuestions',
-      activeCard: question.responseType != 'pageQuestions' , 'submitted' : (isSubmitted || isExpired)
+      'mat-elevation-z8': question.responseType != 'pageQuestions' && apiConfig?.usePageQuestionsGrid === true,
+      activeCard: question.responseType != 'pageQuestions' && apiConfig?.usePageQuestionsGrid === true , 'submitted' : (isSubmitted || isExpired)
     }" class="responsive-margin" *ngIf="!question.visibleIf?.length || question.canDisplay == true">
-    <div [ngClass]="{ content: question.responseType != 'pageQuestions' }">
+    <div [ngClass]="{ content: question.responseType != 'pageQuestions' && apiConfig?.usePageQuestionsGrid === true }">
       <div class="spaceBetweenContent">
         <div *ngFor="let q of question.question; let qai = index" class="mb-20">
           <div *ngIf="q != ''" class="wc-primary-color">

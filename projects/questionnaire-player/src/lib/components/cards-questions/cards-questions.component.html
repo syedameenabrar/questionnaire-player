@@ -1,0 +1,14 @@
+<div class="cards-questions-container">
+  <ng-container *ngIf="questions && questions.length > 0">
+    <lib-page-questions-grid
+      [pageQuestions]="questions"
+      [questionnaireForm]="questionnaireForm"
+      [fileUploadResponse]="fileUploadResponse"
+      [fileSizeLimit]="fileSizeLimit"
+      [isSubmitted]="isSubmitted"
+      [isExpired]="isExpired"
+      [apiConfig]="apiConfig"
+    ></lib-page-questions-grid>
+  </ng-container>
+</div>
+

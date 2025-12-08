@@ -6,7 +6,7 @@ import {
   QueryList,
   ViewChildren,
 } from '@angular/core';
-import { Section } from '../../interfaces/questionnaire.type';
+import { Section, ApiConfiguration } from '../../interfaces/questionnaire.type';
 import { FormGroup } from '@angular/forms';
 import { MainComponent } from '../main/main.component';
 
@@ -21,6 +21,7 @@ export class SectionTabsComponent {
   @Input() isSubmitted: boolean;
   @Input() isExpired: boolean;
   @Input() fileSizeLimit: any;
+  @Input() apiConfig: ApiConfiguration;
   private _sectionIndex: number = 0;
 
   @Input()
