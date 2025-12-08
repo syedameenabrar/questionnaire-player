@@ -61,6 +61,7 @@ import { ObservationDetailsComponent } from './components/observation-details/ob
 import { ReportComponent } from './components/report/report.component';
 import { ObservationDomainComponent } from './components/observation-domain/observation-domain.component';
 import { PlayerBridgeComponent } from './components/player-bridge/player-bridge.component';
+import { SectionTabsComponent } from './components/section-tabs/section-tabs.component';
 import { QuestionnaireService } from './services/questionnaire.service';
 import { MatMenuModule } from '@angular/material/menu';
 import { SpinnerComponent } from './shared/components/spinner/spinner.component';
@@ -112,7 +113,8 @@ const MAT_CUSTOM_DATE_FORMATS = {
     ObservationDetailsComponent,
     ObservationDomainComponent,
     PlayerBridgeComponent,
-    SpinnerComponent
+    SpinnerComponent,
+    SectionTabsComponent
     ],
   imports: [
     CommonModule,

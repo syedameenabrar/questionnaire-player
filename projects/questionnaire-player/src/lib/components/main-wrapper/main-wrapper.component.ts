@@ -1,5 +1,4 @@
 import {
-  CSP_NONCE,
   Component,
   ElementRef,
   Input,
@@ -13,7 +12,6 @@ import {
   booleanAttribute,
 } from '@angular/core';
 import {
-  ApiConfiguration,
   Evidence,
   Question,
   Section,
@@ -21,7 +19,6 @@ import {
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { QuestionnaireService } from '../../services/questionnaire.service';
 import { MatDialog } from '@angular/material/dialog';
-import { MainComponent } from '../main/main.component';
 import { ApiService } from '../../services/api.service';
 import { catchError } from 'rxjs/operators';
 import * as urlConfig from '../../constants/url-config.json';
@@ -38,6 +35,7 @@ import { DbService } from '../../services/db/db.service';
 import { AttachmentService } from '../../services/attachment/attachment.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { sections } from '../../constants/mockData.json';
 
 @Component({
   selector: 'lib-main-wrapper',
@@ -51,9 +49,10 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
   sections: Section[];
   questionnaireForm: FormGroup;
 
-  @Input() apiConfig: ApiConfiguration;
+  @Input() apiConfig: any;
+  @Input() apiconfig: any;
   @ViewChild('questionMapModal') public questionMapModal: TemplateRef<any>;
-  @ViewChild('mainComponent') public mainComponent: MainComponent;
+  @ViewChild('sectionTabs') public sectionTabs: any;
   questionMap = {};
   pageMsg = new Map();
   endDate: Date;
@@ -93,7 +92,8 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
     public apiService: ApiService,
     public toaster: ToastService,
     public location: Location,
-    private renderer: Renderer2, private el: ElementRef,
+    private renderer: Renderer2,
+    private el: ElementRef,
     public router: Router,
     private sharedService: SharedService,
     private queryParamsService: QueryParamsService,
@@ -149,9 +149,10 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
     this.toaster.clearToaster();
 
     let isDataInlocalSotrage = await this.checkAndMapIndexDbDataToVariables();
-    if (typeof this.apiConfig === 'string') {
+    if (typeof this.apiConfig === 'string' || typeof this.apiconfig === 'string') {
       try {
-        this.apiConfig = JSON.parse(this.apiConfig);
+        let data = this.apiConfig || this.apiconfig || '{}';
+        this.apiConfig = JSON.parse(data);
 
         if (!isDataInlocalSotrage) {
           this.setApiService();
@@ -443,10 +444,22 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
 
 
         if (res.result) {
+          this.loaded = true;
           this.assessment = this.questionnaireService.mapSubmissionToAssessment(
-            res.result
+            {
+              ...res.result,
+              assessment: {
+                ...res.result.assessment,
+                evidences: [
+                  {
+                    ...res.result.assessment.evidences[0],
+                    sections: sections,
+                  },
+                ],
+              },
+            }
           );
-
+          console.log('assessment sagar sections', sections);
           this.submissionId = this.assessment.assessment.submissionId;
           this.evidenceCode = this.assessment.assessment.evidences[0].code;
 
@@ -880,7 +893,7 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
     }
     this.sectionName = section.name;
     this.enableRelevantPage();
-    this.mainComponent?.enableRelevantPage();
+    this.sectionTabs?.getCurrentMainComponent()?.enableRelevantPage();
     if (this._formValueChangesSub) {
       this._formValueChangesSub.unsubscribe();
     }
@@ -913,10 +926,22 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
     this.dialog.closeAll();
   }
 
+  onTabChange(newIndex: number) {
+    if (newIndex !== undefined && newIndex !== this.sectionIndex) {
+      this.setSection(newIndex);
+    }
+  }
+
   goToQuestion(questonId, pageIndex, sectionIndex) {
-    this.setSection(sectionIndex, true)
-    this.mainComponent.pageIndex = pageIndex;
-    this.mainComponent.handlePageEvent({ pageIndex: pageIndex, questonId:questonId });
+    this.setSection(sectionIndex, true);
+    const mainComponent = this.sectionTabs?.getCurrentMainComponent();
+    if (mainComponent) {
+      mainComponent.pageIndex = pageIndex;
+      mainComponent.handlePageEvent({
+        pageIndex: pageIndex,
+        questonId: questonId,
+      });
+    }
     this.closeModal();
   }
 

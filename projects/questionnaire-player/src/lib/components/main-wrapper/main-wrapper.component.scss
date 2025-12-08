@@ -292,4 +292,7 @@
   .upload-text .note {
     font-size: 1rem;
   }
+  .sticky-footer .footer-buttons .flex-dr {
+    flex-direction: column !important;
+  }
 }
