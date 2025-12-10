@@ -2,11 +2,13 @@
   "sections": [
     {
       "code": "S1",
+      "name": "Demographics",
       "questions": [
         {
           "_id": "",
           "externalId": "",
           "question": "Survey Metadata",
+          "columnCount": 2,
           "tip": "",
           "hint": "",
           "responseType": "pageQuestions",
@@ -54,7 +56,7 @@
           "file": "",
           "pageQuestions": [
             {
-              "_id": "69282a8b46ad572ba097e0a2",
+              "_id": "69282a8b46ad572ba097e0a21",
               "externalId": "Q1_1764240010384-1764240011797",
               "question": ["Survey Date", ""],
               "tip": "",
@@ -110,7 +112,7 @@
               "file": ""
             },
             {
-              "_id": "69282a8b46ad572ba097e0a3",
+              "_id": "69282a8b46ad572ba097e0a31",
               "externalId": "Q2_1764240010384-1764240011799",
               "question": ["Conducted By", ""],
               "tip": "",
@@ -173,6 +175,7 @@
           "_id": "",
           "externalId": "",
           "question": "Household Composition",
+          "columnCount": 1,
           "tip": "",
           "hint": "",
           "responseType": "pageQuestions",
@@ -228,7 +231,7 @@
               "responseType": "number",
               "value": "",
               "isCompleted": false,
-              "showRemarks": true,
+              "showRemarks": false,
               "remarks": "",
               "visibleIf": "",
               "options": [],
@@ -279,10 +282,7 @@
             {
               "_id": "69282a8b46ad572ba097e0a7",
               "externalId": "Q6_1764240010384-1764240011801",
-              "question": [
-                "Household Members count",
-                ""
-              ],
+              "question": ["Household Members count", ""],
               "tip": "",
               "hint": "",
               "responseType": "number",
@@ -298,13 +298,7 @@
               "questionType": "auto",
               "modeOfCollection": "onfield",
               "usedForScoring": "",
-              "file": {
-                "required": true,
-                "type": ["image/jpeg", "docx", "pdf", "ppt"],
-                "minCount": 0,
-                "maxCount": 10,
-                "caption": "FALSE"
-              },
+              "file": "",
               "fileName": [],
               "validation": {
                 "required": true
@@ -348,7 +342,7 @@
               "question": ["Household Changes Since Baseline"],
               "tip": "",
               "hint": "",
-              "responseType": "textarea",
+              "responseType": "textDescription",
               "value": "",
               "isCompleted": false,
               "showRemarks": false,
@@ -401,17 +395,17 @@
             }
           ]
         }
-       
-      ],
-      "name": "Demographics"
+      ]
     },
     {
       "code": "S2",
+      "name": "Human Capital",
       "questions": [
         {
           "_id": "",
           "externalId": "",
-          "question": "",
+          "question": "Skills Acquired",
+          "columnCount": 1,
           "tip": "",
           "hint": "",
           "responseType": "pageQuestions",
@@ -459,67 +453,18 @@
           "file": "",
           "pageQuestions": [
             {
-              "_id": "69282a8b46ad572ba097e0a2",
+              "_id": "69282a8b46ad572ba097e0a22",
               "externalId": "Q1_1764240010384-1764240011797",
-              "question": ["Name of the school", ""],
+              "question": ["Skills Acquired During Program"],
               "tip": "",
               "hint": "",
-              "responseType": "radio",
+              "responseType": "text",
               "value": "",
               "isCompleted": false,
               "showRemarks": false,
               "remarks": "",
               "visibleIf": "",
-              "options": [
-                {
-                  "value": "R1",
-                  "label": "KARNATAKA PUBLIC SCHOOLS GHPS B MATAKERE"
-                },
-                {
-                  "value": "R2",
-                  "label": "GHPS BANKAVADI"
-                },
-                {
-                  "value": "R3",
-                  "label": "GHPS BADAGA"
-                },
-                {
-                  "value": "R4",
-                  "label": "GLPS HOSAKOTE"
-                },
-                {
-                  "value": "R5",
-                  "label": "GHPS KATAVALU"
-                },
-                {
-                  "value": "R6",
-                  "label": "GLPS MATADA KATTE"
-                },
-                {
-                  "value": "R7",
-                  "label": "GHPS SAGARE"
-                },
-                {
-                  "value": "R8",
-                  "label": "GLPS JORE HALLA"
-                },
-                {
-                  "value": "R9",
-                  "label": "GLPS DEVALAPURA"
-                },
-                {
-                  "value": "R10",
-                  "label": "GLPS HULIKURA"
-                },
-                {
-                  "value": "R11",
-                  "label": "GHPS BOPPANA HALLI"
-                },
-                {
-                  "value": "R12",
-                  "label": "GHPS JAKKA HALLI"
-                }
-              ],
+              "options": [],
               "sliderOptions": [],
               "children": [],
               "questionGroup": ["A1"],
@@ -563,74 +508,64 @@
               "endTime": "",
               "gpsLocation": "",
               "file": ""
-            },
+            }
+          ]
+        },
+        {
+          "_id": "",
+          "externalId": "",
+          "question": "Health Status",
+          "columnCount": 1,
+          "tip": "",
+          "hint": "",
+          "responseType": "pageQuestions",
+          "value": "",
+          "isCompleted": "",
+          "showRemarks": "",
+          "remarks": "",
+          "visibleIf": "",
+          "options": "",
+          "sliderOptions": "",
+          "children": "",
+          "questionGroup": "",
+          "questionType": "",
+          "modeOfCollection": "",
+          "usedForScoring": "",
+          "fileName": "",
+          "validation": "",
+          "accessibility": "",
+          "canBeNotApplicable": "",
+          "instanceQuestions": "",
+          "isAGeneralQuestion": "",
+          "autoCapture": "",
+          "rubricLevel": "",
+          "sectionHeader": "",
+          "allowAudioRecording": "",
+          "page": "p2",
+          "questionNumber": "",
+          "prefillFromEntityProfile": "",
+          "entityFieldName": "",
+          "isEditable": "",
+          "showQuestionInPreview": "",
+          "createdFromQuestionId": "",
+          "orgId": "",
+          "tenantId": "",
+          "reportType": "",
+          "updatedAt": "",
+          "createdAt": "",
+          "deleted": "",
+          "__v": "",
+          "evidenceMethod": "",
+          "payload": "",
+          "startTime": "",
+          "endTime": "",
+          "gpsLocation": "",
+          "file": "",
+          "pageQuestions": [
             {
-              "_id": "69282a8b46ad572ba097e0a3",
-              "externalId": "Q2_1764240010384-1764240011799",
-              "question": ["Date of activity conducted", ""],
-              "tip": "",
-              "hint": "",
-              "responseType": "date",
-              "value": "",
-              "isCompleted": false,
-              "showRemarks": false,
-              "remarks": "",
-              "visibleIf": "",
-              "options": [],
-              "sliderOptions": [],
-              "children": [],
-              "questionGroup": ["A1"],
-              "questionType": "auto",
-              "modeOfCollection": "onfield",
-              "usedForScoring": "",
-              "fileName": [],
-              "validation": {
-                "required": true,
-                "max": "",
-                "min": ""
-              },
-              "accessibility": "No",
-              "canBeNotApplicable": "false",
-              "instanceQuestions": [],
-              "isAGeneralQuestion": false,
-              "dateFormat": "DD-MM-YYYY",
-              "autoCapture": false,
-              "rubricLevel": "",
-              "sectionHeader": "",
-              "allowAudioRecording": false,
-              "page": "p1",
-              "questionNumber": "",
-              "prefillFromEntityProfile": false,
-              "entityFieldName": "",
-              "isEditable": true,
-              "showQuestionInPreview": false,
-              "createdFromQuestionId": "69282a8b46ad572ba097e068",
-              "orgId": "tan90",
-              "tenantId": "shikshalokam",
-              "reportType": "default",
-              "updatedAt": "2025-11-27T10:40:11.805Z",
-              "createdAt": "2025-11-27T10:40:11.481Z",
-              "deleted": false,
-              "__v": 0,
-              "evidenceMethod": "OB",
-              "payload": {
-                "criteriaId": "69282a8f46ad572ba097e0d8",
-                "responseType": "date",
-                "evidenceMethod": "OB",
-                "rubricLevel": ""
-              },
-              "startTime": "",
-              "endTime": "",
-              "gpsLocation": "",
-              "file": ""
-            },
-            {
-              "_id": "69282a8b46ad572ba097e0a4",
-              "externalId": "Q3_1764240010384-1764240011799",
-              "question": [
-                "Has the teacher received any orientation/training on Project-Based Learning (PBL)?",
-                ""
-              ],
+              "_id": "69282a8b46ad572ba097e0a6",
+              "externalId": "Q5_1764240010384-1764240011801",
+              "question": ["Overall Health Status"],
               "tip": "",
               "hint": "",
               "responseType": "radio",
@@ -642,11 +577,19 @@
               "options": [
                 {
                   "value": "R1",
-                  "label": "Yes"
+                  "label": "Excellent"
                 },
                 {
                   "value": "R2",
-                  "label": "No"
+                  "label": "Good"
+                },
+                {
+                  "value": "R3",
+                  "label": "Fair"
+                },
+                {
+                  "value": "R3",
+                  "label": "Poor"
                 }
               ],
               "sliderOptions": [],
@@ -667,18 +610,18 @@
               "rubricLevel": "",
               "sectionHeader": "",
               "allowAudioRecording": false,
-              "page": "p1",
+              "page": "p2",
               "questionNumber": "",
               "prefillFromEntityProfile": false,
               "entityFieldName": "",
               "isEditable": true,
               "showQuestionInPreview": false,
-              "createdFromQuestionId": "69282a8b46ad572ba097e06e",
+              "createdFromQuestionId": "69282a8b46ad572ba097e07a",
               "orgId": "tan90",
               "tenantId": "shikshalokam",
               "reportType": "default",
               "updatedAt": "2025-11-27T10:40:11.805Z",
-              "createdAt": "2025-11-27T10:40:11.496Z",
+              "createdAt": "2025-11-27T10:40:11.533Z",
               "deleted": false,
               "__v": 0,
               "evidenceMethod": "OB",
@@ -694,15 +637,69 @@
               "file": ""
             },
             {
-              "_id": "69282a8b46ad572ba097e0a5",
-              "externalId": "Q4_1764240010384-1764240011800",
-              "question": [
-                "Does the teacher clearly explain the scientific concept during the class?",
-                ""
-              ],
+              "_id": "69282a8b46ad572ba097e0a7",
+              "externalId": "Q6_1764240010384-1764240011801",
+              "question": ["Health Issues in Last 6 Months"],
               "tip": "",
               "hint": "",
-              "responseType": "radio",
+              "responseType": "textDescription",
+              "value": "",
+              "isCompleted": false,
+              "showRemarks": false,
+              "remarks": "",
+              "visibleIf": "",
+              "options": [],
+              "sliderOptions": [],
+              "children": [],
+              "questionGroup": ["A1"],
+              "questionType": "auto",
+              "modeOfCollection": "onfield",
+              "usedForScoring": "",
+              "file": "",
+              "fileName": [],
+              "validation": {
+                "required": true
+              },
+              "accessibility": "No",
+              "canBeNotApplicable": "false",
+              "instanceQuestions": [],
+              "isAGeneralQuestion": false,
+              "autoCapture": false,
+              "rubricLevel": "",
+              "sectionHeader": "",
+              "allowAudioRecording": false,
+              "page": "p2",
+              "questionNumber": "",
+              "prefillFromEntityProfile": false,
+              "entityFieldName": "",
+              "isEditable": true,
+              "showQuestionInPreview": false,
+              "createdFromQuestionId": "69282a8b46ad572ba097e080",
+              "orgId": "tan90",
+              "tenantId": "shikshalokam",
+              "reportType": "default",
+              "updatedAt": "2025-11-27T10:40:11.805Z",
+              "createdAt": "2025-11-27T10:40:11.553Z",
+              "deleted": false,
+              "__v": 0,
+              "evidenceMethod": "OB",
+              "payload": {
+                "criteriaId": "69282a8f46ad572ba097e0d8",
+                "responseType": "radio",
+                "evidenceMethod": "OB",
+                "rubricLevel": ""
+              },
+              "startTime": "",
+              "endTime": "",
+              "gpsLocation": ""
+            },
+            {
+              "_id": "69282a8b46ad572ba097e0a8",
+              "externalId": "Q7_1764240010384-1764240011802",
+              "question": ["Access to Healthcare"],
+              "tip": "",
+              "hint": "",
+              "responseType": "multiselect",
               "value": "",
               "isCompleted": false,
               "showRemarks": false,
@@ -716,12 +713,181 @@
                 {
                   "value": "R2",
                   "label": "No"
-                },
-                {
-                  "value": "R3",
-                  "label": "To some extent"
                 }
               ],
+              "sliderOptions": [],
+              "children": [],
+              "questionGroup": ["A1"],
+              "questionType": "auto",
+              "modeOfCollection": "onfield",
+              "usedForScoring": "",
+              "fileName": [],
+              "validation": {
+                "required": true
+              },
+              "accessibility": "No",
+              "canBeNotApplicable": "false",
+              "instanceQuestions": [],
+              "isAGeneralQuestion": false,
+              "autoCapture": false,
+              "rubricLevel": "",
+              "sectionHeader": "",
+              "allowAudioRecording": false,
+              "page": "p2",
+              "questionNumber": "",
+              "prefillFromEntityProfile": false,
+              "entityFieldName": "",
+              "isEditable": true,
+              "showQuestionInPreview": false,
+              "createdFromQuestionId": "69282a8b46ad572ba097e086",
+              "orgId": "tan90",
+              "tenantId": "shikshalokam",
+              "reportType": "default",
+              "updatedAt": "2025-11-27T10:40:11.805Z",
+              "createdAt": "2025-11-27T10:40:11.577Z",
+              "deleted": false,
+              "__v": 0,
+              "evidenceMethod": "OB",
+              "payload": {
+                "criteriaId": "69282a8f46ad572ba097e0d8",
+                "responseType": "multiselect",
+                "evidenceMethod": "OB",
+                "rubricLevel": ""
+              },
+              "startTime": "",
+              "endTime": "",
+              "gpsLocation": "",
+              "file": ""
+            },
+            {
+              "_id": "69282a8b46ad572ba097e0a8",
+              "externalId": "Q7_1764240010384-1764240011802",
+              "question": ["Healthcare Barriers"],
+              "tip": "",
+              "hint": "",
+              "responseType": "textDescription",
+              "value": "",
+              "isCompleted": false,
+              "showRemarks": false,
+              "remarks": "",
+              "visibleIf": "",
+              "options": [],
+              "sliderOptions": [],
+              "children": [],
+              "questionGroup": ["A1"],
+              "questionType": "auto",
+              "modeOfCollection": "onfield",
+              "usedForScoring": "",
+              "fileName": [],
+              "validation": {
+                "required": true
+              },
+              "accessibility": "No",
+              "canBeNotApplicable": "false",
+              "instanceQuestions": [],
+              "isAGeneralQuestion": false,
+              "autoCapture": false,
+              "rubricLevel": "",
+              "sectionHeader": "",
+              "allowAudioRecording": false,
+              "page": "p2",
+              "questionNumber": "",
+              "prefillFromEntityProfile": false,
+              "entityFieldName": "",
+              "isEditable": true,
+              "showQuestionInPreview": false,
+              "createdFromQuestionId": "69282a8b46ad572ba097e086",
+              "orgId": "tan90",
+              "tenantId": "shikshalokam",
+              "reportType": "default",
+              "updatedAt": "2025-11-27T10:40:11.805Z",
+              "createdAt": "2025-11-27T10:40:11.577Z",
+              "deleted": false,
+              "__v": 0,
+              "evidenceMethod": "OB",
+              "payload": {
+                "criteriaId": "69282a8f46ad572ba097e0d8",
+                "responseType": "multiselect",
+                "evidenceMethod": "OB",
+                "rubricLevel": ""
+              },
+              "startTime": "",
+              "endTime": "",
+              "gpsLocation": "",
+              "file": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "S2",
+      "name": "Physical Capital",
+      "questions": [
+        {
+          "_id": "",
+          "externalId": "",
+          "question": "Asset Ownership",
+          "columnCount": 1,
+          "tip": "",
+          "hint": "",
+          "responseType": "pageQuestions",
+          "value": "",
+          "isCompleted": "",
+          "showRemarks": "",
+          "remarks": "",
+          "visibleIf": "",
+          "options": "",
+          "sliderOptions": "",
+          "children": "",
+          "questionGroup": "",
+          "questionType": "",
+          "modeOfCollection": "",
+          "usedForScoring": "",
+          "fileName": "",
+          "validation": "",
+          "accessibility": "",
+          "canBeNotApplicable": "",
+          "instanceQuestions": "",
+          "isAGeneralQuestion": "",
+          "autoCapture": "",
+          "rubricLevel": "",
+          "sectionHeader": "",
+          "allowAudioRecording": "",
+          "page": "p1",
+          "questionNumber": "",
+          "prefillFromEntityProfile": "",
+          "entityFieldName": "",
+          "isEditable": "",
+          "showQuestionInPreview": "",
+          "createdFromQuestionId": "",
+          "orgId": "",
+          "tenantId": "",
+          "reportType": "",
+          "updatedAt": "",
+          "createdAt": "",
+          "deleted": "",
+          "__v": "",
+          "evidenceMethod": "",
+          "payload": "",
+          "startTime": "",
+          "endTime": "",
+          "gpsLocation": "",
+          "file": "",
+          "pageQuestions": [
+            {
+              "_id": "69282a8b46ad572ba097e0a23",
+              "externalId": "Q1_1764240010384-1764240011797",
+              "question": ["Assets Owned by Household"],
+              "tip": "",
+              "hint": "",
+              "responseType": "text",
+              "value": "",
+              "isCompleted": false,
+              "showRemarks": false,
+              "remarks": "",
+              "visibleIf": "",
+              "options": [],
               "sliderOptions": [],
               "children": [],
               "questionGroup": ["A1"],
@@ -746,12 +912,12 @@
               "entityFieldName": "",
               "isEditable": true,
               "showQuestionInPreview": false,
-              "createdFromQuestionId": "69282a8b46ad572ba097e074",
+              "createdFromQuestionId": "69282a8b46ad572ba097e062",
               "orgId": "tan90",
               "tenantId": "shikshalokam",
               "reportType": "default",
               "updatedAt": "2025-11-27T10:40:11.805Z",
-              "createdAt": "2025-11-27T10:40:11.514Z",
+              "createdAt": "2025-11-27T10:40:11.464Z",
               "deleted": false,
               "__v": 0,
               "evidenceMethod": "OB",
@@ -771,7 +937,8 @@
         {
           "_id": "",
           "externalId": "",
-          "question": "",
+          "question": "Housing & Infrastructure",
+          "columnCount": 1,
           "tip": "",
           "hint": "",
           "responseType": "pageQuestions",
@@ -822,29 +989,32 @@
               "_id": "69282a8b46ad572ba097e0a6",
               "externalId": "Q5_1764240010384-1764240011801",
               "question": [
-                "Is there sufficient teaching-learning material available in the classroom?",
-                ""
+                "Housing Quality"
               ],
               "tip": "",
               "hint": "",
-              "responseType": "radio",
+              "responseType": "multiselect",
               "value": "",
               "isCompleted": false,
-              "showRemarks": true,
+              "showRemarks": false,
               "remarks": "",
               "visibleIf": "",
               "options": [
                 {
                   "value": "R1",
-                  "label": "Yes"
+                  "label": "Formal structure"
                 },
                 {
                   "value": "R2",
-                  "label": "No"
+                  "label": "Informal structure"
                 },
                 {
                   "value": "R3",
-                  "label": "Others (Please specify)"
+                  "label": "Traditional dwelling"
+                },
+                {
+                  "value": "R4",
+                  "label": "Other"
                 }
               ],
               "sliderOptions": [],
@@ -895,12 +1065,11 @@
               "_id": "69282a8b46ad572ba097e0a7",
               "externalId": "Q6_1764240010384-1764240011801",
               "question": [
-                "Does the school have a science lab or a dedicated space for displaying models?",
-                ""
+                "Water Access"
               ],
               "tip": "",
               "hint": "",
-              "responseType": "radio",
+              "responseType": "multiselect",
               "value": "",
               "isCompleted": false,
               "showRemarks": false,
@@ -926,13 +1095,7 @@
               "questionType": "auto",
               "modeOfCollection": "onfield",
               "usedForScoring": "",
-              "file": {
-                "required": true,
-                "type": ["image/jpeg", "docx", "pdf", "ppt"],
-                "minCount": 0,
-                "maxCount": 10,
-                "caption": "FALSE"
-              },
+              "file": "",
               "fileName": [],
               "validation": {
                 "required": true
@@ -1131,7 +1294,7 @@
               "sectionHeader": "",
               "allowAudioRecording": false,
               "page": "p3",
-              "questionNumber": "8",
+              "questionNumber": "",
               "prefillFromEntityProfile": false,
               "entityFieldName": "",
               "isEditable": true,
@@ -1204,7 +1367,7 @@
               "sectionHeader": "",
               "allowAudioRecording": false,
               "page": "p3",
-              "questionNumber": "9",
+              "questionNumber": "",
               "prefillFromEntityProfile": false,
               "entityFieldName": "",
               "isEditable": true,
@@ -1266,7 +1429,7 @@
               "sectionHeader": "",
               "allowAudioRecording": false,
               "page": "p3",
-              "questionNumber": "10",
+              "questionNumber": "",
               "prefillFromEntityProfile": false,
               "entityFieldName": "",
               "isEditable": true,
@@ -1293,16 +1456,17 @@
             }
           ]
         }
-      ],
-      "name": "Human Capital"
+      ]
     },
     {
       "code": "S2",
+      "name": "Financial",
       "questions": [
         {
           "_id": "",
           "externalId": "",
-          "question": "",
+          "question": "Household Income",
+          "columnCount": 1,
           "tip": "",
           "hint": "",
           "responseType": "pageQuestions",
@@ -1350,67 +1514,18 @@
           "file": "",
           "pageQuestions": [
             {
-              "_id": "69282a8b46ad572ba097e0a2",
+              "_id": "69282a8b46ad572ba097e0a24",
               "externalId": "Q1_1764240010384-1764240011797",
-              "question": ["Name of the school", ""],
+              "question": ["Total Household Income (Monthly, ZAR)"],
               "tip": "",
               "hint": "",
-              "responseType": "radio",
+              "responseType": "number",
               "value": "",
               "isCompleted": false,
               "showRemarks": false,
               "remarks": "",
               "visibleIf": "",
-              "options": [
-                {
-                  "value": "R1",
-                  "label": "KARNATAKA PUBLIC SCHOOLS GHPS B MATAKERE"
-                },
-                {
-                  "value": "R2",
-                  "label": "GHPS BANKAVADI"
-                },
-                {
-                  "value": "R3",
-                  "label": "GHPS BADAGA"
-                },
-                {
-                  "value": "R4",
-                  "label": "GLPS HOSAKOTE"
-                },
-                {
-                  "value": "R5",
-                  "label": "GHPS KATAVALU"
-                },
-                {
-                  "value": "R6",
-                  "label": "GLPS MATADA KATTE"
-                },
-                {
-                  "value": "R7",
-                  "label": "GHPS SAGARE"
-                },
-                {
-                  "value": "R8",
-                  "label": "GLPS JORE HALLA"
-                },
-                {
-                  "value": "R9",
-                  "label": "GLPS DEVALAPURA"
-                },
-                {
-                  "value": "R10",
-                  "label": "GLPS HULIKURA"
-                },
-                {
-                  "value": "R11",
-                  "label": "GHPS BOPPANA HALLI"
-                },
-                {
-                  "value": "R12",
-                  "label": "GHPS JAKKA HALLI"
-                }
-              ],
+              "options": [],
               "sliderOptions": [],
               "children": [],
               "questionGroup": ["A1"],
@@ -1430,7 +1545,7 @@
               "sectionHeader": "",
               "allowAudioRecording": false,
               "page": "p1",
-              "questionNumber": "1",
+              "questionNumber": "",
               "prefillFromEntityProfile": false,
               "entityFieldName": "",
               "isEditable": true,
@@ -1456,18 +1571,50 @@
               "file": ""
             },
             {
-              "_id": "69282a8b46ad572ba097e0a3",
+              "_id": "69282a8b46ad572ba097e0a34",
               "externalId": "Q2_1764240010384-1764240011799",
-              "question": ["Date of activity conducted", ""],
+              "question": ["Income Sources (Select all that apply)"],
               "tip": "",
               "hint": "",
-              "responseType": "date",
+              "responseType": "multiselect",
               "value": "",
               "isCompleted": false,
               "showRemarks": false,
               "remarks": "",
               "visibleIf": "",
-              "options": [],
+              "options": [
+                {
+                  "value": "R1",
+                  "label": "Formal Employment"
+                },
+                {
+                  "value": "R2",
+                  "label": "Informal Employment"
+                },
+                {
+                  "value": "R3",
+                  "label": "Business/Enterprise"
+                },
+                {
+                  "value": "R4",
+                  "label": "Pension/Retirement"
+                },
+                {
+                  "value": "R5",
+                  "label": "Agricultural production"
+                },{
+                  "value": "R6",
+                  "label": "Social grants"
+                },
+                {
+                  "value": "R7",
+                  "label": "Remittances"
+                },
+                {
+                  "value": "R8",
+                  "label": "Other"
+                }
+              ],
               "sliderOptions": [],
               "children": [],
               "questionGroup": ["A1"],
@@ -1490,7 +1637,7 @@
               "sectionHeader": "",
               "allowAudioRecording": false,
               "page": "p1",
-              "questionNumber": "2",
+              "questionNumber": "",
               "prefillFromEntityProfile": false,
               "entityFieldName": "",
               "isEditable": true,
@@ -1514,155 +1661,14 @@
               "endTime": "",
               "gpsLocation": "",
               "file": ""
-            },
-            {
-              "_id": "69282a8b46ad572ba097e0a4",
-              "externalId": "Q3_1764240010384-1764240011799",
-              "question": [
-                "Has the teacher received any orientation/training on Project-Based Learning (PBL)?",
-                ""
-              ],
-              "tip": "",
-              "hint": "",
-              "responseType": "radio",
-              "value": "",
-              "isCompleted": false,
-              "showRemarks": false,
-              "remarks": "",
-              "visibleIf": "",
-              "options": [
-                {
-                  "value": "R1",
-                  "label": "Yes"
-                },
-                {
-                  "value": "R2",
-                  "label": "No"
-                }
-              ],
-              "sliderOptions": [],
-              "children": [],
-              "questionGroup": ["A1"],
-              "questionType": "auto",
-              "modeOfCollection": "onfield",
-              "usedForScoring": "",
-              "fileName": [],
-              "validation": {
-                "required": true
-              },
-              "accessibility": "No",
-              "canBeNotApplicable": "false",
-              "instanceQuestions": [],
-              "isAGeneralQuestion": false,
-              "autoCapture": false,
-              "rubricLevel": "",
-              "sectionHeader": "",
-              "allowAudioRecording": false,
-              "page": "p1",
-              "questionNumber": "3",
-              "prefillFromEntityProfile": false,
-              "entityFieldName": "",
-              "isEditable": true,
-              "showQuestionInPreview": false,
-              "createdFromQuestionId": "69282a8b46ad572ba097e06e",
-              "orgId": "tan90",
-              "tenantId": "shikshalokam",
-              "reportType": "default",
-              "updatedAt": "2025-11-27T10:40:11.805Z",
-              "createdAt": "2025-11-27T10:40:11.496Z",
-              "deleted": false,
-              "__v": 0,
-              "evidenceMethod": "OB",
-              "payload": {
-                "criteriaId": "69282a8f46ad572ba097e0d8",
-                "responseType": "radio",
-                "evidenceMethod": "OB",
-                "rubricLevel": ""
-              },
-              "startTime": "",
-              "endTime": "",
-              "gpsLocation": "",
-              "file": ""
-            },
-            {
-              "_id": "69282a8b46ad572ba097e0a5",
-              "externalId": "Q4_1764240010384-1764240011800",
-              "question": [
-                "Does the teacher clearly explain the scientific concept during the class?",
-                ""
-              ],
-              "tip": "",
-              "hint": "",
-              "responseType": "radio",
-              "value": "",
-              "isCompleted": false,
-              "showRemarks": false,
-              "remarks": "",
-              "visibleIf": "",
-              "options": [
-                {
-                  "value": "R1",
-                  "label": "Yes"
-                },
-                {
-                  "value": "R2",
-                  "label": "No"
-                },
-                {
-                  "value": "R3",
-                  "label": "To some extent"
-                }
-              ],
-              "sliderOptions": [],
-              "children": [],
-              "questionGroup": ["A1"],
-              "questionType": "auto",
-              "modeOfCollection": "onfield",
-              "usedForScoring": "",
-              "fileName": [],
-              "validation": {
-                "required": true
-              },
-              "accessibility": "No",
-              "canBeNotApplicable": "false",
-              "instanceQuestions": [],
-              "isAGeneralQuestion": false,
-              "autoCapture": false,
-              "rubricLevel": "",
-              "sectionHeader": "",
-              "allowAudioRecording": false,
-              "page": "p1",
-              "questionNumber": "4",
-              "prefillFromEntityProfile": false,
-              "entityFieldName": "",
-              "isEditable": true,
-              "showQuestionInPreview": false,
-              "createdFromQuestionId": "69282a8b46ad572ba097e074",
-              "orgId": "tan90",
-              "tenantId": "shikshalokam",
-              "reportType": "default",
-              "updatedAt": "2025-11-27T10:40:11.805Z",
-              "createdAt": "2025-11-27T10:40:11.514Z",
-              "deleted": false,
-              "__v": 0,
-              "evidenceMethod": "OB",
-              "payload": {
-                "criteriaId": "69282a8f46ad572ba097e0d8",
-                "responseType": "radio",
-                "evidenceMethod": "OB",
-                "rubricLevel": ""
-              },
-              "startTime": "",
-              "endTime": "",
-              "gpsLocation": "",
-              "file": ""
             }
           ]
         },
         {
           "_id": "",
           "externalId": "",
-          "question": "",
+          "question": "Financial Services & Savings",
+          "columnCount": 1,
           "tip": "",
           "hint": "",
           "responseType": "pageQuestions",
@@ -1713,29 +1719,28 @@
               "_id": "69282a8b46ad572ba097e0a6",
               "externalId": "Q5_1764240010384-1764240011801",
               "question": [
-                "Is there sufficient teaching-learning material available in the classroom?",
-                ""
+                "Financial Services Used (Select all that apply)"
               ],
               "tip": "",
               "hint": "",
               "responseType": "radio",
               "value": "",
               "isCompleted": false,
-              "showRemarks": true,
+              "showRemarks": false,
               "remarks": "",
               "visibleIf": "",
               "options": [
                 {
                   "value": "R1",
-                  "label": "Yes"
+                  "label": "Bank Account"
                 },
                 {
                   "value": "R2",
-                  "label": "No"
+                  "label": "Mobile Money Account"
                 },
                 {
                   "value": "R3",
-                  "label": "Others (Please specify)"
+                  "label": "Other"
                 }
               ],
               "sliderOptions": [],
@@ -1757,7 +1762,7 @@
               "sectionHeader": "",
               "allowAudioRecording": false,
               "page": "p2",
-              "questionNumber": "5",
+              "questionNumber": "",
               "prefillFromEntityProfile": false,
               "entityFieldName": "",
               "isEditable": true,
@@ -1786,44 +1791,24 @@
               "_id": "69282a8b46ad572ba097e0a7",
               "externalId": "Q6_1764240010384-1764240011801",
               "question": [
-                "Does the school have a science lab or a dedicated space for displaying models?",
-                ""
+                "Total Savings Amount (ZAR)"
               ],
               "tip": "",
               "hint": "",
-              "responseType": "radio",
+              "responseType": "number",
               "value": "",
               "isCompleted": false,
               "showRemarks": false,
               "remarks": "",
               "visibleIf": "",
-              "options": [
-                {
-                  "value": "R1",
-                  "label": "Yes, a fully equipped science lab"
-                },
-                {
-                  "value": "R2",
-                  "label": "Yes, a basic science corner"
-                },
-                {
-                  "value": "R3",
-                  "label": "No such space available"
-                }
-              ],
+              "options": [],
               "sliderOptions": [],
               "children": [],
               "questionGroup": ["A1"],
               "questionType": "auto",
               "modeOfCollection": "onfield",
               "usedForScoring": "",
-              "file": {
-                "required": true,
-                "type": ["image/jpeg", "docx", "pdf", "ppt"],
-                "minCount": 0,
-                "maxCount": 10,
-                "caption": "FALSE"
-              },
+              "file": "",
               "fileName": [],
               "validation": {
                 "required": true
@@ -1837,7 +1822,7 @@
               "sectionHeader": "",
               "allowAudioRecording": false,
               "page": "p2",
-              "questionNumber": "6",
+              "questionNumber": "",
               "prefillFromEntityProfile": false,
               "entityFieldName": "",
               "isEditable": true,
@@ -1865,8 +1850,7 @@
               "_id": "69282a8b46ad572ba097e0a8",
               "externalId": "Q7_1764240010384-1764240011802",
               "question": [
-                "Which digital platforms do students have access to for science learning?",
-                ""
+                "Savings Location (Select all that apply)"
               ],
               "tip": "",
               "hint": "",
@@ -1879,15 +1863,15 @@
               "options": [
                 {
                   "value": "R1",
-                  "label": "DIKSHA"
+                  "label": "Bank"
                 },
                 {
                   "value": "R2",
-                  "label": "YouTube"
+                  "label": "Mobile Money"
                 },
                 {
                   "value": "R3",
-                  "label": "None"
+                  "label": "Other"
                 }
               ],
               "sliderOptions": [],
@@ -1909,7 +1893,7 @@
               "sectionHeader": "",
               "allowAudioRecording": false,
               "page": "p2",
-              "questionNumber": "7",
+              "questionNumber": "",
               "prefillFromEntityProfile": false,
               "entityFieldName": "",
               "isEditable": true,
@@ -1939,7 +1923,8 @@
         {
           "_id": "",
           "externalId": "",
-          "question": "",
+          "question": "Debt & Borrowing",
+          "columnCount": 1,
           "tip": "",
           "hint": "",
           "responseType": "pageQuestions",
@@ -1990,8 +1975,7 @@
               "_id": "69282a8b46ad572ba097e0a9",
               "externalId": "Q8_1764240010384-1764240011802",
               "question": [
-                "How many student-created science projects/models are currently available/displayed in your school?",
-                ""
+                "Total Debt/Loans Outstanding (ZAR)"
               ],
               "tip": "",
               "hint": "",
@@ -2022,7 +2006,7 @@
               "sectionHeader": "",
               "allowAudioRecording": false,
               "page": "p3",
-              "questionNumber": "8",
+              "questionNumber": "",
               "prefillFromEntityProfile": false,
               "entityFieldName": "",
               "isEditable": true,
@@ -2051,31 +2035,17 @@
               "_id": "69282a8b46ad572ba097e0aa",
               "externalId": "Q9_1764240010384-1764240011803",
               "question": [
-                "Are students actively participating in classroom discussions or science-related activities?",
-                ""
+                "Purpose of Debt/Loans"
               ],
               "tip": "",
               "hint": "",
-              "responseType": "radio",
+              "responseType": "textDescription",
               "value": "",
               "isCompleted": false,
               "showRemarks": false,
               "remarks": "",
               "visibleIf": "",
-              "options": [
-                {
-                  "value": "R1",
-                  "label": "Yes"
-                },
-                {
-                  "value": "R2",
-                  "label": "No"
-                },
-                {
-                  "value": "R3",
-                  "label": "Few students"
-                }
-              ],
+              "options": [],
               "sliderOptions": [],
               "children": [],
               "questionGroup": ["A1"],
@@ -2095,7 +2065,7 @@
               "sectionHeader": "",
               "allowAudioRecording": false,
               "page": "p3",
-              "questionNumber": "9",
+              "questionNumber": "",
               "prefillFromEntityProfile": false,
               "entityFieldName": "",
               "isEditable": true,
@@ -2119,81 +2089,20 @@
               "endTime": "",
               "gpsLocation": "",
               "file": ""
-            },
-            {
-              "_id": "69282a8b46ad572ba097e0ab",
-              "externalId": "Q10_1764240010384-1764240011804",
-              "question": [
-                "On a scale of 1 to 10, how clearly were students able to articulate the science concept after the class?",
-                ""
-              ],
-              "tip": "",
-              "hint": "",
-              "responseType": "slider",
-              "value": "",
-              "isCompleted": false,
-              "showRemarks": false,
-              "remarks": "",
-              "visibleIf": "",
-              "options": [],
-              "sliderOptions": [],
-              "children": [],
-              "questionGroup": ["A1"],
-              "questionType": "auto",
-              "modeOfCollection": "onfield",
-              "usedForScoring": "",
-              "fileName": [],
-              "validation": {
-                "required": true,
-                "max": "10",
-                "min": "1"
-              },
-              "accessibility": "No",
-              "canBeNotApplicable": "false",
-              "instanceQuestions": [],
-              "isAGeneralQuestion": false,
-              "autoCapture": false,
-              "rubricLevel": "",
-              "sectionHeader": "",
-              "allowAudioRecording": false,
-              "page": "p3",
-              "questionNumber": "10",
-              "prefillFromEntityProfile": false,
-              "entityFieldName": "",
-              "isEditable": true,
-              "showQuestionInPreview": false,
-              "createdFromQuestionId": "69282a8b46ad572ba097e098",
-              "orgId": "tan90",
-              "tenantId": "shikshalokam",
-              "reportType": "default",
-              "updatedAt": "2025-11-27T10:40:11.805Z",
-              "createdAt": "2025-11-27T10:40:11.642Z",
-              "deleted": false,
-              "__v": 0,
-              "evidenceMethod": "OB",
-              "payload": {
-                "criteriaId": "69282a8f46ad572ba097e0d8",
-                "responseType": "slider",
-                "evidenceMethod": "OB",
-                "rubricLevel": ""
-              },
-              "startTime": "",
-              "endTime": "",
-              "gpsLocation": "",
-              "file": ""
             }
           ]
         }
-      ],
-      "name": "Physical Capital"
+      ]
     },
     {
       "code": "S2",
+      "name": "Outcomes",
       "questions": [
         {
           "_id": "",
           "externalId": "",
-          "question": "",
+          "question": "Economic Outcomes",
+          "columnCount": 1,
           "tip": "",
           "hint": "",
           "responseType": "pageQuestions",
@@ -2241,67 +2150,18 @@
           "file": "",
           "pageQuestions": [
             {
-              "_id": "69282a8b46ad572ba097e0a2",
+              "_id": "69282a8b46ad572ba097e0a25",
               "externalId": "Q1_1764240010384-1764240011797",
-              "question": ["Name of the school", ""],
+              "question": ["Per Person Income (Monthly, ZAR)"],
               "tip": "",
               "hint": "",
-              "responseType": "radio",
+              "responseType": "number",
               "value": "",
               "isCompleted": false,
               "showRemarks": false,
               "remarks": "",
               "visibleIf": "",
-              "options": [
-                {
-                  "value": "R1",
-                  "label": "KARNATAKA PUBLIC SCHOOLS GHPS B MATAKERE"
-                },
-                {
-                  "value": "R2",
-                  "label": "GHPS BANKAVADI"
-                },
-                {
-                  "value": "R3",
-                  "label": "GHPS BADAGA"
-                },
-                {
-                  "value": "R4",
-                  "label": "GLPS HOSAKOTE"
-                },
-                {
-                  "value": "R5",
-                  "label": "GHPS KATAVALU"
-                },
-                {
-                  "value": "R6",
-                  "label": "GLPS MATADA KATTE"
-                },
-                {
-                  "value": "R7",
-                  "label": "GHPS SAGARE"
-                },
-                {
-                  "value": "R8",
-                  "label": "GLPS JORE HALLA"
-                },
-                {
-                  "value": "R9",
-                  "label": "GLPS DEVALAPURA"
-                },
-                {
-                  "value": "R10",
-                  "label": "GLPS HULIKURA"
-                },
-                {
-                  "value": "R11",
-                  "label": "GHPS BOPPANA HALLI"
-                },
-                {
-                  "value": "R12",
-                  "label": "GHPS JAKKA HALLI"
-                }
-              ],
+              "options": [],
               "sliderOptions": [],
               "children": [],
               "questionGroup": ["A1"],
@@ -2321,7 +2181,7 @@
               "sectionHeader": "",
               "allowAudioRecording": false,
               "page": "p1",
-              "questionNumber": "1",
+              "questionNumber": "",
               "prefillFromEntityProfile": false,
               "entityFieldName": "",
               "isEditable": true,
@@ -2347,18 +2207,27 @@
               "file": ""
             },
             {
-              "_id": "69282a8b46ad572ba097e0a3",
+              "_id": "69282a8b46ad572ba097e0a35",
               "externalId": "Q2_1764240010384-1764240011799",
-              "question": ["Date of activity conducted", ""],
+              "question": ["Food Security Level"],
               "tip": "",
               "hint": "",
-              "responseType": "date",
+              "responseType": "multiselect",
               "value": "",
               "isCompleted": false,
               "showRemarks": false,
               "remarks": "",
               "visibleIf": "",
-              "options": [],
+              "options": [
+                {
+                  "value": "R1",
+                  "label": "Very Low"
+                },
+                {
+                  "value": "R2",
+                  "label": "Low"
+                }
+              ],
               "sliderOptions": [],
               "children": [],
               "questionGroup": ["A1"],
@@ -2381,7 +2250,7 @@
               "sectionHeader": "",
               "allowAudioRecording": false,
               "page": "p1",
-              "questionNumber": "2",
+              "questionNumber": "",
               "prefillFromEntityProfile": false,
               "entityFieldName": "",
               "isEditable": true,
@@ -2405,155 +2274,14 @@
               "endTime": "",
               "gpsLocation": "",
               "file": ""
-            },
-            {
-              "_id": "69282a8b46ad572ba097e0a4",
-              "externalId": "Q3_1764240010384-1764240011799",
-              "question": [
-                "Has the teacher received any orientation/training on Project-Based Learning (PBL)?",
-                ""
-              ],
-              "tip": "",
-              "hint": "",
-              "responseType": "radio",
-              "value": "",
-              "isCompleted": false,
-              "showRemarks": false,
-              "remarks": "",
-              "visibleIf": "",
-              "options": [
-                {
-                  "value": "R1",
-                  "label": "Yes"
-                },
-                {
-                  "value": "R2",
-                  "label": "No"
-                }
-              ],
-              "sliderOptions": [],
-              "children": [],
-              "questionGroup": ["A1"],
-              "questionType": "auto",
-              "modeOfCollection": "onfield",
-              "usedForScoring": "",
-              "fileName": [],
-              "validation": {
-                "required": true
-              },
-              "accessibility": "No",
-              "canBeNotApplicable": "false",
-              "instanceQuestions": [],
-              "isAGeneralQuestion": false,
-              "autoCapture": false,
-              "rubricLevel": "",
-              "sectionHeader": "",
-              "allowAudioRecording": false,
-              "page": "p1",
-              "questionNumber": "3",
-              "prefillFromEntityProfile": false,
-              "entityFieldName": "",
-              "isEditable": true,
-              "showQuestionInPreview": false,
-              "createdFromQuestionId": "69282a8b46ad572ba097e06e",
-              "orgId": "tan90",
-              "tenantId": "shikshalokam",
-              "reportType": "default",
-              "updatedAt": "2025-11-27T10:40:11.805Z",
-              "createdAt": "2025-11-27T10:40:11.496Z",
-              "deleted": false,
-              "__v": 0,
-              "evidenceMethod": "OB",
-              "payload": {
-                "criteriaId": "69282a8f46ad572ba097e0d8",
-                "responseType": "radio",
-                "evidenceMethod": "OB",
-                "rubricLevel": ""
-              },
-              "startTime": "",
-              "endTime": "",
-              "gpsLocation": "",
-              "file": ""
-            },
-            {
-              "_id": "69282a8b46ad572ba097e0a5",
-              "externalId": "Q4_1764240010384-1764240011800",
-              "question": [
-                "Does the teacher clearly explain the scientific concept during the class?",
-                ""
-              ],
-              "tip": "",
-              "hint": "",
-              "responseType": "radio",
-              "value": "",
-              "isCompleted": false,
-              "showRemarks": false,
-              "remarks": "",
-              "visibleIf": "",
-              "options": [
-                {
-                  "value": "R1",
-                  "label": "Yes"
-                },
-                {
-                  "value": "R2",
-                  "label": "No"
-                },
-                {
-                  "value": "R3",
-                  "label": "To some extent"
-                }
-              ],
-              "sliderOptions": [],
-              "children": [],
-              "questionGroup": ["A1"],
-              "questionType": "auto",
-              "modeOfCollection": "onfield",
-              "usedForScoring": "",
-              "fileName": [],
-              "validation": {
-                "required": true
-              },
-              "accessibility": "No",
-              "canBeNotApplicable": "false",
-              "instanceQuestions": [],
-              "isAGeneralQuestion": false,
-              "autoCapture": false,
-              "rubricLevel": "",
-              "sectionHeader": "",
-              "allowAudioRecording": false,
-              "page": "p1",
-              "questionNumber": "4",
-              "prefillFromEntityProfile": false,
-              "entityFieldName": "",
-              "isEditable": true,
-              "showQuestionInPreview": false,
-              "createdFromQuestionId": "69282a8b46ad572ba097e074",
-              "orgId": "tan90",
-              "tenantId": "shikshalokam",
-              "reportType": "default",
-              "updatedAt": "2025-11-27T10:40:11.805Z",
-              "createdAt": "2025-11-27T10:40:11.514Z",
-              "deleted": false,
-              "__v": 0,
-              "evidenceMethod": "OB",
-              "payload": {
-                "criteriaId": "69282a8f46ad572ba097e0d8",
-                "responseType": "radio",
-                "evidenceMethod": "OB",
-                "rubricLevel": ""
-              },
-              "startTime": "",
-              "endTime": "",
-              "gpsLocation": "",
-              "file": ""
             }
           ]
         },
         {
           "_id": "",
           "externalId": "",
-          "question": "",
+          "question": "Social Empowerment Scales",
+          "columnCount": 1,
           "tip": "",
           "hint": "",
           "responseType": "pageQuestions",
@@ -2604,31 +2332,17 @@
               "_id": "69282a8b46ad572ba097e0a6",
               "externalId": "Q5_1764240010384-1764240011801",
               "question": [
-                "Is there sufficient teaching-learning material available in the classroom?",
-                ""
+                "Self-Esteem Scale (1 = Very Low, 10 = Very High)"
               ],
               "tip": "",
               "hint": "",
-              "responseType": "radio",
+              "responseType": "slider",
               "value": "",
               "isCompleted": false,
-              "showRemarks": true,
+              "showRemarks": false,
               "remarks": "",
               "visibleIf": "",
-              "options": [
-                {
-                  "value": "R1",
-                  "label": "Yes"
-                },
-                {
-                  "value": "R2",
-                  "label": "No"
-                },
-                {
-                  "value": "R3",
-                  "label": "Others (Please specify)"
-                }
-              ],
+              "options": [],
               "sliderOptions": [],
               "children": [],
               "questionGroup": ["A1"],
@@ -2648,7 +2362,7 @@
               "sectionHeader": "",
               "allowAudioRecording": false,
               "page": "p2",
-              "questionNumber": "5",
+              "questionNumber": "",
               "prefillFromEntityProfile": false,
               "entityFieldName": "",
               "isEditable": true,
@@ -2677,44 +2391,24 @@
               "_id": "69282a8b46ad572ba097e0a7",
               "externalId": "Q6_1764240010384-1764240011801",
               "question": [
-                "Does the school have a science lab or a dedicated space for displaying models?",
-                ""
+                "Agency/Control Scale (1 = No Control, 10 = Full Control)"
               ],
               "tip": "",
               "hint": "",
-              "responseType": "radio",
+              "responseType": "slider",
               "value": "",
               "isCompleted": false,
               "showRemarks": false,
               "remarks": "",
               "visibleIf": "",
-              "options": [
-                {
-                  "value": "R1",
-                  "label": "Yes, a fully equipped science lab"
-                },
-                {
-                  "value": "R2",
-                  "label": "Yes, a basic science corner"
-                },
-                {
-                  "value": "R3",
-                  "label": "No such space available"
-                }
-              ],
+              "options": [],
               "sliderOptions": [],
               "children": [],
               "questionGroup": ["A1"],
               "questionType": "auto",
               "modeOfCollection": "onfield",
               "usedForScoring": "",
-              "file": {
-                "required": true,
-                "type": ["image/jpeg", "docx", "pdf", "ppt"],
-                "minCount": 0,
-                "maxCount": 10,
-                "caption": "FALSE"
-              },
+              "file": "",
               "fileName": [],
               "validation": {
                 "required": true
@@ -2728,7 +2422,7 @@
               "sectionHeader": "",
               "allowAudioRecording": false,
               "page": "p2",
-              "questionNumber": "6",
+              "questionNumber": "",
               "prefillFromEntityProfile": false,
               "entityFieldName": "",
               "isEditable": true,
@@ -2756,31 +2450,17 @@
               "_id": "69282a8b46ad572ba097e0a8",
               "externalId": "Q7_1764240010384-1764240011802",
               "question": [
-                "Which digital platforms do students have access to for science learning?",
-                ""
+                "Social Inclusion Scale (1 = Very Excluded, 10 = Fully Included) *"
               ],
               "tip": "",
               "hint": "",
-              "responseType": "multiselect",
+              "responseType": "slider",
               "value": "",
               "isCompleted": false,
               "showRemarks": false,
               "remarks": "",
               "visibleIf": "",
-              "options": [
-                {
-                  "value": "R1",
-                  "label": "DIKSHA"
-                },
-                {
-                  "value": "R2",
-                  "label": "YouTube"
-                },
-                {
-                  "value": "R3",
-                  "label": "None"
-                }
-              ],
+              "options": [],
               "sliderOptions": [],
               "children": [],
               "questionGroup": ["A1"],
@@ -2800,7 +2480,66 @@
               "sectionHeader": "",
               "allowAudioRecording": false,
               "page": "p2",
-              "questionNumber": "7",
+              "questionNumber": "",
+              "prefillFromEntityProfile": false,
+              "entityFieldName": "",
+              "isEditable": true,
+              "showQuestionInPreview": false,
+              "createdFromQuestionId": "69282a8b46ad572ba097e086",
+              "orgId": "tan90",
+              "tenantId": "shikshalokam",
+              "reportType": "default",
+              "updatedAt": "2025-11-27T10:40:11.805Z",
+              "createdAt": "2025-11-27T10:40:11.577Z",
+              "deleted": false,
+              "__v": 0,
+              "evidenceMethod": "OB",
+              "payload": {
+                "criteriaId": "69282a8f46ad572ba097e0d8",
+                "responseType": "multiselect",
+                "evidenceMethod": "OB",
+                "rubricLevel": ""
+              },
+              "startTime": "",
+              "endTime": "",
+              "gpsLocation": "",
+              "file": ""
+            },
+            {
+              "_id": "69282a8b46ad572ba097e0a81",
+              "externalId": "Q7_1764240010384-1764240011802",
+              "question": [
+                "Confidence Scale (1 = Very Low, 10 = Very High)"
+              ],
+              "tip": "",
+              "hint": "",
+              "responseType": "slider",
+              "value": "",
+              "isCompleted": false,
+              "showRemarks": false,
+              "remarks": "",
+              "visibleIf": "",
+              "options": [],
+              "sliderOptions": [],
+              "children": [],
+              "questionGroup": ["A1"],
+              "questionType": "auto",
+              "modeOfCollection": "onfield",
+              "usedForScoring": "",
+              "fileName": [],
+              "validation": {
+                "required": true
+              },
+              "accessibility": "No",
+              "canBeNotApplicable": "false",
+              "instanceQuestions": [],
+              "isAGeneralQuestion": false,
+              "autoCapture": false,
+              "rubricLevel": "",
+              "sectionHeader": "",
+              "allowAudioRecording": false,
+              "page": "p2",
+              "questionNumber": "",
               "prefillFromEntityProfile": false,
               "entityFieldName": "",
               "isEditable": true,
@@ -2826,265 +2565,18 @@
               "file": ""
             }
           ]
-        },
-        {
-          "_id": "",
-          "externalId": "",
-          "question": "",
-          "tip": "",
-          "hint": "",
-          "responseType": "pageQuestions",
-          "value": "",
-          "isCompleted": "",
-          "showRemarks": "",
-          "remarks": "",
-          "visibleIf": "",
-          "options": "",
-          "sliderOptions": "",
-          "children": "",
-          "questionGroup": "",
-          "questionType": "",
-          "modeOfCollection": "",
-          "usedForScoring": "",
-          "fileName": "",
-          "validation": "",
-          "accessibility": "",
-          "canBeNotApplicable": "",
-          "instanceQuestions": "",
-          "isAGeneralQuestion": "",
-          "autoCapture": "",
-          "rubricLevel": "",
-          "sectionHeader": "",
-          "allowAudioRecording": "",
-          "page": "p3",
-          "questionNumber": "",
-          "prefillFromEntityProfile": "",
-          "entityFieldName": "",
-          "isEditable": "",
-          "showQuestionInPreview": "",
-          "createdFromQuestionId": "",
-          "orgId": "",
-          "tenantId": "",
-          "reportType": "",
-          "updatedAt": "",
-          "createdAt": "",
-          "deleted": "",
-          "__v": "",
-          "evidenceMethod": "",
-          "payload": "",
-          "startTime": "",
-          "endTime": "",
-          "gpsLocation": "",
-          "file": "",
-          "pageQuestions": [
-            {
-              "_id": "69282a8b46ad572ba097e0a9",
-              "externalId": "Q8_1764240010384-1764240011802",
-              "question": [
-                "How many student-created science projects/models are currently available/displayed in your school?",
-                ""
-              ],
-              "tip": "",
-              "hint": "",
-              "responseType": "number",
-              "value": "",
-              "isCompleted": false,
-              "showRemarks": false,
-              "remarks": "",
-              "visibleIf": "",
-              "options": [],
-              "sliderOptions": [],
-              "children": [],
-              "questionGroup": ["A1"],
-              "questionType": "auto",
-              "modeOfCollection": "onfield",
-              "usedForScoring": "",
-              "fileName": [],
-              "validation": {
-                "required": true,
-                "IsNumber": "true"
-              },
-              "accessibility": "No",
-              "canBeNotApplicable": "false",
-              "instanceQuestions": [],
-              "isAGeneralQuestion": false,
-              "autoCapture": false,
-              "rubricLevel": "",
-              "sectionHeader": "",
-              "allowAudioRecording": false,
-              "page": "p3",
-              "questionNumber": "8",
-              "prefillFromEntityProfile": false,
-              "entityFieldName": "",
-              "isEditable": true,
-              "showQuestionInPreview": false,
-              "createdFromQuestionId": "69282a8b46ad572ba097e08c",
-              "orgId": "tan90",
-              "tenantId": "shikshalokam",
-              "reportType": "default",
-              "updatedAt": "2025-11-27T10:40:11.805Z",
-              "createdAt": "2025-11-27T10:40:11.597Z",
-              "deleted": false,
-              "__v": 0,
-              "evidenceMethod": "OB",
-              "payload": {
-                "criteriaId": "69282a8f46ad572ba097e0d8",
-                "responseType": "number",
-                "evidenceMethod": "OB",
-                "rubricLevel": ""
-              },
-              "startTime": "",
-              "endTime": "",
-              "gpsLocation": "",
-              "file": ""
-            },
-            {
-              "_id": "69282a8b46ad572ba097e0aa",
-              "externalId": "Q9_1764240010384-1764240011803",
-              "question": [
-                "Are students actively participating in classroom discussions or science-related activities?",
-                ""
-              ],
-              "tip": "",
-              "hint": "",
-              "responseType": "radio",
-              "value": "",
-              "isCompleted": false,
-              "showRemarks": false,
-              "remarks": "",
-              "visibleIf": "",
-              "options": [
-                {
-                  "value": "R1",
-                  "label": "Yes"
-                },
-                {
-                  "value": "R2",
-                  "label": "No"
-                },
-                {
-                  "value": "R3",
-                  "label": "Few students"
-                }
-              ],
-              "sliderOptions": [],
-              "children": [],
-              "questionGroup": ["A1"],
-              "questionType": "auto",
-              "modeOfCollection": "onfield",
-              "usedForScoring": "",
-              "fileName": [],
-              "validation": {
-                "required": true
-              },
-              "accessibility": "No",
-              "canBeNotApplicable": "false",
-              "instanceQuestions": [],
-              "isAGeneralQuestion": false,
-              "autoCapture": false,
-              "rubricLevel": "",
-              "sectionHeader": "",
-              "allowAudioRecording": false,
-              "page": "p3",
-              "questionNumber": "9",
-              "prefillFromEntityProfile": false,
-              "entityFieldName": "",
-              "isEditable": true,
-              "showQuestionInPreview": false,
-              "createdFromQuestionId": "69282a8b46ad572ba097e092",
-              "orgId": "tan90",
-              "tenantId": "shikshalokam",
-              "reportType": "default",
-              "updatedAt": "2025-11-27T10:40:11.805Z",
-              "createdAt": "2025-11-27T10:40:11.618Z",
-              "deleted": false,
-              "__v": 0,
-              "evidenceMethod": "OB",
-              "payload": {
-                "criteriaId": "69282a8f46ad572ba097e0d8",
-                "responseType": "radio",
-                "evidenceMethod": "OB",
-                "rubricLevel": ""
-              },
-              "startTime": "",
-              "endTime": "",
-              "gpsLocation": "",
-              "file": ""
-            },
-            {
-              "_id": "69282a8b46ad572ba097e0ab",
-              "externalId": "Q10_1764240010384-1764240011804",
-              "question": [
-                "On a scale of 1 to 10, how clearly were students able to articulate the science concept after the class?",
-                ""
-              ],
-              "tip": "",
-              "hint": "",
-              "responseType": "slider",
-              "value": "",
-              "isCompleted": false,
-              "showRemarks": false,
-              "remarks": "",
-              "visibleIf": "",
-              "options": [],
-              "sliderOptions": [],
-              "children": [],
-              "questionGroup": ["A1"],
-              "questionType": "auto",
-              "modeOfCollection": "onfield",
-              "usedForScoring": "",
-              "fileName": [],
-              "validation": {
-                "required": true,
-                "max": "10",
-                "min": "1"
-              },
-              "accessibility": "No",
-              "canBeNotApplicable": "false",
-              "instanceQuestions": [],
-              "isAGeneralQuestion": false,
-              "autoCapture": false,
-              "rubricLevel": "",
-              "sectionHeader": "",
-              "allowAudioRecording": false,
-              "page": "p3",
-              "questionNumber": "10",
-              "prefillFromEntityProfile": false,
-              "entityFieldName": "",
-              "isEditable": true,
-              "showQuestionInPreview": false,
-              "createdFromQuestionId": "69282a8b46ad572ba097e098",
-              "orgId": "tan90",
-              "tenantId": "shikshalokam",
-              "reportType": "default",
-              "updatedAt": "2025-11-27T10:40:11.805Z",
-              "createdAt": "2025-11-27T10:40:11.642Z",
-              "deleted": false,
-              "__v": 0,
-              "evidenceMethod": "OB",
-              "payload": {
-                "criteriaId": "69282a8f46ad572ba097e0d8",
-                "responseType": "slider",
-                "evidenceMethod": "OB",
-                "rubricLevel": ""
-              },
-              "startTime": "",
-              "endTime": "",
-              "gpsLocation": "",
-              "file": ""
-            }
-          ]
         }
-      ],
-      "name": "Financial"
+      ]
     },
     {
       "code": "S2",
+      "name": "Livelihoods",
       "questions": [
         {
-          "_id": "",
-          "externalId": "",
-          "question": "",
+          "_id": "3212",
+          "externalId": "321",
+          "question": "Livelihood Activities & Aspirations",
+          "columnCount": 1,
           "tip": "",
           "hint": "",
           "responseType": "pageQuestions",
@@ -3132,67 +2624,18 @@
           "file": "",
           "pageQuestions": [
             {
-              "_id": "69282a8b46ad572ba097e0a2",
+              "_id": "69282a8b46ad572ba097e0a26",
               "externalId": "Q1_1764240010384-1764240011797",
-              "question": ["Name of the school", ""],
+              "question": ["Current Livelihood Activities *"],
               "tip": "",
               "hint": "",
-              "responseType": "radio",
+              "responseType": "text",
               "value": "",
               "isCompleted": false,
               "showRemarks": false,
               "remarks": "",
               "visibleIf": "",
-              "options": [
-                {
-                  "value": "R1",
-                  "label": "KARNATAKA PUBLIC SCHOOLS GHPS B MATAKERE"
-                },
-                {
-                  "value": "R2",
-                  "label": "GHPS BANKAVADI"
-                },
-                {
-                  "value": "R3",
-                  "label": "GHPS BADAGA"
-                },
-                {
-                  "value": "R4",
-                  "label": "GLPS HOSAKOTE"
-                },
-                {
-                  "value": "R5",
-                  "label": "GHPS KATAVALU"
-                },
-                {
-                  "value": "R6",
-                  "label": "GLPS MATADA KATTE"
-                },
-                {
-                  "value": "R7",
-                  "label": "GHPS SAGARE"
-                },
-                {
-                  "value": "R8",
-                  "label": "GLPS JORE HALLA"
-                },
-                {
-                  "value": "R9",
-                  "label": "GLPS DEVALAPURA"
-                },
-                {
-                  "value": "R10",
-                  "label": "GLPS HULIKURA"
-                },
-                {
-                  "value": "R11",
-                  "label": "GHPS BOPPANA HALLI"
-                },
-                {
-                  "value": "R12",
-                  "label": "GHPS JAKKA HALLI"
-                }
-              ],
+              "options": [],
               "sliderOptions": [],
               "children": [],
               "questionGroup": ["A1"],
@@ -3212,7 +2655,7 @@
               "sectionHeader": "",
               "allowAudioRecording": false,
               "page": "p1",
-              "questionNumber": "1",
+              "questionNumber": "",
               "prefillFromEntityProfile": false,
               "entityFieldName": "",
               "isEditable": true,
@@ -3238,12 +2681,12 @@
               "file": ""
             },
             {
-              "_id": "69282a8b46ad572ba097e0a3",
+              "_id": "69282a8b46ad572ba097e0a36",
               "externalId": "Q2_1764240010384-1764240011799",
-              "question": ["Date of activity conducted", ""],
+              "question": ["Livelihood Aspirations *"],
               "tip": "",
               "hint": "",
-              "responseType": "date",
+              "responseType": "textDescription",
               "value": "",
               "isCompleted": false,
               "showRemarks": false,
@@ -3272,7 +2715,7 @@
               "sectionHeader": "",
               "allowAudioRecording": false,
               "page": "p1",
-              "questionNumber": "2",
+              "questionNumber": "",
               "prefillFromEntityProfile": false,
               "entityFieldName": "",
               "isEditable": true,
@@ -3296,155 +2739,14 @@
               "endTime": "",
               "gpsLocation": "",
               "file": ""
-            },
-            {
-              "_id": "69282a8b46ad572ba097e0a4",
-              "externalId": "Q3_1764240010384-1764240011799",
-              "question": [
-                "Has the teacher received any orientation/training on Project-Based Learning (PBL)?",
-                ""
-              ],
-              "tip": "",
-              "hint": "",
-              "responseType": "radio",
-              "value": "",
-              "isCompleted": false,
-              "showRemarks": false,
-              "remarks": "",
-              "visibleIf": "",
-              "options": [
-                {
-                  "value": "R1",
-                  "label": "Yes"
-                },
-                {
-                  "value": "R2",
-                  "label": "No"
-                }
-              ],
-              "sliderOptions": [],
-              "children": [],
-              "questionGroup": ["A1"],
-              "questionType": "auto",
-              "modeOfCollection": "onfield",
-              "usedForScoring": "",
-              "fileName": [],
-              "validation": {
-                "required": true
-              },
-              "accessibility": "No",
-              "canBeNotApplicable": "false",
-              "instanceQuestions": [],
-              "isAGeneralQuestion": false,
-              "autoCapture": false,
-              "rubricLevel": "",
-              "sectionHeader": "",
-              "allowAudioRecording": false,
-              "page": "p1",
-              "questionNumber": "3",
-              "prefillFromEntityProfile": false,
-              "entityFieldName": "",
-              "isEditable": true,
-              "showQuestionInPreview": false,
-              "createdFromQuestionId": "69282a8b46ad572ba097e06e",
-              "orgId": "tan90",
-              "tenantId": "shikshalokam",
-              "reportType": "default",
-              "updatedAt": "2025-11-27T10:40:11.805Z",
-              "createdAt": "2025-11-27T10:40:11.496Z",
-              "deleted": false,
-              "__v": 0,
-              "evidenceMethod": "OB",
-              "payload": {
-                "criteriaId": "69282a8f46ad572ba097e0d8",
-                "responseType": "radio",
-                "evidenceMethod": "OB",
-                "rubricLevel": ""
-              },
-              "startTime": "",
-              "endTime": "",
-              "gpsLocation": "",
-              "file": ""
-            },
-            {
-              "_id": "69282a8b46ad572ba097e0a5",
-              "externalId": "Q4_1764240010384-1764240011800",
-              "question": [
-                "Does the teacher clearly explain the scientific concept during the class?",
-                ""
-              ],
-              "tip": "",
-              "hint": "",
-              "responseType": "radio",
-              "value": "",
-              "isCompleted": false,
-              "showRemarks": false,
-              "remarks": "",
-              "visibleIf": "",
-              "options": [
-                {
-                  "value": "R1",
-                  "label": "Yes"
-                },
-                {
-                  "value": "R2",
-                  "label": "No"
-                },
-                {
-                  "value": "R3",
-                  "label": "To some extent"
-                }
-              ],
-              "sliderOptions": [],
-              "children": [],
-              "questionGroup": ["A1"],
-              "questionType": "auto",
-              "modeOfCollection": "onfield",
-              "usedForScoring": "",
-              "fileName": [],
-              "validation": {
-                "required": true
-              },
-              "accessibility": "No",
-              "canBeNotApplicable": "false",
-              "instanceQuestions": [],
-              "isAGeneralQuestion": false,
-              "autoCapture": false,
-              "rubricLevel": "",
-              "sectionHeader": "",
-              "allowAudioRecording": false,
-              "page": "p1",
-              "questionNumber": "4",
-              "prefillFromEntityProfile": false,
-              "entityFieldName": "",
-              "isEditable": true,
-              "showQuestionInPreview": false,
-              "createdFromQuestionId": "69282a8b46ad572ba097e074",
-              "orgId": "tan90",
-              "tenantId": "shikshalokam",
-              "reportType": "default",
-              "updatedAt": "2025-11-27T10:40:11.805Z",
-              "createdAt": "2025-11-27T10:40:11.514Z",
-              "deleted": false,
-              "__v": 0,
-              "evidenceMethod": "OB",
-              "payload": {
-                "criteriaId": "69282a8f46ad572ba097e0d8",
-                "responseType": "radio",
-                "evidenceMethod": "OB",
-                "rubricLevel": ""
-              },
-              "startTime": "",
-              "endTime": "",
-              "gpsLocation": "",
-              "file": ""
             }
           ]
         },
         {
-          "_id": "",
-          "externalId": "",
-          "question": "",
+          "_id": "3213",
+          "externalId": "321",
+          "question": "Barriers & Support Needed",
+          "columnCount": 1,
           "tip": "",
           "hint": "",
           "responseType": "pageQuestions",
@@ -3495,15 +2797,14 @@
               "_id": "69282a8b46ad572ba097e0a6",
               "externalId": "Q5_1764240010384-1764240011801",
               "question": [
-                "Is there sufficient teaching-learning material available in the classroom?",
-                ""
+                "Skills Gaps (Select all that apply)"
               ],
               "tip": "",
               "hint": "",
               "responseType": "radio",
               "value": "",
               "isCompleted": false,
-              "showRemarks": true,
+              "showRemarks": false,
               "remarks": "",
               "visibleIf": "",
               "options": [
@@ -3539,7 +2840,7 @@
               "sectionHeader": "",
               "allowAudioRecording": false,
               "page": "p2",
-              "questionNumber": "5",
+              "questionNumber": "",
               "prefillFromEntityProfile": false,
               "entityFieldName": "",
               "isEditable": true,
@@ -3568,8 +2869,7 @@
               "_id": "69282a8b46ad572ba097e0a7",
               "externalId": "Q6_1764240010384-1764240011801",
               "question": [
-                "Does the school have a science lab or a dedicated space for displaying models?",
-                ""
+                "Main Barriers Remaining (Select all that apply)"
               ],
               "tip": "",
               "hint": "",
@@ -3599,13 +2899,7 @@
               "questionType": "auto",
               "modeOfCollection": "onfield",
               "usedForScoring": "",
-              "file": {
-                "required": true,
-                "type": ["image/jpeg", "docx", "pdf", "ppt"],
-                "minCount": 0,
-                "maxCount": 10,
-                "caption": "FALSE"
-              },
+              "file": "",
               "fileName": [],
               "validation": {
                 "required": true
@@ -3619,7 +2913,7 @@
               "sectionHeader": "",
               "allowAudioRecording": false,
               "page": "p2",
-              "questionNumber": "6",
+              "questionNumber": "",
               "prefillFromEntityProfile": false,
               "entityFieldName": "",
               "isEditable": true,
@@ -3647,31 +2941,17 @@
               "_id": "69282a8b46ad572ba097e0a8",
               "externalId": "Q7_1764240010384-1764240011802",
               "question": [
-                "Which digital platforms do students have access to for science learning?",
-                ""
+                "Support Needed to Overcome Barriers"
               ],
               "tip": "",
               "hint": "",
-              "responseType": "multiselect",
+              "responseType": "textDescription",
               "value": "",
               "isCompleted": false,
               "showRemarks": false,
               "remarks": "",
               "visibleIf": "",
-              "options": [
-                {
-                  "value": "R1",
-                  "label": "DIKSHA"
-                },
-                {
-                  "value": "R2",
-                  "label": "YouTube"
-                },
-                {
-                  "value": "R3",
-                  "label": "None"
-                }
-              ],
+              "options": [],
               "sliderOptions": [],
               "children": [],
               "questionGroup": ["A1"],
@@ -3691,7 +2971,7 @@
               "sectionHeader": "",
               "allowAudioRecording": false,
               "page": "p2",
-              "questionNumber": "7",
+              "questionNumber": "",
               "prefillFromEntityProfile": false,
               "entityFieldName": "",
               "isEditable": true,
@@ -3715,854 +2995,22 @@
               "endTime": "",
               "gpsLocation": "",
               "file": ""
-            }
-          ]
-        },
-        {
-          "_id": "",
-          "externalId": "",
-          "question": "",
-          "tip": "",
-          "hint": "",
-          "responseType": "pageQuestions",
-          "value": "",
-          "isCompleted": "",
-          "showRemarks": "",
-          "remarks": "",
-          "visibleIf": "",
-          "options": "",
-          "sliderOptions": "",
-          "children": "",
-          "questionGroup": "",
-          "questionType": "",
-          "modeOfCollection": "",
-          "usedForScoring": "",
-          "fileName": "",
-          "validation": "",
-          "accessibility": "",
-          "canBeNotApplicable": "",
-          "instanceQuestions": "",
-          "isAGeneralQuestion": "",
-          "autoCapture": "",
-          "rubricLevel": "",
-          "sectionHeader": "",
-          "allowAudioRecording": "",
-          "page": "p3",
-          "questionNumber": "",
-          "prefillFromEntityProfile": "",
-          "entityFieldName": "",
-          "isEditable": "",
-          "showQuestionInPreview": "",
-          "createdFromQuestionId": "",
-          "orgId": "",
-          "tenantId": "",
-          "reportType": "",
-          "updatedAt": "",
-          "createdAt": "",
-          "deleted": "",
-          "__v": "",
-          "evidenceMethod": "",
-          "payload": "",
-          "startTime": "",
-          "endTime": "",
-          "gpsLocation": "",
-          "file": "",
-          "pageQuestions": [
-            {
-              "_id": "69282a8b46ad572ba097e0a9",
-              "externalId": "Q8_1764240010384-1764240011802",
-              "question": [
-                "How many student-created science projects/models are currently available/displayed in your school?",
-                ""
-              ],
-              "tip": "",
-              "hint": "",
-              "responseType": "number",
-              "value": "",
-              "isCompleted": false,
-              "showRemarks": false,
-              "remarks": "",
-              "visibleIf": "",
-              "options": [],
-              "sliderOptions": [],
-              "children": [],
-              "questionGroup": ["A1"],
-              "questionType": "auto",
-              "modeOfCollection": "onfield",
-              "usedForScoring": "",
-              "fileName": [],
-              "validation": {
-                "required": true,
-                "IsNumber": "true"
-              },
-              "accessibility": "No",
-              "canBeNotApplicable": "false",
-              "instanceQuestions": [],
-              "isAGeneralQuestion": false,
-              "autoCapture": false,
-              "rubricLevel": "",
-              "sectionHeader": "",
-              "allowAudioRecording": false,
-              "page": "p3",
-              "questionNumber": "8",
-              "prefillFromEntityProfile": false,
-              "entityFieldName": "",
-              "isEditable": true,
-              "showQuestionInPreview": false,
-              "createdFromQuestionId": "69282a8b46ad572ba097e08c",
-              "orgId": "tan90",
-              "tenantId": "shikshalokam",
-              "reportType": "default",
-              "updatedAt": "2025-11-27T10:40:11.805Z",
-              "createdAt": "2025-11-27T10:40:11.597Z",
-              "deleted": false,
-              "__v": 0,
-              "evidenceMethod": "OB",
-              "payload": {
-                "criteriaId": "69282a8f46ad572ba097e0d8",
-                "responseType": "number",
-                "evidenceMethod": "OB",
-                "rubricLevel": ""
-              },
-              "startTime": "",
-              "endTime": "",
-              "gpsLocation": "",
-              "file": ""
             },
             {
-              "_id": "69282a8b46ad572ba097e0aa",
-              "externalId": "Q9_1764240010384-1764240011803",
-              "question": [
-                "Are students actively participating in classroom discussions or science-related activities?",
-                ""
-              ],
-              "tip": "",
-              "hint": "",
-              "responseType": "radio",
-              "value": "",
-              "isCompleted": false,
-              "showRemarks": false,
-              "remarks": "",
-              "visibleIf": "",
-              "options": [
-                {
-                  "value": "R1",
-                  "label": "Yes"
-                },
-                {
-                  "value": "R2",
-                  "label": "No"
-                },
-                {
-                  "value": "R3",
-                  "label": "Few students"
-                }
-              ],
-              "sliderOptions": [],
-              "children": [],
-              "questionGroup": ["A1"],
-              "questionType": "auto",
-              "modeOfCollection": "onfield",
-              "usedForScoring": "",
-              "fileName": [],
-              "validation": {
-                "required": true
-              },
-              "accessibility": "No",
-              "canBeNotApplicable": "false",
-              "instanceQuestions": [],
-              "isAGeneralQuestion": false,
-              "autoCapture": false,
-              "rubricLevel": "",
-              "sectionHeader": "",
-              "allowAudioRecording": false,
-              "page": "p3",
-              "questionNumber": "9",
-              "prefillFromEntityProfile": false,
-              "entityFieldName": "",
-              "isEditable": true,
-              "showQuestionInPreview": false,
-              "createdFromQuestionId": "69282a8b46ad572ba097e092",
-              "orgId": "tan90",
-              "tenantId": "shikshalokam",
-              "reportType": "default",
-              "updatedAt": "2025-11-27T10:40:11.805Z",
-              "createdAt": "2025-11-27T10:40:11.618Z",
-              "deleted": false,
-              "__v": 0,
-              "evidenceMethod": "OB",
-              "payload": {
-                "criteriaId": "69282a8f46ad572ba097e0d8",
-                "responseType": "radio",
-                "evidenceMethod": "OB",
-                "rubricLevel": ""
-              },
-              "startTime": "",
-              "endTime": "",
-              "gpsLocation": "",
-              "file": ""
-            },
-            {
-              "_id": "69282a8b46ad572ba097e0ab",
-              "externalId": "Q10_1764240010384-1764240011804",
-              "question": [
-                "On a scale of 1 to 10, how clearly were students able to articulate the science concept after the class?",
-                ""
-              ],
-              "tip": "",
-              "hint": "",
-              "responseType": "slider",
-              "value": "",
-              "isCompleted": false,
-              "showRemarks": false,
-              "remarks": "",
-              "visibleIf": "",
-              "options": [],
-              "sliderOptions": [],
-              "children": [],
-              "questionGroup": ["A1"],
-              "questionType": "auto",
-              "modeOfCollection": "onfield",
-              "usedForScoring": "",
-              "fileName": [],
-              "validation": {
-                "required": true,
-                "max": "10",
-                "min": "1"
-              },
-              "accessibility": "No",
-              "canBeNotApplicable": "false",
-              "instanceQuestions": [],
-              "isAGeneralQuestion": false,
-              "autoCapture": false,
-              "rubricLevel": "",
-              "sectionHeader": "",
-              "allowAudioRecording": false,
-              "page": "p3",
-              "questionNumber": "10",
-              "prefillFromEntityProfile": false,
-              "entityFieldName": "",
-              "isEditable": true,
-              "showQuestionInPreview": false,
-              "createdFromQuestionId": "69282a8b46ad572ba097e098",
-              "orgId": "tan90",
-              "tenantId": "shikshalokam",
-              "reportType": "default",
-              "updatedAt": "2025-11-27T10:40:11.805Z",
-              "createdAt": "2025-11-27T10:40:11.642Z",
-              "deleted": false,
-              "__v": 0,
-              "evidenceMethod": "OB",
-              "payload": {
-                "criteriaId": "69282a8f46ad572ba097e0d8",
-                "responseType": "slider",
-                "evidenceMethod": "OB",
-                "rubricLevel": ""
-              },
-              "startTime": "",
-              "endTime": "",
-              "gpsLocation": "",
-              "file": ""
-            }
-          ]
-        }
-      ],
-      "name": "Outcomes"
-    },
-    {
-      "code": "S2",
-      "questions": [
-        {
-          "_id": "",
-          "externalId": "",
-          "question": "",
-          "tip": "",
-          "hint": "",
-          "responseType": "pageQuestions",
-          "value": "",
-          "isCompleted": "",
-          "showRemarks": "",
-          "remarks": "",
-          "visibleIf": "",
-          "options": "",
-          "sliderOptions": "",
-          "children": "",
-          "questionGroup": "",
-          "questionType": "",
-          "modeOfCollection": "",
-          "usedForScoring": "",
-          "fileName": "",
-          "validation": "",
-          "accessibility": "",
-          "canBeNotApplicable": "",
-          "instanceQuestions": "",
-          "isAGeneralQuestion": "",
-          "autoCapture": "",
-          "rubricLevel": "",
-          "sectionHeader": "",
-          "allowAudioRecording": "",
-          "page": "p1",
-          "questionNumber": "",
-          "prefillFromEntityProfile": "",
-          "entityFieldName": "",
-          "isEditable": "",
-          "showQuestionInPreview": "",
-          "createdFromQuestionId": "",
-          "orgId": "",
-          "tenantId": "",
-          "reportType": "",
-          "updatedAt": "",
-          "createdAt": "",
-          "deleted": "",
-          "__v": "",
-          "evidenceMethod": "",
-          "payload": "",
-          "startTime": "",
-          "endTime": "",
-          "gpsLocation": "",
-          "file": "",
-          "pageQuestions": [
-            {
-              "_id": "69282a8b46ad572ba097e0a2",
-              "externalId": "Q1_1764240010384-1764240011797",
-              "question": ["Name of the school", ""],
-              "tip": "",
-              "hint": "",
-              "responseType": "radio",
-              "value": "",
-              "isCompleted": false,
-              "showRemarks": false,
-              "remarks": "",
-              "visibleIf": "",
-              "options": [
-                {
-                  "value": "R1",
-                  "label": "KARNATAKA PUBLIC SCHOOLS GHPS B MATAKERE"
-                },
-                {
-                  "value": "R2",
-                  "label": "GHPS BANKAVADI"
-                },
-                {
-                  "value": "R3",
-                  "label": "GHPS BADAGA"
-                },
-                {
-                  "value": "R4",
-                  "label": "GLPS HOSAKOTE"
-                },
-                {
-                  "value": "R5",
-                  "label": "GHPS KATAVALU"
-                },
-                {
-                  "value": "R6",
-                  "label": "GLPS MATADA KATTE"
-                },
-                {
-                  "value": "R7",
-                  "label": "GHPS SAGARE"
-                },
-                {
-                  "value": "R8",
-                  "label": "GLPS JORE HALLA"
-                },
-                {
-                  "value": "R9",
-                  "label": "GLPS DEVALAPURA"
-                },
-                {
-                  "value": "R10",
-                  "label": "GLPS HULIKURA"
-                },
-                {
-                  "value": "R11",
-                  "label": "GHPS BOPPANA HALLI"
-                },
-                {
-                  "value": "R12",
-                  "label": "GHPS JAKKA HALLI"
-                }
-              ],
-              "sliderOptions": [],
-              "children": [],
-              "questionGroup": ["A1"],
-              "questionType": "auto",
-              "modeOfCollection": "onfield",
-              "usedForScoring": "",
-              "fileName": [],
-              "validation": {
-                "required": true
-              },
-              "accessibility": "No",
-              "canBeNotApplicable": "false",
-              "instanceQuestions": [],
-              "isAGeneralQuestion": false,
-              "autoCapture": false,
-              "rubricLevel": "",
-              "sectionHeader": "",
-              "allowAudioRecording": false,
-              "page": "p1",
-              "questionNumber": "1",
-              "prefillFromEntityProfile": false,
-              "entityFieldName": "",
-              "isEditable": true,
-              "showQuestionInPreview": false,
-              "createdFromQuestionId": "69282a8b46ad572ba097e062",
-              "orgId": "tan90",
-              "tenantId": "shikshalokam",
-              "reportType": "default",
-              "updatedAt": "2025-11-27T10:40:11.805Z",
-              "createdAt": "2025-11-27T10:40:11.464Z",
-              "deleted": false,
-              "__v": 0,
-              "evidenceMethod": "OB",
-              "payload": {
-                "criteriaId": "69282a8f46ad572ba097e0d8",
-                "responseType": "radio",
-                "evidenceMethod": "OB",
-                "rubricLevel": ""
-              },
-              "startTime": "",
-              "endTime": "",
-              "gpsLocation": "",
-              "file": ""
-            },
-            {
-              "_id": "69282a8b46ad572ba097e0a3",
-              "externalId": "Q2_1764240010384-1764240011799",
-              "question": ["Date of activity conducted", ""],
-              "tip": "",
-              "hint": "",
-              "responseType": "date",
-              "value": "",
-              "isCompleted": false,
-              "showRemarks": false,
-              "remarks": "",
-              "visibleIf": "",
-              "options": [],
-              "sliderOptions": [],
-              "children": [],
-              "questionGroup": ["A1"],
-              "questionType": "auto",
-              "modeOfCollection": "onfield",
-              "usedForScoring": "",
-              "fileName": [],
-              "validation": {
-                "required": true,
-                "max": "",
-                "min": ""
-              },
-              "accessibility": "No",
-              "canBeNotApplicable": "false",
-              "instanceQuestions": [],
-              "isAGeneralQuestion": false,
-              "dateFormat": "DD-MM-YYYY",
-              "autoCapture": false,
-              "rubricLevel": "",
-              "sectionHeader": "",
-              "allowAudioRecording": false,
-              "page": "p1",
-              "questionNumber": "2",
-              "prefillFromEntityProfile": false,
-              "entityFieldName": "",
-              "isEditable": true,
-              "showQuestionInPreview": false,
-              "createdFromQuestionId": "69282a8b46ad572ba097e068",
-              "orgId": "tan90",
-              "tenantId": "shikshalokam",
-              "reportType": "default",
-              "updatedAt": "2025-11-27T10:40:11.805Z",
-              "createdAt": "2025-11-27T10:40:11.481Z",
-              "deleted": false,
-              "__v": 0,
-              "evidenceMethod": "OB",
-              "payload": {
-                "criteriaId": "69282a8f46ad572ba097e0d8",
-                "responseType": "date",
-                "evidenceMethod": "OB",
-                "rubricLevel": ""
-              },
-              "startTime": "",
-              "endTime": "",
-              "gpsLocation": "",
-              "file": ""
-            },
-            {
-              "_id": "69282a8b46ad572ba097e0a4",
-              "externalId": "Q3_1764240010384-1764240011799",
-              "question": [
-                "Has the teacher received any orientation/training on Project-Based Learning (PBL)?",
-                ""
-              ],
-              "tip": "",
-              "hint": "",
-              "responseType": "radio",
-              "value": "",
-              "isCompleted": false,
-              "showRemarks": false,
-              "remarks": "",
-              "visibleIf": "",
-              "options": [
-                {
-                  "value": "R1",
-                  "label": "Yes"
-                },
-                {
-                  "value": "R2",
-                  "label": "No"
-                }
-              ],
-              "sliderOptions": [],
-              "children": [],
-              "questionGroup": ["A1"],
-              "questionType": "auto",
-              "modeOfCollection": "onfield",
-              "usedForScoring": "",
-              "fileName": [],
-              "validation": {
-                "required": true
-              },
-              "accessibility": "No",
-              "canBeNotApplicable": "false",
-              "instanceQuestions": [],
-              "isAGeneralQuestion": false,
-              "autoCapture": false,
-              "rubricLevel": "",
-              "sectionHeader": "",
-              "allowAudioRecording": false,
-              "page": "p1",
-              "questionNumber": "3",
-              "prefillFromEntityProfile": false,
-              "entityFieldName": "",
-              "isEditable": true,
-              "showQuestionInPreview": false,
-              "createdFromQuestionId": "69282a8b46ad572ba097e06e",
-              "orgId": "tan90",
-              "tenantId": "shikshalokam",
-              "reportType": "default",
-              "updatedAt": "2025-11-27T10:40:11.805Z",
-              "createdAt": "2025-11-27T10:40:11.496Z",
-              "deleted": false,
-              "__v": 0,
-              "evidenceMethod": "OB",
-              "payload": {
-                "criteriaId": "69282a8f46ad572ba097e0d8",
-                "responseType": "radio",
-                "evidenceMethod": "OB",
-                "rubricLevel": ""
-              },
-              "startTime": "",
-              "endTime": "",
-              "gpsLocation": "",
-              "file": ""
-            },
-            {
-              "_id": "69282a8b46ad572ba097e0a5",
-              "externalId": "Q4_1764240010384-1764240011800",
-              "question": [
-                "Does the teacher clearly explain the scientific concept during the class?",
-                ""
-              ],
-              "tip": "",
-              "hint": "",
-              "responseType": "radio",
-              "value": "",
-              "isCompleted": false,
-              "showRemarks": false,
-              "remarks": "",
-              "visibleIf": "",
-              "options": [
-                {
-                  "value": "R1",
-                  "label": "Yes"
-                },
-                {
-                  "value": "R2",
-                  "label": "No"
-                },
-                {
-                  "value": "R3",
-                  "label": "To some extent"
-                }
-              ],
-              "sliderOptions": [],
-              "children": [],
-              "questionGroup": ["A1"],
-              "questionType": "auto",
-              "modeOfCollection": "onfield",
-              "usedForScoring": "",
-              "fileName": [],
-              "validation": {
-                "required": true
-              },
-              "accessibility": "No",
-              "canBeNotApplicable": "false",
-              "instanceQuestions": [],
-              "isAGeneralQuestion": false,
-              "autoCapture": false,
-              "rubricLevel": "",
-              "sectionHeader": "",
-              "allowAudioRecording": false,
-              "page": "p1",
-              "questionNumber": "4",
-              "prefillFromEntityProfile": false,
-              "entityFieldName": "",
-              "isEditable": true,
-              "showQuestionInPreview": false,
-              "createdFromQuestionId": "69282a8b46ad572ba097e074",
-              "orgId": "tan90",
-              "tenantId": "shikshalokam",
-              "reportType": "default",
-              "updatedAt": "2025-11-27T10:40:11.805Z",
-              "createdAt": "2025-11-27T10:40:11.514Z",
-              "deleted": false,
-              "__v": 0,
-              "evidenceMethod": "OB",
-              "payload": {
-                "criteriaId": "69282a8f46ad572ba097e0d8",
-                "responseType": "radio",
-                "evidenceMethod": "OB",
-                "rubricLevel": ""
-              },
-              "startTime": "",
-              "endTime": "",
-              "gpsLocation": "",
-              "file": ""
-            }
-          ]
-        },
-        {
-          "_id": "",
-          "externalId": "",
-          "question": "",
-          "tip": "",
-          "hint": "",
-          "responseType": "pageQuestions",
-          "value": "",
-          "isCompleted": "",
-          "showRemarks": "",
-          "remarks": "",
-          "visibleIf": "",
-          "options": "",
-          "sliderOptions": "",
-          "children": "",
-          "questionGroup": "",
-          "questionType": "",
-          "modeOfCollection": "",
-          "usedForScoring": "",
-          "fileName": "",
-          "validation": "",
-          "accessibility": "",
-          "canBeNotApplicable": "",
-          "instanceQuestions": "",
-          "isAGeneralQuestion": "",
-          "autoCapture": "",
-          "rubricLevel": "",
-          "sectionHeader": "",
-          "allowAudioRecording": "",
-          "page": "p2",
-          "questionNumber": "",
-          "prefillFromEntityProfile": "",
-          "entityFieldName": "",
-          "isEditable": "",
-          "showQuestionInPreview": "",
-          "createdFromQuestionId": "",
-          "orgId": "",
-          "tenantId": "",
-          "reportType": "",
-          "updatedAt": "",
-          "createdAt": "",
-          "deleted": "",
-          "__v": "",
-          "evidenceMethod": "",
-          "payload": "",
-          "startTime": "",
-          "endTime": "",
-          "gpsLocation": "",
-          "file": "",
-          "pageQuestions": [
-            {
-              "_id": "69282a8b46ad572ba097e0a6",
-              "externalId": "Q5_1764240010384-1764240011801",
-              "question": [
-                "Is there sufficient teaching-learning material available in the classroom?",
-                ""
-              ],
-              "tip": "",
-              "hint": "",
-              "responseType": "radio",
-              "value": "",
-              "isCompleted": false,
-              "showRemarks": true,
-              "remarks": "",
-              "visibleIf": "",
-              "options": [
-                {
-                  "value": "R1",
-                  "label": "Yes"
-                },
-                {
-                  "value": "R2",
-                  "label": "No"
-                },
-                {
-                  "value": "R3",
-                  "label": "Others (Please specify)"
-                }
-              ],
-              "sliderOptions": [],
-              "children": [],
-              "questionGroup": ["A1"],
-              "questionType": "auto",
-              "modeOfCollection": "onfield",
-              "usedForScoring": "",
-              "fileName": [],
-              "validation": {
-                "required": true
-              },
-              "accessibility": "No",
-              "canBeNotApplicable": "false",
-              "instanceQuestions": [],
-              "isAGeneralQuestion": false,
-              "autoCapture": false,
-              "rubricLevel": "",
-              "sectionHeader": "",
-              "allowAudioRecording": false,
-              "page": "p2",
-              "questionNumber": "5",
-              "prefillFromEntityProfile": false,
-              "entityFieldName": "",
-              "isEditable": true,
-              "showQuestionInPreview": false,
-              "createdFromQuestionId": "69282a8b46ad572ba097e07a",
-              "orgId": "tan90",
-              "tenantId": "shikshalokam",
-              "reportType": "default",
-              "updatedAt": "2025-11-27T10:40:11.805Z",
-              "createdAt": "2025-11-27T10:40:11.533Z",
-              "deleted": false,
-              "__v": 0,
-              "evidenceMethod": "OB",
-              "payload": {
-                "criteriaId": "69282a8f46ad572ba097e0d8",
-                "responseType": "radio",
-                "evidenceMethod": "OB",
-                "rubricLevel": ""
-              },
-              "startTime": "",
-              "endTime": "",
-              "gpsLocation": "",
-              "file": ""
-            },
-            {
-              "_id": "69282a8b46ad572ba097e0a7",
-              "externalId": "Q6_1764240010384-1764240011801",
-              "question": [
-                "Does the school have a science lab or a dedicated space for displaying models?",
-                ""
-              ],
-              "tip": "",
-              "hint": "",
-              "responseType": "radio",
-              "value": "",
-              "isCompleted": false,
-              "showRemarks": false,
-              "remarks": "",
-              "visibleIf": "",
-              "options": [
-                {
-                  "value": "R1",
-                  "label": "Yes, a fully equipped science lab"
-                },
-                {
-                  "value": "R2",
-                  "label": "Yes, a basic science corner"
-                },
-                {
-                  "value": "R3",
-                  "label": "No such space available"
-                }
-              ],
-              "sliderOptions": [],
-              "children": [],
-              "questionGroup": ["A1"],
-              "questionType": "auto",
-              "modeOfCollection": "onfield",
-              "usedForScoring": "",
-              "file": {
-                "required": true,
-                "type": ["image/jpeg", "docx", "pdf", "ppt"],
-                "minCount": 0,
-                "maxCount": 10,
-                "caption": "FALSE"
-              },
-              "fileName": [],
-              "validation": {
-                "required": true
-              },
-              "accessibility": "No",
-              "canBeNotApplicable": "false",
-              "instanceQuestions": [],
-              "isAGeneralQuestion": false,
-              "autoCapture": false,
-              "rubricLevel": "",
-              "sectionHeader": "",
-              "allowAudioRecording": false,
-              "page": "p2",
-              "questionNumber": "6",
-              "prefillFromEntityProfile": false,
-              "entityFieldName": "",
-              "isEditable": true,
-              "showQuestionInPreview": false,
-              "createdFromQuestionId": "69282a8b46ad572ba097e080",
-              "orgId": "tan90",
-              "tenantId": "shikshalokam",
-              "reportType": "default",
-              "updatedAt": "2025-11-27T10:40:11.805Z",
-              "createdAt": "2025-11-27T10:40:11.553Z",
-              "deleted": false,
-              "__v": 0,
-              "evidenceMethod": "OB",
-              "payload": {
-                "criteriaId": "69282a8f46ad572ba097e0d8",
-                "responseType": "radio",
-                "evidenceMethod": "OB",
-                "rubricLevel": ""
-              },
-              "startTime": "",
-              "endTime": "",
-              "gpsLocation": ""
-            },
-            {
-              "_id": "69282a8b46ad572ba097e0a8",
+              "_id": "69282a8b46ad572ba097e0a81",
               "externalId": "Q7_1764240010384-1764240011802",
               "question": [
-                "Which digital platforms do students have access to for science learning?",
-                ""
+                "Future Goals (Next 12 Months)"
               ],
               "tip": "",
               "hint": "",
-              "responseType": "multiselect",
+              "responseType": "textDescription",
               "value": "",
               "isCompleted": false,
               "showRemarks": false,
               "remarks": "",
               "visibleIf": "",
-              "options": [
-                {
-                  "value": "R1",
-                  "label": "DIKSHA"
-                },
-                {
-                  "value": "R2",
-                  "label": "YouTube"
-                },
-                {
-                  "value": "R3",
-                  "label": "None"
-                }
-              ],
+              "options": [],
               "sliderOptions": [],
               "children": [],
               "questionGroup": ["A1"],
@@ -4582,7 +3030,7 @@
               "sectionHeader": "",
               "allowAudioRecording": false,
               "page": "p2",
-              "questionNumber": "7",
+              "questionNumber": "",
               "prefillFromEntityProfile": false,
               "entityFieldName": "",
               "isEditable": true,
@@ -4608,257 +3056,8 @@
               "file": ""
             }
           ]
-        },
-        {
-          "_id": "",
-          "externalId": "",
-          "question": "",
-          "tip": "",
-          "hint": "",
-          "responseType": "pageQuestions",
-          "value": "",
-          "isCompleted": "",
-          "showRemarks": "",
-          "remarks": "",
-          "visibleIf": "",
-          "options": "",
-          "sliderOptions": "",
-          "children": "",
-          "questionGroup": "",
-          "questionType": "",
-          "modeOfCollection": "",
-          "usedForScoring": "",
-          "fileName": "",
-          "validation": "",
-          "accessibility": "",
-          "canBeNotApplicable": "",
-          "instanceQuestions": "",
-          "isAGeneralQuestion": "",
-          "autoCapture": "",
-          "rubricLevel": "",
-          "sectionHeader": "",
-          "allowAudioRecording": "",
-          "page": "p3",
-          "questionNumber": "",
-          "prefillFromEntityProfile": "",
-          "entityFieldName": "",
-          "isEditable": "",
-          "showQuestionInPreview": "",
-          "createdFromQuestionId": "",
-          "orgId": "",
-          "tenantId": "",
-          "reportType": "",
-          "updatedAt": "",
-          "createdAt": "",
-          "deleted": "",
-          "__v": "",
-          "evidenceMethod": "",
-          "payload": "",
-          "startTime": "",
-          "endTime": "",
-          "gpsLocation": "",
-          "file": "",
-          "pageQuestions": [
-            {
-              "_id": "69282a8b46ad572ba097e0a9",
-              "externalId": "Q8_1764240010384-1764240011802",
-              "question": [
-                "How many student-created science projects/models are currently available/displayed in your school?",
-                ""
-              ],
-              "tip": "",
-              "hint": "",
-              "responseType": "number",
-              "value": "",
-              "isCompleted": false,
-              "showRemarks": false,
-              "remarks": "",
-              "visibleIf": "",
-              "options": [],
-              "sliderOptions": [],
-              "children": [],
-              "questionGroup": ["A1"],
-              "questionType": "auto",
-              "modeOfCollection": "onfield",
-              "usedForScoring": "",
-              "fileName": [],
-              "validation": {
-                "required": true,
-                "IsNumber": "true"
-              },
-              "accessibility": "No",
-              "canBeNotApplicable": "false",
-              "instanceQuestions": [],
-              "isAGeneralQuestion": false,
-              "autoCapture": false,
-              "rubricLevel": "",
-              "sectionHeader": "",
-              "allowAudioRecording": false,
-              "page": "p3",
-              "questionNumber": "8",
-              "prefillFromEntityProfile": false,
-              "entityFieldName": "",
-              "isEditable": true,
-              "showQuestionInPreview": false,
-              "createdFromQuestionId": "69282a8b46ad572ba097e08c",
-              "orgId": "tan90",
-              "tenantId": "shikshalokam",
-              "reportType": "default",
-              "updatedAt": "2025-11-27T10:40:11.805Z",
-              "createdAt": "2025-11-27T10:40:11.597Z",
-              "deleted": false,
-              "__v": 0,
-              "evidenceMethod": "OB",
-              "payload": {
-                "criteriaId": "69282a8f46ad572ba097e0d8",
-                "responseType": "number",
-                "evidenceMethod": "OB",
-                "rubricLevel": ""
-              },
-              "startTime": "",
-              "endTime": "",
-              "gpsLocation": "",
-              "file": ""
-            },
-            {
-              "_id": "69282a8b46ad572ba097e0aa",
-              "externalId": "Q9_1764240010384-1764240011803",
-              "question": [
-                "Are students actively participating in classroom discussions or science-related activities?",
-                ""
-              ],
-              "tip": "",
-              "hint": "",
-              "responseType": "radio",
-              "value": "",
-              "isCompleted": false,
-              "showRemarks": false,
-              "remarks": "",
-              "visibleIf": "",
-              "options": [
-                {
-                  "value": "R1",
-                  "label": "Yes"
-                },
-                {
-                  "value": "R2",
-                  "label": "No"
-                },
-                {
-                  "value": "R3",
-                  "label": "Few students"
-                }
-              ],
-              "sliderOptions": [],
-              "children": [],
-              "questionGroup": ["A1"],
-              "questionType": "auto",
-              "modeOfCollection": "onfield",
-              "usedForScoring": "",
-              "fileName": [],
-              "validation": {
-                "required": true
-              },
-              "accessibility": "No",
-              "canBeNotApplicable": "false",
-              "instanceQuestions": [],
-              "isAGeneralQuestion": false,
-              "autoCapture": false,
-              "rubricLevel": "",
-              "sectionHeader": "",
-              "allowAudioRecording": false,
-              "page": "p3",
-              "questionNumber": "9",
-              "prefillFromEntityProfile": false,
-              "entityFieldName": "",
-              "isEditable": true,
-              "showQuestionInPreview": false,
-              "createdFromQuestionId": "69282a8b46ad572ba097e092",
-              "orgId": "tan90",
-              "tenantId": "shikshalokam",
-              "reportType": "default",
-              "updatedAt": "2025-11-27T10:40:11.805Z",
-              "createdAt": "2025-11-27T10:40:11.618Z",
-              "deleted": false,
-              "__v": 0,
-              "evidenceMethod": "OB",
-              "payload": {
-                "criteriaId": "69282a8f46ad572ba097e0d8",
-                "responseType": "radio",
-                "evidenceMethod": "OB",
-                "rubricLevel": ""
-              },
-              "startTime": "",
-              "endTime": "",
-              "gpsLocation": "",
-              "file": ""
-            },
-            {
-              "_id": "69282a8b46ad572ba097e0ab",
-              "externalId": "Q10_1764240010384-1764240011804",
-              "question": [
-                "On a scale of 1 to 10, how clearly were students able to articulate the science concept after the class?",
-                ""
-              ],
-              "tip": "",
-              "hint": "",
-              "responseType": "slider",
-              "value": "",
-              "isCompleted": false,
-              "showRemarks": false,
-              "remarks": "",
-              "visibleIf": "",
-              "options": [],
-              "sliderOptions": [],
-              "children": [],
-              "questionGroup": ["A1"],
-              "questionType": "auto",
-              "modeOfCollection": "onfield",
-              "usedForScoring": "",
-              "fileName": [],
-              "validation": {
-                "required": true,
-                "max": "10",
-                "min": "1"
-              },
-              "accessibility": "No",
-              "canBeNotApplicable": "false",
-              "instanceQuestions": [],
-              "isAGeneralQuestion": false,
-              "autoCapture": false,
-              "rubricLevel": "",
-              "sectionHeader": "",
-              "allowAudioRecording": false,
-              "page": "p3",
-              "questionNumber": "10",
-              "prefillFromEntityProfile": false,
-              "entityFieldName": "",
-              "isEditable": true,
-              "showQuestionInPreview": false,
-              "createdFromQuestionId": "69282a8b46ad572ba097e098",
-              "orgId": "tan90",
-              "tenantId": "shikshalokam",
-              "reportType": "default",
-              "updatedAt": "2025-11-27T10:40:11.805Z",
-              "createdAt": "2025-11-27T10:40:11.642Z",
-              "deleted": false,
-              "__v": 0,
-              "evidenceMethod": "OB",
-              "payload": {
-                "criteriaId": "69282a8f46ad572ba097e0d8",
-                "responseType": "slider",
-                "evidenceMethod": "OB",
-                "rubricLevel": ""
-              },
-              "startTime": "",
-              "endTime": "",
-              "gpsLocation": "",
-              "file": ""
-            }
-          ]
         }
-      ],
-      "name": "Livelihoods"
+      ]
     }
   ]
 }

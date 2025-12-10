@@ -220,6 +220,7 @@ export interface ApiConfiguration{
   stateData:any;
   usePageQuestionsGrid?: boolean; // If true, use lib-page-questions-grid for pageQuestions, otherwise use lib-main
   enablePagination?: boolean; // If false, display all page groups as cards instead of paginating
+  gridCount?: number; // If provided, use grid layout with specified number of columns
 }
 
 

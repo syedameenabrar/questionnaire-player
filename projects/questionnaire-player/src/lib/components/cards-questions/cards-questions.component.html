@@ -1,6 +1,7 @@
 <div class="cards-questions-container">
   <ng-container *ngIf="questions && questions.length > 0">
     <lib-page-questions-grid
+      #pageQuestionsGrid
       [pageQuestions]="questions"
       [questionnaireForm]="questionnaireForm"
       [fileUploadResponse]="fileUploadResponse"

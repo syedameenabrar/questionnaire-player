@@ -9,6 +9,7 @@ import {
 import { Section, ApiConfiguration } from '../../interfaces/questionnaire.type';
 import { FormGroup } from '@angular/forms';
 import { MainComponent } from '../main/main.component';
+import { CardsQuestionsComponent } from '../cards-questions/cards-questions.component';
 
 @Component({
   selector: 'lib-section-tabs',
@@ -39,7 +40,7 @@ export class SectionTabsComponent {
   @Output() tabChange = new EventEmitter<number>();
 
   @ViewChildren('mainComponent')
-  public mainComponents: QueryList<MainComponent>;
+  public mainComponents: QueryList<MainComponent | CardsQuestionsComponent>;
 
   onTabChange(event: any) {
     const newIndex = event.index;
@@ -50,7 +51,7 @@ export class SectionTabsComponent {
     }
   }
 
-  getCurrentMainComponent(): MainComponent | undefined {
+  getCurrentMainComponent(): MainComponent | CardsQuestionsComponent | undefined {
     if (!this.mainComponents || this.mainComponents.length === 0) {
       return undefined;
     }

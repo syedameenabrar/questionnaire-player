@@ -64,16 +64,21 @@
             </div>
 
             <div>
-              <button
+              <!-- <button
                 class="btn btn-primary mr-2"
                 (click)="startQuestioner()"
                 *ngIf="
                   (stateData && stateData?.isSurvey === false) ||
                   questionNotStarted
                 "
+                *** submit condition**** 
+                *ngIf="
+                  ((stateData && stateData?.isSurvey === true) || !stateData) &&
+                  !questionNotStarted
+                "
               >
                 Start
-              </button>
+              </button> -->
 
               <button
                 class="btn btn-primary mr-2"
@@ -81,10 +86,6 @@
                   !questionnaireForm?.valid
                     ? getQuestionMap()
                     : submission('submit')
-                "
-                *ngIf="
-                  ((stateData && stateData?.isSurvey === true) || !stateData) &&
-                  !questionNotStarted
                 "
               >
                 Submit

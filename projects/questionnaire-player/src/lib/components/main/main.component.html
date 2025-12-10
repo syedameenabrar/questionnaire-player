@@ -1,4 +1,6 @@
-<div [ngClass]="{'custom-font': apiConfig?.usePageQuestionsGrid === true, 'custom-font-grid': apiConfig?.usePageQuestionsGrid === false}">
+<div [ngClass]="{'custom-font': apiConfig?.usePageQuestionsGrid === true,'custom-font-grid': apiConfig?.usePageQuestionsGrid === false}"
+[style.grid-template-columns]="apiConfig?.gridCount > 1 ? 'repeat(' + apiConfig?.gridCount + ', 1fr)' : 'auto'"
+>
   <ng-container *ngIf="!questionnaireInstance else paginationNonApplicableInstance">
     <ng-container *ngFor="
         let question of questions;
@@ -48,7 +50,7 @@
       <div class="spaceBetweenContent">
         <div *ngFor="let q of question.question; let qai = index" class="mb-20">
           <div *ngIf="q != ''" class="wc-primary-color">
-            {{ question.questionNumber + " . " }}&nbsp;{{ q }} <span *ngIf="question.validation.required" class="colorRed">*</span>
+            {{ question.questionNumber ? question.questionNumber + " . " : "" }}&nbsp;{{ q }} <span *ngIf="question.validation.required" class="colorRed">*</span>
             <button *ngIf="question?.hint" mat-icon-button class="wc-primary-color"
               aria-label="Icon-button with a lightbulb icon" matTooltip="Hint about the question"
               (click)="openDialog(question.hint)">
@@ -62,7 +64,7 @@
           {{ question?.tip }}
         </p>
       </ng-container>
-      <div class="d-flex flex-dc flex-gap-10">
+      <div class="d-flex flex-gap-10" [ngClass]="apiConfig?.usePageQuestionsGrid === true ? 'flex-dr' : 'flex-dc'">
         <lib-text-input [id]="question._id" tabindex="-1" *ngIf="question.responseType == reponseType.TEXT" [questionnaireForm]="questionnaireForm"
           [question]="question"></lib-text-input>
           <lib-text-area [id]="question._id" tabindex="-1" *ngIf="question.responseType == reponseType.TEXTAREA" [questionnaireForm]="questionnaireForm"

@@ -105,12 +105,13 @@ export class PageQuestionsGridComponent implements OnInit, AfterViewInit {
     return question._id;
   }
 
-  getSafeApiConfig(): ApiConfiguration {
+  getSafeApiConfig(data: any): ApiConfiguration {
     // Prevent circular dependency by disabling usePageQuestionsGrid
     // when lib-main is called from page-questions-grid
     return {
       ...this.apiConfig,
-      usePageQuestionsGrid: false
+      gridCount: data?.columnCount,
+      usePageQuestionsGrid: false,
     };
   }
 }
