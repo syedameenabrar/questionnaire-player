@@ -19,11 +19,11 @@
     </form>
 
     <ng-container *ngIf="!uploading">
-      <div class="sticky-footer">
+      <div class="sticky-footer" *ngIf="!evidence?.isSubmitted && !isExpired"
+      >
         <hr class="partition" />
         <div class="footer-buttons">
           <div
-            *ngIf="!evidence?.isSubmitted && !isExpired"
             class="m-4 d-flex flex-ai-center flex-jc-space-between flex-dr flex-gap-30"
           >
             <div>
@@ -166,7 +166,7 @@
                       goToQuestion(
                         question._id,
                         question.pageIndex,
-                        sectionIndex
+                        question.sectionIndex
                       )
                     "
                     mat-mini-fab

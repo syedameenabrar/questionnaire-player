@@ -7,6 +7,12 @@
   gap: 1rem;
   display: flex;
   flex-direction: column;
+  background: white;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #e2e8f0;
+  box-shadow: none;
+  border-radius: 1rem;
 }
 
 .page-header {
@@ -127,5 +133,9 @@
   .spaceBetweenContent {
     display: block;
   }
+}
+
+.wc-primary-color {
+  color: #1e293b;
 }
 

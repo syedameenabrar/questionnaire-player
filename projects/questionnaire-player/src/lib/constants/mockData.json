@@ -5,7 +5,7 @@
       "name": "Demographics",
       "questions": [
         {
-          "_id": "",
+          "_id": "40604957cc1345c4be9891d4",
           "externalId": "",
           "question": "Survey Metadata",
           "columnCount": 2,
@@ -58,7 +58,7 @@
             {
               "_id": "69282a8b46ad572ba097e0a21",
               "externalId": "Q1_1764240010384-1764240011797",
-              "question": ["Survey Date", ""],
+              "question": ["Survey Date"],
               "tip": "",
               "hint": "",
               "responseType": "date",
@@ -114,7 +114,7 @@
             {
               "_id": "69282a8b46ad572ba097e0a31",
               "externalId": "Q2_1764240010384-1764240011799",
-              "question": ["Conducted By", ""],
+              "question": ["Conducted By"],
               "tip": "",
               "hint": "",
               "responseType": "text",
@@ -172,7 +172,7 @@
           ]
         },
         {
-          "_id": "",
+          "_id": "1ef28f63dd08489fb7e870cb",
           "externalId": "",
           "question": "Household Composition",
           "columnCount": 1,
@@ -282,7 +282,7 @@
             {
               "_id": "69282a8b46ad572ba097e0a7",
               "externalId": "Q6_1764240010384-1764240011801",
-              "question": ["Household Members count", ""],
+              "question": ["Household Members count"],
               "tip": "",
               "hint": "",
               "responseType": "number",
@@ -402,7 +402,7 @@
       "name": "Human Capital",
       "questions": [
         {
-          "_id": "",
+          "_id": "601be9e677a54b1c9b7766fc",
           "externalId": "",
           "question": "Skills Acquired",
           "columnCount": 1,
@@ -512,7 +512,7 @@
           ]
         },
         {
-          "_id": "",
+          "_id": "83e3cf1fecb2430d85a994a6",
           "externalId": "",
           "question": "Health Status",
           "columnCount": 1,
@@ -563,7 +563,7 @@
           "file": "",
           "pageQuestions": [
             {
-              "_id": "69282a8b46ad572ba097e0a6",
+              "_id": "29d980ff78a6411ba57f74bd",
               "externalId": "Q5_1764240010384-1764240011801",
               "question": ["Overall Health Status"],
               "tip": "",
@@ -637,7 +637,7 @@
               "file": ""
             },
             {
-              "_id": "69282a8b46ad572ba097e0a7",
+              "_id": "9e5e071450434a4bb3f1bd31",
               "externalId": "Q6_1764240010384-1764240011801",
               "question": ["Health Issues in Last 6 Months"],
               "tip": "",
@@ -694,7 +694,7 @@
               "gpsLocation": ""
             },
             {
-              "_id": "69282a8b46ad572ba097e0a8",
+              "_id": "11485b1b4e03495f8c24643c",
               "externalId": "Q7_1764240010384-1764240011802",
               "question": ["Access to Healthcare"],
               "tip": "",
@@ -760,7 +760,7 @@
               "file": ""
             },
             {
-              "_id": "69282a8b46ad572ba097e0a8",
+              "_id": "9557125659a84438879f25bf",
               "externalId": "Q7_1764240010384-1764240011802",
               "question": ["Healthcare Barriers"],
               "tip": "",
@@ -825,7 +825,7 @@
       "name": "Physical Capital",
       "questions": [
         {
-          "_id": "",
+          "_id": "a0ae2e43307d48cbbd338de4",
           "externalId": "",
           "question": "Asset Ownership",
           "columnCount": 1,
@@ -935,7 +935,7 @@
           ]
         },
         {
-          "_id": "",
+          "_id": "e661e05460f04eac888c03ee",
           "externalId": "",
           "question": "Housing & Infrastructure",
           "columnCount": 1,
@@ -986,7 +986,7 @@
           "file": "",
           "pageQuestions": [
             {
-              "_id": "69282a8b46ad572ba097e0a6",
+              "_id": "29dbbedad3424da5ae0c793e",
               "externalId": "Q5_1764240010384-1764240011801",
               "question": [
                 "Housing Quality"
@@ -1062,7 +1062,7 @@
               "file": ""
             },
             {
-              "_id": "69282a8b46ad572ba097e0a7",
+              "_id": "7d15a75d565d49ed8d82052b",
               "externalId": "Q6_1764240010384-1764240011801",
               "question": [
                 "Water Access"
@@ -1134,11 +1134,10 @@
               "gpsLocation": ""
             },
             {
-              "_id": "69282a8b46ad572ba097e0a8",
+              "_id": "b7f331f51be74a3b9cd9ec26",
               "externalId": "Q7_1764240010384-1764240011802",
               "question": [
-                "Which digital platforms do students have access to for science learning?",
-                ""
+                "Which digital platforms do students have access to for science learning?"
               ],
               "tip": "",
               "hint": "",
@@ -1209,7 +1208,7 @@
           ]
         },
         {
-          "_id": "",
+          "_id": "40fa743e57cc4bc8b6748933",
           "externalId": "",
           "question": "",
           "tip": "",
@@ -1396,8 +1395,7 @@
               "_id": "69282a8b46ad572ba097e0ab",
               "externalId": "Q10_1764240010384-1764240011804",
               "question": [
-                "On a scale of 1 to 10, how clearly were students able to articulate the science concept after the class?",
-                ""
+                "On a scale of 1 to 10, how clearly were students able to articulate the science concept after the class?"
               ],
               "tip": "",
               "hint": "",
@@ -1410,7 +1408,9 @@
               "options": [],
               "sliderOptions": [],
               "children": [],
-              "questionGroup": ["A1"],
+              "questionGroup": [
+                "A1"
+              ],
               "questionType": "auto",
               "modeOfCollection": "onfield",
               "usedForScoring": "",
@@ -1463,7 +1463,7 @@
       "name": "Financial",
       "questions": [
         {
-          "_id": "",
+          "_id": "34e74dfc5e5b483891683051",
           "externalId": "",
           "question": "Household Income",
           "columnCount": 1,
@@ -1516,7 +1516,9 @@
             {
               "_id": "69282a8b46ad572ba097e0a24",
               "externalId": "Q1_1764240010384-1764240011797",
-              "question": ["Total Household Income (Monthly, ZAR)"],
+              "question": [
+                "Total Household Income (Monthly, ZAR)"
+              ],
               "tip": "",
               "hint": "",
               "responseType": "number",
@@ -1528,7 +1530,9 @@
               "options": [],
               "sliderOptions": [],
               "children": [],
-              "questionGroup": ["A1"],
+              "questionGroup": [
+                "A1"
+              ],
               "questionType": "auto",
               "modeOfCollection": "onfield",
               "usedForScoring": "",
@@ -1573,7 +1577,9 @@
             {
               "_id": "69282a8b46ad572ba097e0a34",
               "externalId": "Q2_1764240010384-1764240011799",
-              "question": ["Income Sources (Select all that apply)"],
+              "question": [
+                "Income Sources (Select all that apply)"
+              ],
               "tip": "",
               "hint": "",
               "responseType": "multiselect",
@@ -1602,7 +1608,8 @@
                 {
                   "value": "R5",
                   "label": "Agricultural production"
-                },{
+                },
+                {
                   "value": "R6",
                   "label": "Social grants"
                 },
@@ -1617,7 +1624,9 @@
               ],
               "sliderOptions": [],
               "children": [],
-              "questionGroup": ["A1"],
+              "questionGroup": [
+                "A1"
+              ],
               "questionType": "auto",
               "modeOfCollection": "onfield",
               "usedForScoring": "",
@@ -1665,7 +1674,7 @@
           ]
         },
         {
-          "_id": "",
+          "_id": "6ade86b52e184d8f99035d6a",
           "externalId": "",
           "question": "Financial Services & Savings",
           "columnCount": 1,
@@ -1716,7 +1725,7 @@
           "file": "",
           "pageQuestions": [
             {
-              "_id": "69282a8b46ad572ba097e0a6",
+              "_id": "5e2f9ff7d5cb4a2c95be6ed9",
               "externalId": "Q5_1764240010384-1764240011801",
               "question": [
                 "Financial Services Used (Select all that apply)"
@@ -1745,7 +1754,9 @@
               ],
               "sliderOptions": [],
               "children": [],
-              "questionGroup": ["A1"],
+              "questionGroup": [
+                "A1"
+              ],
               "questionType": "auto",
               "modeOfCollection": "onfield",
               "usedForScoring": "",
@@ -1788,7 +1799,7 @@
               "file": ""
             },
             {
-              "_id": "69282a8b46ad572ba097e0a7",
+              "_id": "faf92b35a9ee4dfd940016a1",
               "externalId": "Q6_1764240010384-1764240011801",
               "question": [
                 "Total Savings Amount (ZAR)"
@@ -1804,7 +1815,9 @@
               "options": [],
               "sliderOptions": [],
               "children": [],
-              "questionGroup": ["A1"],
+              "questionGroup": [
+                "A1"
+              ],
               "questionType": "auto",
               "modeOfCollection": "onfield",
               "usedForScoring": "",
@@ -1847,7 +1860,7 @@
               "gpsLocation": ""
             },
             {
-              "_id": "69282a8b46ad572ba097e0a8",
+              "_id": "88423c9165a64a82918bac90",
               "externalId": "Q7_1764240010384-1764240011802",
               "question": [
                 "Savings Location (Select all that apply)"
@@ -1876,7 +1889,9 @@
               ],
               "sliderOptions": [],
               "children": [],
-              "questionGroup": ["A1"],
+              "questionGroup": [
+                "A1"
+              ],
               "questionType": "auto",
               "modeOfCollection": "onfield",
               "usedForScoring": "",
@@ -1921,7 +1936,7 @@
           ]
         },
         {
-          "_id": "",
+          "_id": "5d1d6ac3fb384e4b8dbbc21f",
           "externalId": "",
           "question": "Debt & Borrowing",
           "columnCount": 1,
@@ -1972,7 +1987,7 @@
           "file": "",
           "pageQuestions": [
             {
-              "_id": "69282a8b46ad572ba097e0a9",
+              "_id": "ac176a0eba814b37b83b721a",
               "externalId": "Q8_1764240010384-1764240011802",
               "question": [
                 "Total Debt/Loans Outstanding (ZAR)"
@@ -1988,7 +2003,9 @@
               "options": [],
               "sliderOptions": [],
               "children": [],
-              "questionGroup": ["A1"],
+              "questionGroup": [
+                "A1"
+              ],
               "questionType": "auto",
               "modeOfCollection": "onfield",
               "usedForScoring": "",
@@ -2032,7 +2049,7 @@
               "file": ""
             },
             {
-              "_id": "69282a8b46ad572ba097e0aa",
+              "_id": "0b170846ec234eeb9e59730b",
               "externalId": "Q9_1764240010384-1764240011803",
               "question": [
                 "Purpose of Debt/Loans"
@@ -2048,7 +2065,9 @@
               "options": [],
               "sliderOptions": [],
               "children": [],
-              "questionGroup": ["A1"],
+              "questionGroup": [
+                "A1"
+              ],
               "questionType": "auto",
               "modeOfCollection": "onfield",
               "usedForScoring": "",
@@ -2099,7 +2118,7 @@
       "name": "Outcomes",
       "questions": [
         {
-          "_id": "",
+          "_id": "d87a5e3fc9034137a41e0abb",
           "externalId": "",
           "question": "Economic Outcomes",
           "columnCount": 1,
@@ -2152,7 +2171,9 @@
             {
               "_id": "69282a8b46ad572ba097e0a25",
               "externalId": "Q1_1764240010384-1764240011797",
-              "question": ["Per Person Income (Monthly, ZAR)"],
+              "question": [
+                "Per Person Income (Monthly, ZAR)"
+              ],
               "tip": "",
               "hint": "",
               "responseType": "number",
@@ -2164,7 +2185,9 @@
               "options": [],
               "sliderOptions": [],
               "children": [],
-              "questionGroup": ["A1"],
+              "questionGroup": [
+                "A1"
+              ],
               "questionType": "auto",
               "modeOfCollection": "onfield",
               "usedForScoring": "",
@@ -2209,7 +2232,9 @@
             {
               "_id": "69282a8b46ad572ba097e0a35",
               "externalId": "Q2_1764240010384-1764240011799",
-              "question": ["Food Security Level"],
+              "question": [
+                "Food Security Level"
+              ],
               "tip": "",
               "hint": "",
               "responseType": "multiselect",
@@ -2230,7 +2255,9 @@
               ],
               "sliderOptions": [],
               "children": [],
-              "questionGroup": ["A1"],
+              "questionGroup": [
+                "A1"
+              ],
               "questionType": "auto",
               "modeOfCollection": "onfield",
               "usedForScoring": "",
@@ -2278,7 +2305,7 @@
           ]
         },
         {
-          "_id": "",
+          "_id": "798ec0d06cf845228cf46b39",
           "externalId": "",
           "question": "Social Empowerment Scales",
           "columnCount": 1,
@@ -2329,7 +2356,7 @@
           "file": "",
           "pageQuestions": [
             {
-              "_id": "69282a8b46ad572ba097e0a6",
+              "_id": "2726b9d3813744d58bd40cca",
               "externalId": "Q5_1764240010384-1764240011801",
               "question": [
                 "Self-Esteem Scale (1 = Very Low, 10 = Very High)"
@@ -2345,13 +2372,17 @@
               "options": [],
               "sliderOptions": [],
               "children": [],
-              "questionGroup": ["A1"],
+              "questionGroup": [
+                "A1"
+              ],
               "questionType": "auto",
               "modeOfCollection": "onfield",
               "usedForScoring": "",
               "fileName": [],
               "validation": {
-                "required": true
+                "required": true,
+                "max": "10",
+                "min": "1"
               },
               "accessibility": "No",
               "canBeNotApplicable": "false",
@@ -2388,7 +2419,7 @@
               "file": ""
             },
             {
-              "_id": "69282a8b46ad572ba097e0a7",
+              "_id": "e48dc019cff6431386dc2e68",
               "externalId": "Q6_1764240010384-1764240011801",
               "question": [
                 "Agency/Control Scale (1 = No Control, 10 = Full Control)"
@@ -2404,14 +2435,18 @@
               "options": [],
               "sliderOptions": [],
               "children": [],
-              "questionGroup": ["A1"],
+              "questionGroup": [
+                "A1"
+              ],
               "questionType": "auto",
               "modeOfCollection": "onfield",
               "usedForScoring": "",
               "file": "",
               "fileName": [],
               "validation": {
-                "required": true
+                "required": true,
+                "max": "10",
+                "min": "1"
               },
               "accessibility": "No",
               "canBeNotApplicable": "false",
@@ -2447,7 +2482,7 @@
               "gpsLocation": ""
             },
             {
-              "_id": "69282a8b46ad572ba097e0a8",
+              "_id": "23edaeb022d54fee9e1ec096",
               "externalId": "Q7_1764240010384-1764240011802",
               "question": [
                 "Social Inclusion Scale (1 = Very Excluded, 10 = Fully Included) *"
@@ -2463,13 +2498,17 @@
               "options": [],
               "sliderOptions": [],
               "children": [],
-              "questionGroup": ["A1"],
+              "questionGroup": [
+                "A1"
+              ],
               "questionType": "auto",
               "modeOfCollection": "onfield",
               "usedForScoring": "",
               "fileName": [],
               "validation": {
-                "required": true
+                "required": true,
+                "max": "10",
+                "min": "1"
               },
               "accessibility": "No",
               "canBeNotApplicable": "false",
@@ -2522,13 +2561,17 @@
               "options": [],
               "sliderOptions": [],
               "children": [],
-              "questionGroup": ["A1"],
+              "questionGroup": [
+                "A1"
+              ],
               "questionType": "auto",
               "modeOfCollection": "onfield",
               "usedForScoring": "",
               "fileName": [],
               "validation": {
-                "required": true
+                "required": true,
+                "max": "10",
+                "min": "1"
               },
               "accessibility": "No",
               "canBeNotApplicable": "false",
@@ -2626,7 +2669,9 @@
             {
               "_id": "69282a8b46ad572ba097e0a26",
               "externalId": "Q1_1764240010384-1764240011797",
-              "question": ["Current Livelihood Activities *"],
+              "question": [
+                "Current Livelihood Activities *"
+              ],
               "tip": "",
               "hint": "",
               "responseType": "text",
@@ -2638,7 +2683,9 @@
               "options": [],
               "sliderOptions": [],
               "children": [],
-              "questionGroup": ["A1"],
+              "questionGroup": [
+                "A1"
+              ],
               "questionType": "auto",
               "modeOfCollection": "onfield",
               "usedForScoring": "",
@@ -2683,7 +2730,9 @@
             {
               "_id": "69282a8b46ad572ba097e0a36",
               "externalId": "Q2_1764240010384-1764240011799",
-              "question": ["Livelihood Aspirations *"],
+              "question": [
+                "Livelihood Aspirations *"
+              ],
               "tip": "",
               "hint": "",
               "responseType": "textDescription",
@@ -2695,7 +2744,9 @@
               "options": [],
               "sliderOptions": [],
               "children": [],
-              "questionGroup": ["A1"],
+              "questionGroup": [
+                "A1"
+              ],
               "questionType": "auto",
               "modeOfCollection": "onfield",
               "usedForScoring": "",
@@ -2794,7 +2845,7 @@
           "file": "",
           "pageQuestions": [
             {
-              "_id": "69282a8b46ad572ba097e0a6",
+              "_id": "dce4f1377dfa47279b035db0",
               "externalId": "Q5_1764240010384-1764240011801",
               "question": [
                 "Skills Gaps (Select all that apply)"
@@ -2823,7 +2874,9 @@
               ],
               "sliderOptions": [],
               "children": [],
-              "questionGroup": ["A1"],
+              "questionGroup": [
+                "A1"
+              ],
               "questionType": "auto",
               "modeOfCollection": "onfield",
               "usedForScoring": "",
@@ -2866,7 +2919,7 @@
               "file": ""
             },
             {
-              "_id": "69282a8b46ad572ba097e0a7",
+              "_id": "33cf0f6d427b46ddb676e146",
               "externalId": "Q6_1764240010384-1764240011801",
               "question": [
                 "Main Barriers Remaining (Select all that apply)"
@@ -2895,7 +2948,9 @@
               ],
               "sliderOptions": [],
               "children": [],
-              "questionGroup": ["A1"],
+              "questionGroup": [
+                "A1"
+              ],
               "questionType": "auto",
               "modeOfCollection": "onfield",
               "usedForScoring": "",
@@ -2938,7 +2993,7 @@
               "gpsLocation": ""
             },
             {
-              "_id": "69282a8b46ad572ba097e0a8",
+              "_id": "75be45a5b6ab4d0f9cc7e6b9",
               "externalId": "Q7_1764240010384-1764240011802",
               "question": [
                 "Support Needed to Overcome Barriers"
@@ -2954,7 +3009,9 @@
               "options": [],
               "sliderOptions": [],
               "children": [],
-              "questionGroup": ["A1"],
+              "questionGroup": [
+                "A1"
+              ],
               "questionType": "auto",
               "modeOfCollection": "onfield",
               "usedForScoring": "",
@@ -2997,7 +3054,7 @@
               "file": ""
             },
             {
-              "_id": "69282a8b46ad572ba097e0a81",
+              "_id": "8206debf4606430aa1cf3c01",
               "externalId": "Q7_1764240010384-1764240011802",
               "question": [
                 "Future Goals (Next 12 Months)"

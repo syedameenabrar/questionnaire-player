@@ -202,7 +202,16 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
     this.queryParamsService.parseQueryParams();
     this.submissionId = this.queryParamsService?.submissionId || this.submissionId || "";
     this.evidenceCode = this.queryParamsService?.evidenceCode || this.evidenceCode;
-    this.sectionIndex = this.queryParamsService?.sectionIndex || 0;
+    
+    // Preserve current sectionIndex - only set from query params if explicitly provided and not already set
+    // This prevents resetting sectionIndex to 0 when getQueryParms is called during form updates
+    if (this.queryParamsService?.sectionIndex !== undefined && this.queryParamsService?.sectionIndex !== null) {
+      // Only update if sectionIndex hasn't been set yet (initial load) or if query param explicitly provides a value
+      if (this.sectionIndex === 0 && this.queryParamsService.sectionIndex !== 0) {
+        this.sectionIndex = this.queryParamsService.sectionIndex;
+      }
+    }
+    // Don't reset to 0 if sectionIndex is already set - preserve user's current tab selection
 
     // if (!submissionId || !evidenceCode) {
     //   return null;
@@ -288,9 +297,22 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
   }
   
   async updateDataInIndexDb(updatedAnswers) {
+    // Preserve current sectionIndex before calling getQueryParms
+    const currentSectionIndex = this.sectionIndex;
+    
     const queryParamsData = await this.getQueryParms();
     const indexDbKey = queryParamsData?.indexDbKey;
     const evidenceCode = queryParamsData?.evidenceCode;
+    
+    // Restore sectionIndex if it was changed by getQueryParms
+    if (this.sectionIndex !== currentSectionIndex) {
+      this.sectionIndex = currentSectionIndex;
+      // Also sync with sectionTabs component
+      if (this.sectionTabs) {
+        this.sectionTabs.sectionIndex = currentSectionIndex;
+      }
+    }
+    
     if (!indexDbKey || indexDbKey === 'undefined') {
       return false;
     }
@@ -459,7 +481,6 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
               },
             }
           );
-          console.log('assessment sagar sections', sections);
           this.submissionId = this.assessment.assessment.submissionId;
           this.evidenceCode = this.assessment.assessment.evidences[0].code;
 
@@ -493,19 +514,41 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
 
 
   getQuestionMap() {
+    // Reset questionMap and pageMsg to prevent duplicates on multiple renders
+    this.questionMap = {};
+    this.pageMsg.clear();
+    
+    // Check if pagination is enabled (default to true for backward compatibility)
+    const enablePagination = this.apiConfig?.enablePagination !== false;
+    
     for (
       let sectionIndex = 0;
       sectionIndex < this.sections.length;
       sectionIndex++
     ) {
+      // Track question index within section for non-paginated mode
+      let questionIndexInSection = 0;
+      
       for (
         let questionIndex = 0;
         questionIndex < this.sections[sectionIndex].questions.length;
         questionIndex++
       ) {
-        this.questionMap[
-          `${this.sections[sectionIndex].name} - Page ${questionIndex + 1}`
-        ] = [];
+        // Determine the map key based on enablePagination
+        let mapKey: string;
+        if (enablePagination) {
+          // Paginated mode: Group by "Section - Page X"
+          mapKey = `${this.sections[sectionIndex].name} - Page ${questionIndex + 1}`;
+        } else {
+          // Non-paginated mode: Group by section name only
+          mapKey = `${this.sections[sectionIndex].name} - ${this.sections[sectionIndex].questions[questionIndex].question} ${questionIndex + 1}`;
+        }
+        
+        // Initialize the map key if it doesn't exist
+        if (!this.questionMap[mapKey]) {
+          this.questionMap[mapKey] = [];
+        }
+        
         if (
           this.sections[sectionIndex].questions[questionIndex].responseType ==
           'pageQuestions'
@@ -545,21 +588,23 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
                   .pageQuestions[pqIndex].responseType == 'slider'
               ) {
                 this.pageMsg.set(
-                  `${this.sections[sectionIndex].name} - Page ${questionIndex + 1}`,
+                  mapKey,
                   'Please review your response to the slider question on this page'
                 );
               }
               this.setQuestionMap(
                 sectionIndex,
-                questionIndex,
+                enablePagination ? questionIndex : questionIndexInSection,
                 this.sections[sectionIndex].questions[questionIndex]
                   .pageQuestions[pqIndex].validation,
                 value,
                 this.sections[sectionIndex].questions[questionIndex]
                   .pageQuestions[pqIndex]._id,
                 this.sections[sectionIndex].questions[questionIndex]
-                  .pageQuestions[pqIndex].questionNumber
+                  .pageQuestions[pqIndex].questionNumber,
+                mapKey
               );
+              questionIndexInSection++;
             }
           }
         } else {
@@ -587,19 +632,21 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
                 .responseType == 'slider'
             ) {
               this.pageMsg.set(
-                `${this.sections[sectionIndex].name} - Page ${questionIndex + 1}`,
+                mapKey,
                 'Please review your response to the slider question on this page'
               );
             }
             this.setQuestionMap(
               sectionIndex,
-              questionIndex,
+              enablePagination ? questionIndex : questionIndexInSection,
               this.sections[sectionIndex].questions[questionIndex].validation,
               value,
               this.sections[sectionIndex].questions[questionIndex]._id,
               this.sections[sectionIndex].questions[questionIndex]
-                .questionNumber
+                .questionNumber,
+              mapKey
             );
+            questionIndexInSection++;
           }
         }
       }
@@ -613,7 +660,7 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
     });
   }
 
-  setQuestionMap(sectionIndex, qIndex, qValidation, qValue, questionId, qNum) {
+  setQuestionMap(sectionIndex, qIndex, qValidation, qValue, questionId, qNum, mapKey?: string) {
     const validation = qValidation;
     const value = qValue;
     const question = {
@@ -625,26 +672,46 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
             ? '#A30000'
             : '#595959',
       sectionName: this.sections[sectionIndex].name,
+      sectionIndex: sectionIndex,
       pageIndex: qIndex,
       questionNumber: qNum,
     };
-    this.questionMap[`${this.sections[sectionIndex].name} - Page ${qIndex + 1}`].push(
-      question
-    );
+    
+    // Use provided mapKey or generate default based on pagination mode
+    const keyToUse = mapKey || `${this.sections[sectionIndex].name} - Page ${qIndex + 1}`;
+    
+    if (!this.questionMap[keyToUse]) {
+      this.questionMap[keyToUse] = [];
+    }
+    
+    // Check if question already exists in the map to prevent duplicates
+    const questionExists = this.questionMap[keyToUse].some(q => q._id === questionId);
+    if (!questionExists) {
+      this.questionMap[keyToUse].push(question);
+    }
   }
 
   enableRelevantPage() {
-    for (let i = 0; i < this.sections.length; i++) {
-      if (this.sections[i].name !== this.sectionName) {
-        this.domQuery(this.sections[i].name, 'none');
+    // Only hide/show sections if there's a single section (not using Material tabs)
+    // Material tabs handle visibility automatically for multiple sections
+    if (this.sections && this.sections.length === 1) {
+      // Single section mode: ensure it's visible
+      this.domQuery(this.sectionName, 'block');
+    } else if (this.sections && this.sections.length > 1) {
+      // Multiple sections mode: Material tabs handle visibility
+      // Just ensure all sections are visible (Material tabs will show/hide as needed)
+      for (let i = 0; i < this.sections.length; i++) {
+        const sectionElement = document.getElementById(this.sections[i].name);
+        if (sectionElement) {
+          // Remove any inline display styles to let Material tabs control visibility
+          sectionElement.style.display = '';
+        }
       }
     }
-
-    this.domQuery(this.sectionName, 'block');
+    
     if (document.getElementById('observation-ion-toolbar')) {
       document.getElementById('observation-ion-toolbar').style.display = 'block'
     }
-
   }
 
   domQuery(elemendId: string, action: string) {
@@ -892,8 +959,18 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
       return;
     }
     this.sectionName = section.name;
+    
+    // Sync sectionTabs component's sectionIndex before calling enableRelevantPage
+    if (this.sectionTabs && this.sectionTabs.sectionIndex !== idx) {
+      this.sectionTabs.sectionIndex = idx;
+    }
+    
     this.enableRelevantPage();
-    this.sectionTabs?.getCurrentMainComponent()?.enableRelevantPage();
+    
+    // Wait a bit for Material tabs to update before calling enableRelevantPage on main component
+    setTimeout(() => {
+      this.sectionTabs?.getCurrentMainComponent()?.enableRelevantPage();
+    }, 50);
     if (this._formValueChangesSub) {
       this._formValueChangesSub.unsubscribe();
     }
@@ -928,19 +1005,100 @@ export class MainWrapperComponent implements OnInit, OnChanges, OnDestroy {
 
   onTabChange(newIndex: number) {
     if (newIndex !== undefined && newIndex !== this.sectionIndex) {
+      // Ensure all sections are visible before switching (Material tabs will handle visibility)
+      if (this.sections && this.sections.length > 1) {
+        for (let i = 0; i < this.sections.length; i++) {
+          const sectionElement = document.getElementById(this.sections[i].name);
+          if (sectionElement) {
+            // Remove any inline display styles to let Material tabs control visibility
+            sectionElement.style.display = '';
+          }
+        }
+      }
       this.setSection(newIndex);
     }
   }
 
-  goToQuestion(questonId, pageIndex, sectionIndex) {
-    this.setSection(sectionIndex, true);
+  async goToQuestion(questonId, pageIndex, sectionIndex) {
+    // Check if pagination is enabled
+    const enablePagination = this.apiConfig?.enablePagination !== false;
+    
+    // Switch to the correct tab section first
+    if (sectionIndex !== this.sectionIndex) {
+      await this.setSection(sectionIndex, true);
+      // Wait for tab to switch and component to be ready
+      await new Promise(resolve => setTimeout(resolve, 200));
+    }
+    
     const mainComponent = this.sectionTabs?.getCurrentMainComponent();
     if (mainComponent) {
-      mainComponent.pageIndex = pageIndex;
-      mainComponent.handlePageEvent({
-        pageIndex: pageIndex,
-        questonId: questonId,
-      });
+      if (enablePagination) {
+        // Paginated mode: Use page navigation
+        mainComponent.pageIndex = pageIndex;
+        mainComponent.handlePageEvent({
+          pageIndex: pageIndex,
+          questonId: questonId,
+        });
+      } else {
+        // Non-paginated mode: Scroll directly to the question element
+        // Wait for DOM to be ready and Angular change detection to complete
+        await new Promise(resolve => setTimeout(resolve, 300));
+        
+        // Use requestAnimationFrame to ensure DOM is fully rendered
+        requestAnimationFrame(() => {
+          // Try multiple ways to find the question element
+          let questionElement = document.getElementById(questonId);
+          
+          // If not found by ID, try querySelector (for Angular component root elements)
+          if (!questionElement) {
+            questionElement = document.querySelector(`[id="${questonId}"]`) as HTMLElement;
+          }
+          
+          // If still not found, try to find the parent container
+          if (!questionElement) {
+            // Look for the input/component element and get its parent container
+            const inputElement = document.querySelector(`input[id="${questonId}"], textarea[id="${questonId}"], mat-radio-group[id="${questonId}"], mat-checkbox[id="${questonId}"]`);
+            if (inputElement) {
+              // Find the parent div with class 'responsive-margin' which wraps the question
+              questionElement = inputElement.closest('.responsive-margin') as HTMLElement;
+            }
+          }
+          
+          // If still not found, try finding by data attribute or any element containing the ID
+          if (!questionElement) {
+            const allElements = document.querySelectorAll(`[id*="${questonId}"]`);
+            if (allElements.length > 0) {
+              questionElement = allElements[0] as HTMLElement;
+            }
+          }
+          
+          if (questionElement) {
+            // Scroll to the element
+            questionElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Highlight the question briefly
+            const originalBoxShadow = questionElement.style.boxShadow;
+            const originalTransition = questionElement.style.transition;
+            questionElement.style.transition = 'box-shadow 0.3s';
+            questionElement.style.boxShadow = '0 0 15px rgba(0, 102, 0, 0.6)';
+            
+            // Focus on the input element if it exists
+            const inputElement = questionElement.querySelector('input, textarea, mat-radio-group, mat-checkbox') as HTMLElement;
+            if (inputElement && inputElement.focus) {
+              setTimeout(() => {
+                inputElement.focus();
+              }, 300);
+            }
+            
+            setTimeout(() => {
+              questionElement.style.boxShadow = originalBoxShadow;
+              questionElement.style.transition = originalTransition;
+            }, 2000);
+            } else {
+              console.warn(`Question element with ID "${questonId}" not found`);
+            }
+        });
+      }
     }
     this.closeModal();
   }
