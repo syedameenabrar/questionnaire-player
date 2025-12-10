@@ -228,7 +228,7 @@
               "question": ["Total Household Size"],
               "tip": "",
               "hint": "",
-              "responseType": "number",
+              "responseType": "fileUpload",
               "value": "",
               "isCompleted": false,
               "showRemarks": false,
@@ -277,7 +277,18 @@
               "startTime": "",
               "endTime": "",
               "gpsLocation": "",
-              "file": ""
+              "file": {
+                "required": true,
+                "type": [
+                    "image/jpeg",
+                    "docx",
+                    "pdf",
+                    "ppt"
+                ],
+                "minCount": 0,
+                "maxCount": 10,
+                "caption": "FALSE"
+              }
             },
             {
               "_id": "69282a8b46ad572ba097e0a7",

@@ -69,6 +69,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 import { PageQuestionsGridComponent } from './components/page-questions-grid/page-questions-grid.component';
 import { CardsQuestionsComponent } from './components/cards-questions/cards-questions.component';
+import { FileUploadInputComponent } from './components/file-upload-input/file-upload-input.component';
 
 const routes: Routes = [
   { path: 'observation', component: ObservationWrapperComponent }
@@ -117,7 +118,8 @@ const MAT_CUSTOM_DATE_FORMATS = {
     SpinnerComponent,
     SectionTabsComponent,
     PageQuestionsGridComponent,
-    CardsQuestionsComponent
+    CardsQuestionsComponent,
+    FileUploadInputComponent
     ],
   imports: [
     CommonModule,

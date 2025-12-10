@@ -112,6 +112,7 @@ export class PageQuestionsGridComponent implements OnInit, AfterViewInit {
       ...this.apiConfig,
       gridCount: data?.columnCount,
       usePageQuestionsGrid: false,
+      labelInputHorizontalLayout: false,
     };
   }
 }

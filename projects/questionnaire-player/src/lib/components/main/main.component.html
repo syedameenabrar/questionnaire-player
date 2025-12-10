@@ -46,9 +46,9 @@
       'mat-elevation-z8': question.responseType != 'pageQuestions' && apiConfig?.usePageQuestionsGrid === true,
       activeCard: question.responseType != 'pageQuestions' && apiConfig?.usePageQuestionsGrid === true , 'submitted' : (isSubmitted || isExpired)
     }" class="responsive-margin" *ngIf="!question.visibleIf?.length || question.canDisplay == true">
-    <div [ngClass]="{ content: question.responseType != 'pageQuestions' && apiConfig?.usePageQuestionsGrid === true }">
+    <div [ngClass]="{ content: question.responseType != 'pageQuestions' && apiConfig?.usePageQuestionsGrid === true }" [ngClass]="{'d-flex flex-dr flex-gap-10 flex-jc-space-between': apiConfig?.labelInputHorizontalLayout === true}">
       <div class="spaceBetweenContent">
-        <div *ngFor="let q of question.question; let qai = index" class="mb-20">
+        <div *ngFor="let q of question.question; let qai = index" class="mb-20" [ngClass]="{'label-container': apiConfig?.labelInputHorizontalLayout === true}">
           <div *ngIf="q != ''" class="wc-primary-color">
             {{ question.questionNumber ? question.questionNumber + " . " : "" }}&nbsp;{{ q }} <span *ngIf="question.validation.required" class="colorRed">*</span>
             <button *ngIf="question?.hint" mat-icon-button class="wc-primary-color"
@@ -85,6 +85,8 @@
           [question]="question"></lib-range-input>
         <lib-date-input [id]="question._id" tabindex="-1" *ngIf="question.responseType == reponseType.DATE" [questionnaireForm]="questionnaireForm"
           [question]="question"></lib-date-input>
+        <lib-file-upload-input [id]="question._id" tabindex="-1" *ngIf="question.responseType == reponseType.FILE_UPLOAD" [questionnaireForm]="questionnaireForm"
+          [question]="question" [fileSizeLimit]="fileSizeLimit"></lib-file-upload-input>
         <lib-matrix-questions *ngIf="question.responseType == reponseType.MATRIX"
           [questionnaireForm]="questionnaireForm" [question]="question" #libMatrix>
           <ng-template #libMainTemplateRef>
@@ -93,7 +95,7 @@
           </ng-template>
         </lib-matrix-questions>
         <lib-remarks [question]="question" *ngIf="question.showRemarks"></lib-remarks>
-        <lib-attachment *ngIf="question.file" [fileSizeLimit]="fileSizeLimit" [data]="{
+        <lib-attachment *ngIf="question.file && question.responseType != reponseType.FILE_UPLOAD" [fileSizeLimit]="fileSizeLimit" [data]="{
             submissionId: qService.getSubmissionId(),
             files: question.fileName
           }" [questionId]="question._id + qi" [fileSizeLimit]="fileSizeLimit" [questionFile]="question.file">
