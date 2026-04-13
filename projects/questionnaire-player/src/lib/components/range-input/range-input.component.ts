@@ -29,7 +29,7 @@ export class RangeInputComponent implements OnInit {
         ])
       );
       this.question.startTime = this.question.startTime || Date.now();
-      this.question.value = this.question.value ? this.question.value : '0';
+      this.question.value = this.question.value ?? null;
     });
     this.max && (this.options['max'] = +this.max)
     this.min && (this.options['min'] = +this.min)
