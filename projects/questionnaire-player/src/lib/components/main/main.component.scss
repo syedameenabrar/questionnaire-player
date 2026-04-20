@@ -33,9 +33,9 @@
 }
 
 @media screen and (max-width: 768px) {
-  .responsive-margin {
-    margin: 0.75rem !important;
-  }
+  // .responsive-margin {
+  //   margin: 0.75rem !important;
+  // }
   .spaceBetweenContent{
     display: block;
   }
@@ -73,13 +73,15 @@
   color: red;
 }
 
+.custom-font-grid{
+  font-size: 1rem;
+  display: grid;
+  gap: 1rem;
 
-
-
-
-
-
-
-
-
-
+  @media screen and (max-width: 900px) {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+  }
+}

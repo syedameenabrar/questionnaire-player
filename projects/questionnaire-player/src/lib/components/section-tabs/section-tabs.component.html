@@ -1,0 +1,39 @@
+<ng-container *ngIf="sections?.length > 1; else singleSection">
+  <mat-tab-group
+    [(selectedIndex)]="sectionIndex"
+    (selectedTabChange)="onTabChange($event)"
+    class="section-tabs"
+  >
+    <mat-tab
+      *ngFor="let section of sections; let secId = index"
+      [label]="section.name"
+    >
+      <span [id]="section.name" *ngIf="section.name">
+        <lib-cards-questions
+          #mainComponent
+          [questions]="section.questions"
+          [questionnaireForm]="questionnaireForm"
+          [isSubmitted]="isSubmitted"
+          [isExpired]="isExpired"
+          [fileSizeLimit]="fileSizeLimit"
+          [apiConfig]="apiConfig"
+        ></lib-cards-questions>
+      </span>
+    </mat-tab>
+  </mat-tab-group>
+</ng-container>
+
+<ng-template #singleSection>
+  <span [id]="sections?.[0]?.name" *ngIf="sections?.[0]?.name">
+    <lib-main
+      #mainComponent
+      [questions]="sections?.[0]?.questions"
+      [questionnaireForm]="questionnaireForm"
+      [isSubmitted]="isSubmitted"
+      [isExpired]="isExpired"
+      [fileSizeLimit]="fileSizeLimit"
+      [apiConfig]="apiConfig"
+    ></lib-main>
+  </span>
+</ng-template>
+

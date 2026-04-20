@@ -1,0 +1,76 @@
+::ng-deep {
+  .mat-mdc-tab-group, .mat-mdc-tab-nav-bar {
+    // Tab indicator (active tab underline)
+    --mdc-tab-indicator-active-indicator-color: var(--primary-color) !important;
+    // Tab label (text) - active
+    --mdc-tab-text-label-color-active: var(--primary-color) !important;
+    // Tab label (text) - inactive
+    --mdc-tab-text-label-color: rgba(0,0,0,0.6) !important;
+    // Pagination icons (left/right tab scroll arrows)
+    --mat-tab-header-pagination-icon-color: var(--primary-color) !important;
+    // Disable ripple color for tab header
+    --mat-tab-header-disabled-ripple-color: var(--primary-color) !important;
+  }
+
+  .mat-mdc-tab-label.mat-mdc-tab-label-active {
+    color: var(--primary-color) !important;
+    font-weight: 700;
+  }
+
+  .mat-mdc-tab-label:not(.mat-mdc-tab-label-active) {
+    color: rgba(0,0,0,0.6) !important;
+    font-weight: 600;
+  }
+
+  .mat-mdc-tab-header {
+    background-color: var(--tab-header-bg, #fff);
+  }
+  .mat-mdc-tab.mdc-tab {
+    height: 29px !important;
+    font-size: 14px !important;
+  }
+  .mat-mdc-tab.mdc-tab--active {
+    background-color: white !important;
+    border-radius:1rem !important
+  }
+  .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
+    color: #1e293b !important;
+    font-weight: 700;
+  }
+  .mat-mdc-tab-labels {
+    background-color: #f1f5f9 !important;
+    border-radius:1rem !important;
+    align-items: center !important;
+  }
+
+  .mat-mdc-tab.mdc-tab--active .mdc-tab-indicator {
+    display: none !important;
+  }
+
+  .mat-mdc-tab:not(.mdc-tab--active) .mdc-tab__text-label {
+    color: rgba(0,0,0,0.6) !important;
+    font-weight: 600;
+  }
+}
+
+.section-tabs {
+  margin-bottom: 1rem;
+}
+
+::ng-deep {
+  .section-tabs {
+    .mat-mdc-tab-header {
+      border-bottom: none
+    }
+
+    .mat-mdc-tab-label {
+      min-width: 120px;
+      padding: 12px 24px;
+    }
+
+    .mat-mdc-tab-body-wrapper {
+      padding-top: 1rem;
+    }
+  }
+}
+

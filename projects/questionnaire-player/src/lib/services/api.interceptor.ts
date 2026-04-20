@@ -72,18 +72,21 @@ export class ApiInterceptor implements HttpInterceptor {
   }
 
   async getToken(): Promise<string | null> {
+    if (this.apiService.token) {
+      return this.apiService.token;
+    }
     let token = localStorage.getItem('accToken');
     if (!token) {
       return null;
     }
-    const isValidToken = await this.utilService.validateToken(token);
-    if (!isValidToken) {
-      const data = await this.apiService.getAccessToken();
-      if (data) {
-        localStorage.setItem('accToken', data);
-        return data;
-      }
-    }
+    // const isValidToken = await this.utilService.validateToken(token);
+    // if (!isValidToken) {
+    //   const data = await this.apiService.getAccessToken();
+    //   if (data) {
+    //     localStorage.setItem('accToken', data);
+    //     return data;
+    //   }
+    // }
     return token;
   }
 

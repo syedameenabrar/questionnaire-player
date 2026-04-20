@@ -1,0 +1,29 @@
+<div class="custom-font">
+  <ng-container *ngIf="pageQuestions && pageQuestions.length > 0">
+    <ng-container *ngFor="
+        let question of pageQuestions;
+        let pageIndex = index;
+        trackBy: questionTrackBy
+      ">
+    <div
+      [id]="'page-group-' + pageIndex"
+      class="page-group-container"
+    >
+      <h3 class="page-header">{{question.question}}</h3>
+      <div class="questions-grid">
+        <lib-main
+          [questions]="question.pageQuestions"
+          [questionnaireForm]="questionnaireForm"
+          [fileUploadResponse]="fileUploadResponse"
+          [questionnaireInstance]="true"
+          [fileSizeLimit]="fileSizeLimit"
+          [isSubmitted]="isSubmitted"
+          [isExpired]="isExpired"
+          [apiConfig]="getSafeApiConfig(question)"
+        ></lib-main>
+      </div>
+    </div>
+    </ng-container>
+  </ng-container>
+</div>
+
